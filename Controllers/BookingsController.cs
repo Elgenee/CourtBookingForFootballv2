@@ -51,7 +51,7 @@ namespace CourtBookingSystem.Controllers
             var courts = await GetBookableCourtsAsync();
             if (courts.Count == 0)
             {
-                TempData["Error"] = "No courts are currently available for booking.";
+                TempData["Error"] = "No fields are currently available for booking.";
                 return RedirectToAction("Index", "Home");
             }
 
@@ -115,7 +115,7 @@ namespace CourtBookingSystem.Controllers
             var court = vm.Courts.FirstOrDefault(c => c.Id == vm.CourtId);
             if (court == null)
             {
-                ModelState.AddModelError(nameof(vm.CourtId), "Selected court is not available.");
+                ModelState.AddModelError(nameof(vm.CourtId), "Selected field is not available.");
                 return View(vm);
             }
 
@@ -231,7 +231,7 @@ namespace CourtBookingSystem.Controllers
             _db.Payments.Add(payment);
             await _db.SaveChangesAsync();
 
-            _logger.LogInformation("Booking {Ref} created for court {CourtId} on {Date} {Start}-{End}",
+            _logger.LogInformation("Booking {Ref} created for field {CourtId} on {Date} {Start}-{End}",
                 referenceNo, court.Id, booking.BookingDate, startTime, endTime);
 
 
@@ -248,7 +248,7 @@ namespace CourtBookingSystem.Controllers
             return RedirectToAction(nameof(Confirmation), new { reference = referenceNo });
         }
 
-        // GET /Bookings/PayMongoStart?reference=RC-...
+        // GET /Bookings/PayMongoStart?reference=GFC-...
         // Creates a PayMongo QR Ph Checkout Session for the booking and
         // either redirects to the hosted QR page or shows the embedded view.
         [HttpGet]
@@ -409,7 +409,7 @@ namespace CourtBookingSystem.Controllers
             return View(booking);
         }
 
-        // GET /Bookings/Confirmation/CB-20260201-ABC123
+        // GET /Bookings/Confirmation/GFC-20260201-ABC123
         [HttpGet]
         [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
         public async Task<IActionResult> Confirmation(string reference)
@@ -435,7 +435,7 @@ namespace CourtBookingSystem.Controllers
             return View(booking);
         }
 
-        // GET /Bookings/ConfirmationStatus?reference=RC-...
+        // GET /Bookings/ConfirmationStatus?reference=GFC-...
         // Lightweight polling endpoint used by the confirmation page while a
         // PayMongo webhook is still settling.
         [HttpGet]
@@ -474,7 +474,7 @@ namespace CourtBookingSystem.Controllers
             });
         }
 
-        // GET /Bookings/Receipt/RC-...
+        // GET /Bookings/Receipt/GFC-...
         // Mobile-friendly, print-optimized standalone receipt page.
         [HttpGet]
         public async Task<IActionResult> Receipt(string reference)
@@ -488,7 +488,7 @@ namespace CourtBookingSystem.Controllers
             return View(booking);
         }
 
-        // GET /Bookings/ReceiptPdf/RC-...
+        // GET /Bookings/ReceiptPdf/GFC-...
         // Returns the same receipt as a downloadable PDF (server-generated via QuestPDF).
         [HttpGet]
         public async Task<IActionResult> ReceiptPdf(
@@ -670,7 +670,7 @@ namespace CourtBookingSystem.Controllers
         private static string GenerateBookingReference()
         {
             var random = Guid.NewGuid().ToString("N").Substring(0, 6).ToUpperInvariant();
-            return $"RC-{PhilippineTime.Today:yyyyMMdd}-{random}";
+            return $"GFC-{PhilippineTime.Today:yyyyMMdd}-{random}";
         }
 
         private static string FormatTime(TimeSpan t) =>

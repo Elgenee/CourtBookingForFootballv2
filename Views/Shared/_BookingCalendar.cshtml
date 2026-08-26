@@ -47,9 +47,9 @@
                 <input id="calendar-month" name="month" type="month" value="@Model.MonthKey" class="form-control form-control-sm" />
             </div>
             <div class="form-group col-md-3">
-                <label for="calendar-court" class="small">Court</label>
+                <label for="calendar-court" class="small">Field</label>
                 <select id="calendar-court" name="courtId" class="form-control form-control-sm">
-                    <option value="">All courts</option>
+                    <option value="">All fields</option>
                     @foreach (var court in Model.Courts)
                     {
                         if (Model.CourtId == court.Id)

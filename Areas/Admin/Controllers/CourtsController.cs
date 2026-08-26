@@ -58,7 +58,7 @@ namespace CourtBookingSystem.Areas.Admin.Controllers
                 IsFullCourt = vm.IsFullCourt
             });
             await _db.SaveChangesAsync();
-            TempData["Success"] = $"Court '{vm.CourtName}' created.";
+            TempData["Success"] = $"Field '{vm.CourtName}' created.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -96,7 +96,7 @@ namespace CourtBookingSystem.Areas.Admin.Controllers
             court.IsFullCourt = vm.IsFullCourt;
 
             await _db.SaveChangesAsync();
-            TempData["Success"] = $"Court '{vm.CourtName}' updated.";
+            TempData["Success"] = $"Field '{vm.CourtName}' updated.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -111,12 +111,12 @@ namespace CourtBookingSystem.Areas.Admin.Controllers
             if (hasBookings)
             {
                 court.IsActive = false;
-                TempData["Success"] = $"Court '{court.CourtName}' deactivated (has existing bookings).";
+                TempData["Success"] = $"Field '{court.CourtName}' deactivated (has existing bookings).";
             }
             else
             {
                 _db.Courts.Remove(court);
-                TempData["Success"] = $"Court '{court.CourtName}' deleted.";
+                TempData["Success"] = $"Field '{court.CourtName}' deleted.";
             }
             await _db.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

@@ -14,7 +14,7 @@ namespace CourtBookingSystem.Controllers
         [HttpGet]
         public IActionResult Find(SportType? sport, DateTime? date, int? durationHours)
         {
-            ViewBag.Sport = sport ?? SportType.Pickleball;
+            ViewBag.Sport = sport ?? SportType.Football;
             ViewBag.Date = (date ?? PhilippineTime.Today).ToString("yyyy-MM-dd");
             ViewBag.Duration = durationHours.HasValue && durationHours.Value is >= 1 and <= 8 ? durationHours.Value : 1;
             ViewBag.MinDate = PhilippineTime.Today.ToString("yyyy-MM-dd");

@@ -54,7 +54,7 @@ namespace CourtBookingSystem.Areas.Admin.ViewModels
         public int Id { get; set; }
 
         [Required, StringLength(100)]
-        [Display(Name = "Court Name")]
+        [Display(Name = "Field Name")]
         public string CourtName { get; set; } = string.Empty;
 
         [Required, Display(Name = "Sport Type")]
@@ -68,10 +68,10 @@ namespace CourtBookingSystem.Areas.Admin.ViewModels
         [Display(Name = "Is Active")]
         public bool IsActive { get; set; } = true;
 
-        [Display(Name = "Court Group")]
+        [Display(Name = "Field Group")]
         public int? CourtGroupId { get; set; }
 
-        [Display(Name = "Is Full Court")]
+        [Display(Name = "Is Full Field")]
         public bool IsFullCourt { get; set; }
 
         // Populated by controller for the dropdown.
@@ -199,7 +199,7 @@ namespace CourtBookingSystem.Areas.Admin.ViewModels
 
     public class BlockedSlotFormViewModel
     {
-        [Required, Display(Name = "Court")]
+        [Required, Display(Name = "Field")]
         public int CourtId { get; set; }
 
         [Required, DataType(DataType.Date), Display(Name = "Blocked Date")]
@@ -239,7 +239,7 @@ namespace CourtBookingSystem.Areas.Admin.ViewModels
 
         // Court assignment (multi-select on Create / Edit). Order matters
         // for the UI hint only — the underlying relationship is unordered.
-        [Display(Name = "Member Courts")]
+        [Display(Name = "Member Fields")]
         public List<int> SelectedCourtIds { get; set; } = new();
 
         public List<Court> AvailableCourts { get; set; } = new();

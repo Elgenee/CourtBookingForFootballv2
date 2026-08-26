@@ -65,7 +65,7 @@ namespace CourtBookingSystem.Services.PayMongo
                     {
                         CancelUrl = BuildReturnUrl(_options.CancelUrl, booking, "cancel"),
                         SuccessUrl = BuildReturnUrl(_options.SuccessUrl, booking, "success"),
-                        Description = $"Royal Court booking {booking.BookingReferenceNo}",
+                        Description = $"Giuseppe Football booking {booking.BookingReferenceNo}",
                         ReferenceNumber = booking.BookingReferenceNo,
                         LineItems = new List<CheckoutSessionLineItem>
                         {
@@ -82,7 +82,7 @@ namespace CourtBookingSystem.Services.PayMongo
                         {
                             ["bookingId"] = booking.Id.ToString(),
                             ["bookingReference"] = booking.BookingReferenceNo,
-                            ["channel"] = "courtbooking-aspnet-mvc"
+                            ["channel"] = "giuseppe-football-aspnet-mvc"
                         }
                     }
                 }

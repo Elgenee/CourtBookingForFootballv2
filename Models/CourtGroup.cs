@@ -7,10 +7,10 @@ namespace CourtBookingSystem.Models
     /// Members of a group constrain each other's availability via the
     /// IsFullCourt flag on <see cref="Court"/>:
     ///
-    ///   - If a Full Court in the group has a booking at time T, every
+    ///   - If a Full Field in the group has a booking at time T, every
     ///     other court in the group (Full or Split) is unavailable at T.
-    ///   - If a Split Court in the group has a booking at time T, only
-    ///     the Full Court(s) in the group are unavailable — other Split
+    ///   - If a Split Field in the group has a booking at time T, only
+    ///     the Full Field(s) in the group are unavailable — other Split
     ///     Courts remain bookable.
     ///
     /// Courts with a null <c>CourtGroupId</c> are independent (no sharing).

@@ -43,7 +43,7 @@ namespace CourtBookingSystem.Areas.Staff.Controllers
                 ConfirmedTodayCount = todays.Count(b => b.BookingStatus == BookingStatus.Confirmed),
                 RevenueToday = revenueToday,
                 WalkInsToday = todays.Count(b =>
-                    b.CustomerEmail.EndsWith("@courtbook.local", StringComparison.OrdinalIgnoreCase)),
+                    b.CustomerEmail.EndsWith("@giuseppefootball.local", StringComparison.OrdinalIgnoreCase)),
                 UpcomingToday = todays
                     .Where(b => b.BookingStatus == BookingStatus.Confirmed
                              || b.BookingStatus == BookingStatus.Pending

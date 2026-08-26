@@ -15,7 +15,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>@ViewData["Title"] - Admin · CourtBook</title>
+    <title>@ViewData["Title"] - Admin · Giuseppe Football</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -50,8 +50,8 @@
         <!-- ============ SIDEBAR ============ -->
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="brand-link">
-                <i class="fas fa-table-tennis-paddle-ball brand-image ml-3" style="font-size:1.6rem; color:var(--brand-accent);"></i>
-                <span class="brand-text font-weight-bold">CourtBook Admin</span>
+                <i class="fas fa-futbol brand-image ml-3" style="font-size:1.6rem; color:var(--brand-accent);"></i>
+                <span class="brand-text font-weight-bold">Giuseppe Football Admin</span>
             </a>
 
             <div class="sidebar">
@@ -86,12 +86,12 @@
                         <li class="nav-header">CONFIGURATION</li>
                         <li class="nav-item">
                             <a asp-area="Admin" asp-controller="Courts" asp-action="Index" class="nav-link @active("Courts")">
-                                <i class="nav-icon fas fa-th-large"></i><p>Courts</p>
+                                <i class="nav-icon fas fa-th-large"></i><p>Fields</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a asp-area="Admin" asp-controller="CourtGroups" asp-action="Index" class="nav-link @active("CourtGroups")" data-testid="sidebar-court-groups-link">
-                                <i class="nav-icon fas fa-object-group"></i><p>Court Groups</p>
+                                <i class="nav-icon fas fa-object-group"></i><p>Field Groups</p>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -165,7 +165,7 @@
         </div>
 
         <footer class="main-footer text-sm">
-            <strong>&copy; @PhilippineTime.Now.Year CourtBook</strong> — Admin Console
+            <strong>&copy; @PhilippineTime.Now.Year Giuseppe Football</strong> — Admin Console
             <div class="float-right d-none d-sm-inline-block"><b>v</b> 0.4.0</div>
         </footer>
     </div>

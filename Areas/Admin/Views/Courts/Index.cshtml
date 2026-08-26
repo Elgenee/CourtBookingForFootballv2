@@ -1,15 +1,15 @@
 @model IEnumerable<CourtBookingSystem.Models.Court>
-@{ ViewData["Title"] = "Courts"; }
+@{ ViewData["Title"] = "Fields"; }
 
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="card-title mb-0"><i class="fas fa-th-large mr-2"></i>All Courts</h5>
-        <a asp-action="Create" class="btn btn-primary btn-sm"><i class="fas fa-plus mr-1"></i>New Court</a>
+        <h5 class="card-title mb-0"><i class="fas fa-th-large mr-2"></i>All Fields</h5>
+        <a asp-action="Create" class="btn btn-primary btn-sm"><i class="fas fa-plus mr-1"></i>New Field</a>
     </div>
     <div class="card-body p-0">
         @if (!Model.Any())
         {
-            <div class="p-4 text-muted text-center">No courts yet. Click "New Court" to add one.</div>
+            <div class="p-4 text-muted text-center">No fields yet. Click "New Field" to add one.</div>
         }
         else
         {
@@ -37,11 +37,11 @@
                                 <span class="badge badge-pill badge-secondary"><code class="text-white">@c.CourtGroup.GroupCode</code></span>
                                 @if (c.IsFullCourt)
                                 {
-                                    <span class="badge badge-primary ml-1" title="Full Court — booking it blocks every sibling"><i class="fas fa-expand-arrows-alt mr-1"></i>Full</span>
+                                    <span class="badge badge-primary ml-1" title="Full Field — booking it blocks every sibling"><i class="fas fa-expand-arrows-alt mr-1"></i>Full</span>
                                 }
                                 else
                                 {
-                                    <span class="badge badge-light border ml-1" title="Split Court — blocks only the Full Court(s) of its group">Split</span>
+                                    <span class="badge badge-light border ml-1" title="Split Field — blocks only the Full Field(s) of its group">Split</span>
                                 }
                             }
                             else { <span class="text-muted small">—</span> }
@@ -52,7 +52,7 @@
                         </td>
                         <td class="text-right">
                             <a asp-action="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i></a>
-                            <form asp-action="Delete" asp-route-id="@c.Id" method="post" class="d-inline" onsubmit="return confirm('Delete or deactivate this court?');">
+                            <form asp-action="Delete" asp-route-id="@c.Id" method="post" class="d-inline" onsubmit="return confirm('Delete or deactivate this field?');">
                                 @Html.AntiForgeryToken()
                                 <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
                             </form>

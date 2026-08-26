@@ -7,7 +7,7 @@
 <div class="row">
     <div class="col-lg-3 col-6">
         <div class="small-box admin-stat admin-stat-primary">
-            <div class="inner"><h3>@Model.ActiveCourts</h3><p>Active Courts</p></div>
+            <div class="inner"><h3>@Model.ActiveCourts</h3><p>Active Fields</p></div>
             <div class="icon"><i class="fas fa-th-large"></i></div>
             <a asp-controller="Courts" asp-action="Index" class="small-box-footer">Manage <i class="fas fa-arrow-circle-right"></i></a>
         </div>
@@ -52,7 +52,7 @@
                                 <tr>
                                     <th>Reference</th>
                                     <th>Customer</th>
-                                    <th>Court</th>
+                                    <th>Field</th>
                                     <th>When</th>
                                     <th>Status</th>
                                     <th class="text-right">Total</th>
@@ -79,7 +79,7 @@
     </div>
     <div class="col-lg-4">
         <div class="card">
-            <div class="card-header"><h5 class="card-title mb-0"><i class="fas fa-chart-pie mr-2"></i>Bookings by Sport</h5></div>
+            <div class="card-header"><h5 class="card-title mb-0"><i class="fas fa-chart-pie mr-2"></i>Bookings by Activity</h5></div>
             <div class="card-body">
                 @if (!Model.BookingsBySport.Any())
                 {

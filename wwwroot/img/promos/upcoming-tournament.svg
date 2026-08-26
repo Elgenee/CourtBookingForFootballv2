@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
-  <title id="title">Upcoming tournament at The Royall Courts</title>
-  <desc id="desc">A tournament poster with court lines, bracket paths, trophy, and The Royall Courts branding.</desc>
+  <title id="title">Upcoming tournament at Giuseppe</title>
+  <desc id="desc">A tournament poster with field lines, bracket paths, trophy, and Giuseppe branding.</desc>
   <defs>
     <linearGradient id="posterBg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#061b2f"/>
@@ -49,7 +49,7 @@
   </g>
 
   <g font-family="Source Sans Pro, Arial, sans-serif">
-    <text x="86" y="106" fill="#ffdf8a" font-size="24" font-weight="800" letter-spacing="3">THE ROYALL COURTS</text>
+    <text x="86" y="106" fill="#ffdf8a" font-size="24" font-weight="800" letter-spacing="3">Giuseppe</text>
     <text x="84" y="370" fill="#ffffff" font-size="68" font-weight="900">Upcoming</text>
     <text x="84" y="432" fill="#ffffff" font-size="68" font-weight="900">Tournament</text>
     <text x="88" y="474" fill="#ffffff" fill-opacity="0.82" font-size="27" font-weight="600">Registration opens soon. Compete, rally, and rise.</text>

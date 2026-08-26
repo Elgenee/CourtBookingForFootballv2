@@ -1,6 +1,6 @@
 @model CourtBookingSystem.Areas.Admin.ViewModels.CourtGroupFormViewModel
 @{
-    ViewData["Title"] = ViewData["Title"] ?? "Court Group";
+    ViewData["Title"] = ViewData["Title"] ?? "Field Group";
     var isEdit = Model.Id != 0;
     var formAction = isEdit ? "Edit" : "Create";
 }
@@ -25,13 +25,13 @@
                     <div class="form-row">
                         <div class="form-group col-md-4">
                             <label asp-for="GroupCode"></label>
-                            <input asp-for="GroupCode" class="form-control text-uppercase" placeholder="MAIN_COURT" data-testid="court-group-code-input" />
+                            <input asp-for="GroupCode" class="form-control text-uppercase" placeholder="FOOTBALL_FIELD" data-testid="court-group-code-input" />
                             <small class="form-text text-muted">Uppercase letters, digits, _ or -</small>
                             <span asp-validation-for="GroupCode" class="text-danger small"></span>
                         </div>
                         <div class="form-group col-md-8">
                             <label asp-for="GroupName"></label>
-                            <input asp-for="GroupName" class="form-control" placeholder="Main Convertible Court" data-testid="court-group-name-input" />
+                            <input asp-for="GroupName" class="form-control" placeholder="Football Field Group" data-testid="court-group-name-input" />
                             <span asp-validation-for="GroupName" class="text-danger small"></span>
                         </div>
                     </div>
@@ -45,11 +45,11 @@
                     </div>
 
                     <hr />
-                    <h6 class="text-muted mb-3"><i class="fas fa-th-large mr-1"></i>Member courts</h6>
+                    <h6 class="text-muted mb-3"><i class="fas fa-th-large mr-1"></i>Member fields</h6>
                     @if (!Model.AvailableCourts.Any())
                     {
                         <div class="alert alert-warning small">
-                            No assignable courts found. Create the courts first from <a asp-controller="Courts" asp-action="Index">Courts</a>,
+                            No assignable fields found. Create the fields first from <a asp-controller="Courts" asp-action="Index">Fields</a>,
                             then come back to add them to this group.
                         </div>
                     }
@@ -70,7 +70,7 @@
                                         <small class="text-muted">— @c.SportType</small>
                                         @if (c.IsFullCourt)
                                         {
-                                            <span class="badge badge-primary ml-1" title="Full Court — booking it blocks all siblings">Full</span>
+                                            <span class="badge badge-primary ml-1" title="Full Field — booking it blocks all siblings">Full</span>
                                         }
                                     </label>
                                 </div>
@@ -78,8 +78,8 @@
                         }
                         </div>
                         <small class="form-text text-muted mt-2">
-                            Tip: mark exactly one court as <strong>Full Court</strong> on its <em>Court</em> page if booking it should
-                            block every sibling. Split courts only block the Full Court(s) of their group.
+                            Tip: mark exactly one field as <strong>Full Field</strong> on its <em>Field</em> page if booking it should
+                            block every sibling. Split fields only block the Full Field(s) of their group.
                         </small>
                     }
                 </div>
@@ -108,7 +108,7 @@
                                 @if (c.IsFullCourt) {<span class="badge badge-primary ml-1">Full</span>}
                             </span>
                             <form asp-action="RemoveCourt" method="post" class="d-inline"
-                                  onsubmit="return confirm('Remove this court from the group?');">
+                                  onsubmit="return confirm('Remove this field from the group?');">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="groupId" value="@Model.Id" />
                                 <input type="hidden" name="courtId" value="@c.Id" />

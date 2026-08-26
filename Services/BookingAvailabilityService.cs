@@ -93,7 +93,7 @@ namespace CourtBookingSystem.Services
                 .ToListAsync();
             if (courts.Count == 0) return results;
 
-            // Materialize same-operating-day data once per court (still cross-provider safe).
+            // Materialize same-operating-day data once per field (still cross-provider safe).
             var now = PhilippineTime.Now;
             var duration = TimeSpan.FromHours(durationHours);
             var operatingRange = OperatingHoursHelper.GetOperatingRange(date, bh);

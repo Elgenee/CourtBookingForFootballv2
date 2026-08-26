@@ -11,7 +11,7 @@ namespace CourtBookingSystem.Models.Cms
         public int Id { get; set; }
 
         [Required, StringLength(140)]
-        public string Title { get; set; } = "About The Royall Courts";
+        public string Title { get; set; } = "About Giuseppe Football";
 
         [Required, StringLength(2000)]
         public string Description { get; set; } = string.Empty;

@@ -7,8 +7,8 @@ namespace CourtBookingSystem.ViewModels
 {
     public class BookingFormViewModel
     {
-        [Required(ErrorMessage = "Please choose a court.")]
-        [Display(Name = "Court")]
+        [Required(ErrorMessage = "Please choose a field.")]
+        [Display(Name = "Field")]
         public int CourtId { get; set; }
 
         [Required(ErrorMessage = "Please pick a date.")]

@@ -54,7 +54,7 @@ namespace CourtBookingSystem.Areas.Staff.Controllers
             var court = vm.Courts.FirstOrDefault(c => c.Id == vm.CourtId);
             if (court == null)
             {
-                ModelState.AddModelError(nameof(vm.CourtId), "Court not found.");
+                ModelState.AddModelError(nameof(vm.CourtId), "Field not found.");
                 return View(vm);
             }
 
@@ -130,11 +130,11 @@ namespace CourtBookingSystem.Areas.Staff.Controllers
             var pricingLabel = price.IsMixedRate
                 ? "mixed rates"
                 : price.IsPromoApplied ? "promo rate" : "regular rate";
-            var refNo = $"RC-{PhilippineTime.Today:yyyyMMdd}-{Guid.NewGuid().ToString("N")[..6].ToUpperInvariant()}";
+            var refNo = $"GFC-{PhilippineTime.Today:yyyyMMdd}-{Guid.NewGuid().ToString("N")[..6].ToUpperInvariant()}";
 
             // Walk-ins typically lack email; auto-generate a placeholder if blank.
             var email = string.IsNullOrWhiteSpace(vm.CustomerEmail)
-                ? $"walkin-{refNo.ToLowerInvariant()}@courtbook.local"
+                ? $"walkin-{refNo.ToLowerInvariant()}@giuseppefootball.local"
                 : vm.CustomerEmail.Trim();
 
             // Payment flow differs by method:

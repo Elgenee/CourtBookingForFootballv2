@@ -1,10 +1,10 @@
-# Test Credentials — Royal Court Booking System
+# Test Credentials — Giuseppe Football Booking System
 
 These are seeded by `DbSeeder.SeedAsync` on first run. They are unchanged
 from the upstream repository (this iteration does not modify auth).
 
 ## Admin
-- Email: `admin@courtbooking.com`
+- Email: `admin@giuseppefootball.com`
 - Password: `Admin@123`
 - Role: `Admin`
 
