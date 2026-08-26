@@ -24,7 +24,11 @@ namespace CourtBookingSystem.Services
         public async Task<WebsiteSetting> GetSettingsAsync()
         {
             if (_settings != null) return _settings;
-            _settings = await _db.WebsiteSettings.AsNoTracking().FirstOrDefaultAsync()
+            _settings = await _db.WebsiteSettings
+                .AsNoTracking()
+                .OrderByDescending(s => s.UpdatedDate)
+                .ThenByDescending(s => s.Id)
+                .FirstOrDefaultAsync()
                 ?? new WebsiteSetting();
             return _settings;
         }

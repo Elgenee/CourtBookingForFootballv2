@@ -33,7 +33,7 @@ namespace CourtBookingSystem.Areas.SuperAdmin.Controllers
         [HttpGet]
         public async Task<IActionResult> Website()
         {
-            var setting = await _db.WebsiteSettings.FirstOrDefaultAsync()
+            var setting = await GetEditableWebsiteSettingQuery().FirstOrDefaultAsync()
                 ?? new Models.Cms.WebsiteSetting();
 
             var vm = new WebsiteSettingsViewModel
@@ -54,7 +54,7 @@ namespace CourtBookingSystem.Areas.SuperAdmin.Controllers
         [RequestSizeLimit(MaxLogoBytes + 1024)]
         public async Task<IActionResult> Website(WebsiteSettingsViewModel vm)
         {
-            var setting = await _db.WebsiteSettings.FirstOrDefaultAsync();
+            var setting = await GetEditableWebsiteSettingQuery().FirstOrDefaultAsync();
             var isNew = setting == null;
             setting ??= new Models.Cms.WebsiteSetting();
 
@@ -105,6 +105,13 @@ namespace CourtBookingSystem.Areas.SuperAdmin.Controllers
         }
 
         // ---------- helpers ----------
+
+        private IQueryable<WebsiteSetting> GetEditableWebsiteSettingQuery()
+        {
+            return _db.WebsiteSettings
+                .OrderByDescending(s => s.UpdatedDate)
+                .ThenByDescending(s => s.Id);
+        }
 
         private async Task<string?> SaveLogoAsync(IFormFile file)
         {
