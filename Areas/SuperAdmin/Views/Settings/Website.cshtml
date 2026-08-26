@@ -85,6 +85,14 @@
                                asp-for="LandingColorScheme"
                                id="@inputId"
                                value="@scheme.Key"
+                               data-primary="@scheme.Primary"
+                               data-primary-dark="@scheme.PrimaryDark"
+                               data-accent="@scheme.Accent"
+                               data-background-soft="@scheme.BackgroundSoft"
+                               data-text-dark="@scheme.TextDark"
+                               data-primary-rgb="@scheme.PrimaryRgb"
+                               data-primary-dark-rgb="@scheme.PrimaryDarkRgb"
+                               data-accent-rgb="@scheme.AccentRgb"
                                data-testid="radio-color-scheme-@scheme.Key" />
                         <span class="color-scheme-card">
                             <span class="color-scheme-swatches" aria-hidden="true">
@@ -111,4 +119,29 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        (() => {
+            const inputs = document.querySelectorAll('input[name="LandingColorScheme"]');
+            const root = document.documentElement;
+
+            function applyScheme(input) {
+                root.style.setProperty('--brand-primary', input.dataset.primary);
+                root.style.setProperty('--brand-primary-dark', input.dataset.primaryDark);
+                root.style.setProperty('--brand-accent', input.dataset.accent);
+                root.style.setProperty('--brand-bg-soft', input.dataset.backgroundSoft);
+                root.style.setProperty('--brand-text-dark', input.dataset.textDark);
+                root.style.setProperty('--brand-primary-rgb', input.dataset.primaryRgb);
+                root.style.setProperty('--brand-primary-dark-rgb', input.dataset.primaryDarkRgb);
+                root.style.setProperty('--brand-accent-rgb', input.dataset.accentRgb);
+                document.body.dataset.colorScheme = input.value;
+            }
+
+            inputs.forEach(input => {
+                input.addEventListener('change', () => applyScheme(input));
+            });
+
+            const selected = document.querySelector('input[name="LandingColorScheme"]:checked');
+            if (selected) applyScheme(selected);
+        })();
+    </script>
 }
