@@ -11,7 +11,7 @@
         <div class="card cms-section-card">
             <div class="card-header"><i class="fas fa-bullhorn mr-2"></i> Add Promotion</div>
             <div class="card-body">
-                <form asp-action="Create" method="post" data-testid="form-create-promotion">
+                <form asp-action="Create" method="post" enctype="multipart/form-data" data-testid="form-create-promotion">
                     @Html.AntiForgeryToken()
                     <div class="form-group">
                         <label for="AnnouncementType">Type</label>
@@ -26,8 +26,14 @@
                         <textarea name="Description" id="Description" class="form-control" rows="3" maxlength="500" required></textarea>
                     </div>
                     <div class="form-group">
+                        <label for="ImageFile">Upload Image</label>
+                        <input name="ImageFile" id="ImageFile" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" class="form-control-file" />
+                        <small class="form-text text-muted">PNG, JPG, WebP, or SVG · max 5 MB</small>
+                    </div>
+                    <div class="form-group">
                         <label for="ImagePath">Image Path</label>
-                        <input name="ImagePath" id="ImagePath" class="form-control" value="/img/promos/months/august.svg" maxlength="260" required />
+                        <input name="ImagePath" id="ImagePath" class="form-control" value="/img/promos/months/august.svg" maxlength="260" />
+                        <small class="form-text text-muted">Optional when uploading a new image. You can keep this for existing SVGs or remote image URLs.</small>
                     </div>
                     <div class="form-group">
                         <label for="ImageAlt">Image Alt Text</label>
@@ -83,7 +89,7 @@
                 }
                 else
                 {
-                    <form asp-action="Update" method="post" data-testid="form-update-promotions">
+                    <form asp-action="Update" method="post" enctype="multipart/form-data" data-testid="form-update-promotions">
                         @Html.AntiForgeryToken()
                         <div class="promotion-admin-list">
                             @{ var index = 0; }
@@ -122,12 +128,17 @@
                                         <div class="form-row">
                                             <div class="form-group col-md-7">
                                                 <label>Image Path</label>
-                                                <input name="items[@index].ImagePath" value="@promo.ImagePath" class="form-control form-control-sm" maxlength="260" required />
+                                                <input name="items[@index].ImagePath" value="@promo.ImagePath" class="form-control form-control-sm" maxlength="260" />
                                             </div>
                                             <div class="form-group col-md-5">
                                                 <label>Alt Text</label>
                                                 <input name="items[@index].ImageAlt" value="@promo.ImageAlt" class="form-control form-control-sm" maxlength="180" />
                                             </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Replace Image</label>
+                                            <input name="items[@index].ImageFile" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" class="form-control-file form-control-sm" />
+                                            <small class="form-text text-muted">Leave blank to keep the current image.</small>
                                         </div>
                                         <div class="form-row">
                                             <div class="form-group col-md-4">

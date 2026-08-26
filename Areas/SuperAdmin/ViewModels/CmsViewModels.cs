@@ -97,9 +97,12 @@ namespace CourtBookingSystem.Areas.SuperAdmin.ViewModels
         [Required, StringLength(500)]
         public string Description { get; set; } = string.Empty;
 
-        [Required, StringLength(260)]
+        [StringLength(260)]
         [Display(Name = "Image Path")]
-        public string ImagePath { get; set; } = string.Empty;
+        public string? ImagePath { get; set; }
+
+        [Display(Name = "Upload Image")]
+        public IFormFile? ImageFile { get; set; }
 
         [StringLength(180)]
         [Display(Name = "Image Alt Text")]
