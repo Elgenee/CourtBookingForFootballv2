@@ -1,0 +1,67 @@
+@model IEnumerable<CourtBookingSystem.Models.Court>
+@{ ViewData["Title"] = "Courts"; }
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0"><i class="fas fa-th-large mr-2"></i>All Courts</h5>
+        <a asp-action="Create" class="btn btn-primary btn-sm"><i class="fas fa-plus mr-1"></i>New Court</a>
+    </div>
+    <div class="card-body p-0">
+        @if (!Model.Any())
+        {
+            <div class="p-4 text-muted text-center">No courts yet. Click "New Court" to add one.</div>
+        }
+        else
+        {
+            <div class="table-responsive">      
+            <table class="table table-hover mb-0">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Sport</th>
+                        <th>Group</th>
+                        <th>Status</th>
+                        <th>Active</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var c in Model)
+                {
+                    <tr>
+                        <td><strong>@c.CourtName</strong>@if (!string.IsNullOrWhiteSpace(c.Description)) {<div><small class="text-muted">@c.Description</small></div>}</td>
+                        <td><span class="badge badge-info">@c.SportType</span></td>
+                        <td>
+                            @if (c.CourtGroup != null)
+                            {
+                                <span class="badge badge-pill badge-secondary"><code class="text-white">@c.CourtGroup.GroupCode</code></span>
+                                @if (c.IsFullCourt)
+                                {
+                                    <span class="badge badge-primary ml-1" title="Full Court — booking it blocks every sibling"><i class="fas fa-expand-arrows-alt mr-1"></i>Full</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-light border ml-1" title="Split Court — blocks only the Full Court(s) of its group">Split</span>
+                                }
+                            }
+                            else { <span class="text-muted small">—</span> }
+                        </td>
+                        <td><span class="status-badge court-@c.Status">@c.Status</span></td>
+                        <td>
+                            @if (c.IsActive) {<span class="text-success"><i class="fas fa-check"></i></span>} else {<span class="text-muted"><i class="fas fa-times"></i></span>}
+                        </td>
+                        <td class="text-right">
+                            <a asp-action="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i></a>
+                            <form asp-action="Delete" asp-route-id="@c.Id" method="post" class="d-inline" onsubmit="return confirm('Delete or deactivate this court?');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+        }
+    </div>
+</div>

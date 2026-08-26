@@ -1,0 +1,117 @@
+@model IEnumerable<CourtBookingSystem.Models.Payment>
+@{
+    ViewData["Title"] = "Payments";
+    var current = ViewBag.FilterStatus as PaymentStatus?;
+}
+
+<div class="card">
+    <div class="card-header">
+        <ul class="nav nav-pills">
+            <li class="nav-item"><a asp-action="Index" class="nav-link @(current == null ? "active" : "")">All</a></li>
+            @foreach (var status in Enum.GetValues<PaymentStatus>())
+            {
+                <li class="nav-item">
+                    <a asp-action="Index" asp-route-status="@status" class="nav-link @(current == status ? "active" : "")">@status</a>
+                </li>
+            }
+        </ul>
+    </div>
+    <div class="card-body p-0">
+        @if (!Model.Any())
+        {
+            <div class="p-4 text-muted text-center">No payments match this filter.</div>
+        }
+        else
+        {
+            <div class="table-responsive">      
+            <table class="table table-hover mb-0">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Booking</th>
+                        <th>Customer</th>
+                        <th>Method</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Proof</th>
+                        <th>Confirmed By</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var p in Model)
+                {
+                    var canChangePaymentStatus = p.PaymentStatus is PaymentStatus.Unpaid or PaymentStatus.Submitted;
+                    <tr>
+                        <td>
+                            <a asp-controller="Bookings" asp-action="Details" asp-route-id="@p.BookingId" class="text-monospace">
+                                @p.Booking?.BookingReferenceNo
+                            </a><br />
+                            <small class="text-muted">@p.Booking?.Court?.CourtName</small>
+                        </td>
+                        <td>
+                            @p.Booking?.CustomerName<br />
+                            <small class="text-muted">@p.Booking?.CustomerEmail</small>
+                        </td>
+                        <td>@p.PaymentMethod</td>
+                        <td><strong>@p.Amount.ToString("0.00")</strong></td>
+                        <td><span class="status-badge payment-@p.PaymentStatus">@p.PaymentStatus</span></td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(p.ProofImagePath))
+                            {
+                                <img src="/@p.ProofImagePath" alt="Proof" class="proof-thumbnail"
+                                     data-toggle="modal" data-target="#proofModal"
+                                     data-src="/@p.ProofImagePath"
+                                     data-ref="@p.Booking?.BookingReferenceNo" />
+                            }
+                            else if (p.PaymentMethod == PaymentMethod.GCash)
+                            {
+                                <span class="text-muted small"><i class="fas fa-camera-slash"></i> none</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                        </td>
+                        <td>
+                            @if (p.ConfirmedByUser != null)
+                            {
+                                <small>@p.ConfirmedByUser.FullName<br /><span class="text-muted">@(p.ConfirmedDate.HasValue ? PhilippineTime.FromUtc(p.ConfirmedDate.Value).ToString("MMM d, h:mm tt") : null)</span></small>
+                            }
+                            else { <small class="text-muted">—</small> }
+                        </td>
+                        <td class="text-right">
+                            @if (canChangePaymentStatus)
+                            {
+                                <form asp-action="Approve" asp-route-id="@p.Id" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-success" title="Approve">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                                <form asp-action="Reject" asp-route-id="@p.Id" method="post" class="d-inline" onsubmit="return confirm('Reject this payment?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Reject">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <span class="text-muted small mr-2">Locked</span>
+                            }
+                            <a asp-area="Admin" asp-controller="Bookings" asp-action="Details" asp-route-id="@p.BookingId"
+                               class="btn btn-sm btn-outline-primary" title="View booking details"
+                               data-testid="admin-payment-details-link-@p.Id">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+            </div>
+        }
+    </div>
+</div>
+
+<partial name="_ProofModal" />

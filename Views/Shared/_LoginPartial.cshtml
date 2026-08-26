@@ -1,0 +1,64 @@
+@if (SignInManager.IsSignedIn(User))
+{
+    var user = await UserManager.GetUserAsync(User);
+    var roles = user != null ? await UserManager.GetRolesAsync(user) : new List<string>();
+    var primaryRole = roles.FirstOrDefault() ?? "Member";
+
+    <li class="nav-item dropdown">
+        <a class="nav-link" data-toggle="dropdown" href="#">
+            <i class="fas fa-user-circle"></i>
+            <span class="d-none d-md-inline ml-1">@(user?.FullName ?? User.Identity?.Name)</span>
+            <span class="badge badge-light ml-1">@primaryRole</span>
+        </a>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+            <span class="dropdown-item dropdown-header">@(user?.Email)</span>
+            <div class="dropdown-divider"></div>
+            @if (User.IsInRole("SuperAdmin"))
+            {
+                <a asp-area="SuperAdmin" asp-controller="Settings" asp-action="Website" class="dropdown-item" data-testid="link-superadmin-console">
+                    <i class="fas fa-crown mr-2"></i> CMS Console
+                </a>
+            }
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="dropdown-item">
+                    <i class="fas fa-tachometer-alt mr-2"></i> Admin Dashboard
+                </a>
+                <a asp-area="Staff" asp-controller="Dashboard" asp-action="Index" class="dropdown-item">
+                    <i class="fas fa-headset mr-2"></i> Staff Console
+                </a>
+                <div class="dropdown-divider"></div>
+            }
+            else if (User.IsInRole("Staff"))
+            {
+                <a asp-area="Staff" asp-controller="Dashboard" asp-action="Index" class="dropdown-item">
+                    <i class="fas fa-headset mr-2"></i> Staff Console
+                </a>
+                <div class="dropdown-divider"></div>
+            }
+            <a asp-area="Identity" asp-page="/Account/Manage/Index" class="dropdown-item">
+                <i class="fas fa-user-cog mr-2"></i> Manage Account
+            </a>
+            <div class="dropdown-divider"></div>
+            <form class="form-inline" asp-area="" asp-controller="Account" asp-action="Logout"  method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="dropdown-item">
+                    <i class="fas fa-sign-out-alt mr-2"></i> Log out
+                </button>
+            </form>
+        </div>
+    </li>
+}
+else
+{
+@*     <li class="nav-item">
+        <a class="nav-link" asp-area="Identity" asp-page="/Account/Register">
+            <i class="fas fa-user-plus mr-1"></i> Register
+        </a>
+    </li> *@
+    <li class="nav-item">
+        <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Login">
+            <i class="fas fa-sign-in-alt mr-1"></i> Log in
+        </a>
+    </li>
+}

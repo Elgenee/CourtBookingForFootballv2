@@ -1,0 +1,119 @@
+@model CourtBookingSystem.Models.Booking
+@using CourtBookingSystem.Models.Enums
+@{
+    ViewData["Title"] = "Payment Pending";
+    var payment = Model.Payments
+        .Where(p => p.PaymentMethod == PaymentMethod.PayMongoQrPh)
+        .OrderByDescending(p => p.Id)
+        .FirstOrDefault();
+    string formatTime(TimeSpan t) => PhilippineTime.FormatTime(t);
+    string bookingBadge(BookingStatus s) => $"status-badge status-{s}";
+    string paymentBadge(PaymentStatus? s) => $"status-badge payment-{s}";
+}
+
+<section class="section-default">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="confirmation-hero" data-testid="payment-pending-page">
+                    <div class="confirmation-check confirmation-check-Pending">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                    <h2 class="mb-1">Your payment is still being verified</h2>
+                    <p class="text-muted mb-3">
+                        We are waiting for PayMongo to confirm your QR Ph payment. QR Ph checkout expires after 3 minutes, and expired bookings are cancelled automatically.
+                    </p>
+                    <div class="confirmation-ref">
+                        <span class="label">Booking Reference</span>
+                        <span class="value">@Model.BookingReferenceNo</span>
+                    </div>
+                </div>
+
+                <div class="card booking-card mt-4">
+                    <div class="card-header">
+                        <i class="fas fa-calendar-check mr-2"></i>Booking Details
+                    </div>
+                    <div class="card-body">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">Court</dt>
+                            <dd class="col-sm-8">@Model.Court?.CourtName <span class="badge badge-info ml-1">@Model.Court?.SportType</span></dd>
+
+                            <dt class="col-sm-4">Date</dt>
+                            <dd class="col-sm-8">@Model.BookingDate.ToString("dddd, MMMM d, yyyy")</dd>
+
+                            <dt class="col-sm-4">Time</dt>
+                            <dd class="col-sm-8">@formatTime(Model.StartTime) - @formatTime(Model.EndTime)</dd>
+
+                            <dt class="col-sm-4">Booking Status</dt>
+                            <dd class="col-sm-8">
+                                <span id="booking-status" class="@bookingBadge(Model.BookingStatus)" data-testid="payment-pending-booking-status">@Model.BookingStatus</span>
+                            </dd>
+
+                            <dt class="col-sm-4">Payment Status</dt>
+                            <dd class="col-sm-8">
+                                <span id="payment-status" class="@paymentBadge(payment?.PaymentStatus)" data-testid="payment-pending-payment-status">@(payment?.PaymentStatus.ToString() ?? "Submitted")</span>
+                            </dd>
+
+                            <dt class="col-sm-4">Total Amount</dt>
+                            <dd class="col-sm-8"><strong class="confirmation-amount">@Model.TotalAmount.ToString("0.00") PHP</strong></dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <div class="card booking-card mt-3 border-primary">
+                    <div class="card-header">
+                        <i class="fas fa-qrcode mr-2"></i>PayMongo QR Ph
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info mb-3">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Your payment is still being verified. PayMongo will notify us once the payment is approved, or this booking will be cancelled when the 3-minute checkout window expires.
+                        </div>
+                        <a asp-action="PayMongoStart" asp-route-reference="@Model.BookingReferenceNo"
+                           class="btn btn-primary"
+                           data-testid="payment-pending-continue-btn">
+                            <i class="fas fa-qrcode mr-1"></i>Return to PayMongo
+                        </a>
+                        <a asp-action="Confirmation" asp-route-reference="@Model.BookingReferenceNo"
+                           class="btn btn-outline-secondary ml-2"
+                           data-testid="payment-pending-confirmation-btn">
+                            <i class="fas fa-calendar-check mr-1"></i>View Booking
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        (function () {
+            const ref = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.BookingReferenceNo));
+            const statusUrl = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Url.Action("ConfirmationStatus", "Bookings")));
+            const receiptUrl = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Url.Action("Receipt", "Bookings", new { reference = Model.BookingReferenceNo })));
+
+            async function pollStatus() {
+                try {
+                    const response = await fetch(statusUrl + "?reference=" + encodeURIComponent(ref), { cache: "no-store" });
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.paymentStatus === "Approved" || data.bookingStatus === "Confirmed") {
+                            window.location.href = receiptUrl;
+                            return;
+                        }
+                        if (data.paymentStatus === "Rejected" || data.bookingStatus === "Cancelled") {
+                            window.location.href = "/Bookings/Confirmation?reference=" + encodeURIComponent(ref);
+                            return;
+                        }
+                    }
+                } catch (error) {
+                }
+
+                window.setTimeout(pollStatus, 5000);
+            }
+
+            window.setTimeout(pollStatus, 5000);
+        })();
+    </script>
+}

@@ -1,0 +1,115 @@
+@model IEnumerable<CourtBookingSystem.Areas.Admin.ViewModels.UserListItemViewModel>
+@{
+    ViewData["Title"] = "User Management";
+    var search = ViewData["Search"] as string;
+    var resetLink = TempData["ResetLink"] as string;
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6"><h1>Users</h1></div>
+            <div class="col-sm-6 text-right">
+                <a asp-action="Create" class="btn btn-primary"><i class="fas fa-plus"></i> New User</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                @TempData["SuccessMessage"]
+                @if (!string.IsNullOrEmpty(resetLink))
+                {
+                    <div class="mt-2"><small>Link: <code>@resetLink</code></small></div>
+                }
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                @TempData["ErrorMessage"]
+            </div>
+        }
+
+        <div class="card">
+            <div class="card-header">
+                <form asp-action="Index" method="get" class="form-inline">
+                    <div class="input-group">
+                        <input type="text" name="search" value="@search" class="form-control" placeholder="Search by name, email, or username..." />
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="card-body table-responsive p-0">
+                <table class="table table-hover text-nowrap">
+                    <thead>
+                        <tr>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Username</th>
+                            <th>Phone</th>
+                            <th>Roles</th>
+                            <th>Confirmed</th>
+                            <th>Locked</th>
+                            <th class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var u in Model)
+                        {
+                            <tr>
+                                <td>@u.FullName</td>
+                                <td>@u.Email</td>
+                                <td>@u.UserName</td>
+                                <td>@u.PhoneNumber</td>
+                                <td>@u.Roles</td>
+                                <td>
+                                    @if (u.EmailConfirmed)
+                                    {
+                                        <span class="badge badge-success">Yes</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-secondary">No</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (u.LockedOut)
+                                    {
+                                        <span class="badge badge-warning">Locked</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-light">—</span>
+                                    }
+                                </td>
+                                <td class="text-right">
+                                    <a asp-action="Edit" asp-route-id="@u.Id" class="btn btn-sm btn-info" title="Edit"><i class="fas fa-edit"></i></a>
+                                    <a asp-action="AssignRoles" asp-route-id="@u.Id" class="btn btn-sm btn-secondary" title="Assign Roles"><i class="fas fa-user-tag"></i></a>
+                                    <a asp-action="ResetPassword" asp-route-id="@u.Id" class="btn btn-sm btn-warning" title="Reset Password"><i class="fas fa-key"></i></a>
+                                    <form asp-action="SendPasswordResetLink" asp-route-id="@u.Id" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-outline-warning" title="Send Reset Link (Forgot Password)"><i class="fas fa-envelope"></i></button>
+                                    </form>
+                                    <a asp-action="Delete" asp-route-id="@u.Id" class="btn btn-sm btn-danger" title="Delete"><i class="fas fa-trash"></i></a>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.Any())
+                        {
+                            <tr><td colspan="8" class="text-center text-muted py-4">No users found.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>

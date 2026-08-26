@@ -1,0 +1,444 @@
+@model CourtBookingSystem.ViewModels.BookingFormViewModel
+@using CourtBookingSystem.Models.Enums
+@{
+    ViewData["Title"] = "Book a Court";
+    var minDate = PhilippineTime.Today.ToString("yyyy-MM-dd");
+    var maxDate = PhilippineTime.Today.AddYears(5).ToString("yyyy-MM-dd");
+    var qrExpiryMinutes = (int)CourtBookingSystem.Services.PayMongoQrPhExpiryService.CheckoutLifetime.TotalMinutes;
+    var showPayMongoNote = Model.PaymentMethod == PaymentMethod.PayMongoQrPh;
+}
+
+<section class="section-default">
+    <div class="container">
+        <div class="row mb-3">
+            <div class="col">
+                <h2 class="mb-1">Book a Court</h2>
+                <p class="text-muted">Reserve your slot in under a minute. No account required.</p>
+            </div>
+        </div>
+
+        <form asp-action="Create" method="post" id="bookingForm" novalidate>
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+            <div class="row">
+                <!-- LEFT: Selection -->
+                <div class="col-lg-7">
+                    <div class="card booking-card mb-3">
+                        <div class="card-header"><i class="fas fa-table-tennis-paddle-ball mr-2"></i>1. Choose court &amp; time</div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group col-md-7">
+                                    <label asp-for="CourtId"></label>
+                                    <select asp-for="CourtId" class="form-control" id="CourtId">
+                                        @foreach (var court in Model.Courts)
+                                        {
+                                            <option value="@court.Id" data-sport="@court.SportType">
+                                                @court.CourtName — @court.SportType
+                                            </option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="CourtId" class="text-danger small"></span>
+                                </div>
+                                <div class="form-group col-md-5">
+                                    <label asp-for="DurationHours"></label>
+                                    <select asp-for="DurationHours" class="form-control" id="DurationHours">
+                                        @for (var hours = 1; hours <= 8; hours++)
+                                        {
+                                            <option value="@hours">@(hours == 1 ? "1 hour" : $"{hours} hours")</option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="DurationHours" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="BookingDate"></label>
+                                <input asp-for="BookingDate" type="date" class="form-control" id="BookingDate"
+                                       min="@minDate" max="@maxDate" />
+                                <span asp-validation-for="BookingDate" class="text-danger small"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Available Slots</label>
+                                <div id="slotsContainer" class="slot-grid">
+                                    <div class="text-muted small">Pick a court, date, and duration to see available slots.</div>
+                                </div>
+                                <input type="hidden" asp-for="StartTime" id="StartTime" />
+                                <span asp-validation-for="StartTime" class="text-danger small d-block mt-1"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card booking-card mb-3">
+                        <div class="card-header"><i class="fas fa-user mr-2"></i>2. Your details</div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group col-md-12">
+                                    <label asp-for="CustomerName"></label>
+                                    <input asp-for="CustomerName" class="form-control" placeholder="Juan Dela Cruz" />
+                                    <span asp-validation-for="CustomerName" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-7">
+                                    <label asp-for="CustomerEmail"></label>
+                                    <input asp-for="CustomerEmail" class="form-control" placeholder="you@example.com" />
+                                    <span asp-validation-for="CustomerEmail" class="text-danger small"></span>
+                                </div>
+                                <div class="form-group col-md-5">
+                                    <label asp-for="CustomerMobile"></label>
+                                    <input asp-for="CustomerMobile" class="form-control" placeholder="09171234567" />
+                                    <span asp-validation-for="CustomerMobile" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Notes"></label>
+                                <textarea asp-for="Notes" class="form-control" rows="2" placeholder="Anything we should know?"></textarea>
+                                <span asp-validation-for="Notes" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card booking-card mb-3">
+                        <div class="card-header"><i class="fas fa-credit-card mr-2"></i>3. Payment method</div>
+                        <div class="card-body">
+                            <div class="payment-options">
+@*                                 <label class="payment-option">
+                                    <input type="radio" asp-for="PaymentMethod" value="@((int)PaymentMethod.Cash)" />
+                                    <div class="payment-option-card">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                        <strong>Cash</strong>
+                                        <small class="text-muted">Pay at the counter on arrival</small>
+                                    </div>
+                                </label>
+                                <label class="payment-option">
+                                    <input type="radio" asp-for="PaymentMethod" value="@((int)PaymentMethod.GCash)" />
+                                    <div class="payment-option-card">
+                                        <i class="fas fa-mobile-screen-button"></i>
+                                        <strong>GCash</strong>
+                                        <small class="text-muted">We'll show you payment details next</small>
+                                    </div>
+                                </label> *@
+                                <label class="payment-option">
+                                    <input type="radio" asp-for="PaymentMethod" value="@((int)PaymentMethod.PayMongoQrPh)" data-testid="payment-method-paymongo" />
+                                    <div class="payment-option-card">
+                                        <i class="fas fa-qrcode"></i>
+                                        <strong>QR Ph (PayMongo)</strong>
+                                        <small class="text-muted">Scan to pay with GCash, Maya, BPI, BDO, UnionBank…</small>
+                                    </div>
+                                </label>
+                            </div>
+                            <div id="paymongoExpiryNote"
+                                 class="alert alert-warning border-warning small mt-3 mb-0"
+                                 style="@(showPayMongoNote ? "" : "display:none;")"
+                                 data-testid="paymongo-expiry-note">
+                                <i class="fas fa-exclamation-triangle mr-1"></i>
+                                <strong>Important:</strong> QR Ph checkout expires after <strong>@qrExpiryMinutes minutes</strong>.
+                                Once it expires, this booking is automatically cancelled and cannot be refreshed.
+                            </div>
+                            <span asp-validation-for="PaymentMethod" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="card booking-card mb-3">
+                        <div class="card-header"><i class="fas fa-file-contract mr-2"></i>4. Terms and Conditions</div>
+                        <div class="card-body">
+                            <div class="border rounded p-3 mb-3 bg-light" style="max-height: 300px; overflow-y: auto;" data-testid="terms-text">
+                                <h5 class="mb-1">THE ROYALL COURTS CEBU</h5>
+                                <h6 class="text-muted mb-3">Court Booking Terms &amp; Conditions</h6>
+                                <p>By making a reservation through The Royall Courts Cebu website, the customer ("Player", "User", or "Client") acknowledges that they have read, understood, and agreed to the following Terms and Conditions.</p>
+
+                                <h6>1. Booking and Reservation</h6>
+                                <p>1.1 All court reservations must be made exclusively through The Royall Courts Cebu website.</p>
+                                <p>1.2 The customer shall select their preferred date, time, and duration of play and complete the required online payment process.</p>
+                                <p>1.3 Upon successful payment, the system will automatically generate a booking confirmation email containing the reservation details and a unique reference number.</p>
+                                <p>1.4 The booking confirmation email and reference number must be presented at the court reception or counter for verification prior to court access.</p>
+
+                                <h6>2. Arrival and Court Usage</h6>
+                                <p>2.1 Players are required to arrive at least thirty (30) minutes prior to their scheduled booking time. Arriving one (1) hour before the booked schedule is highly encouraged.</p>
+                                <p>2.2 The booked court time shall begin and end strictly according to the reserved schedule.</p>
+                                <p>2.3 Late arrivals will not be entitled to time extensions, credits, refunds, or rescheduling.</p>
+                                <p>2.4 A maximum of ten (10) players are permitted per court during any reserved session unless otherwise approved by management.</p>
+
+                                <h6>3. Payment Policy</h6>
+                                <p>3.1 Full payment is required to confirm a reservation.</p>
+                                <p>3.2 All confirmed bookings are considered final.</p>
+                                <p>3.3 Bookings are NON-REFUNDABLE, NON-NEGOTIABLE, and NON-TRANSFERABLE.</p>
+                                <p>3.4 No refunds, credits, or rescheduling shall be provided for no-shows, late arrivals, unused court time, personal schedule conflicts, weather-related preferences, or change of plans.</p>
+
+                                <h6>4. Court Transfers ("Pasalo")</h6>
+                                <p>4.1 Players may privately transfer or sell their booked court slot to another party ("Pasalo") at their own discretion.</p>
+                                <p>4.2 Any such arrangement shall be solely between the original booking holder and the replacement player.</p>
+                                <p>4.3 The Royall Courts Cebu shall not participate in, mediate, verify, guarantee, or assume responsibility for any payment, dispute, fraud, misunderstanding, or agreement arising from such transfers.</p>
+
+                                <h6>5. Safety and Assumption of Risk</h6>
+                                <p>5.1 Participation in pickleball and related activities involves inherent risks, including but not limited to slips, falls, collisions, equipment-related injuries, medical emergencies, and other unforeseen incidents.</p>
+                                <p>5.2 All players voluntarily participate at their own risk.</p>
+                                <p>5.3 Players are responsible for ensuring that they are physically fit and medically capable of participating in sports activities.</p>
+                                <p>5.4 The Royall Courts Cebu, its owners, officers, employees, coaches, staff, affiliates, and representatives shall not be liable for any injury, illness, disability, death, accident, or loss resulting from participation in activities conducted on the premises.</p>
+
+                                <h6>6. Personal Belongings and Property</h6>
+                                <p>6.1 Players are solely responsible for safeguarding their personal belongings at all times.</p>
+                                <p>6.2 The Royall Courts Cebu shall not be responsible or liable for any lost, stolen, misplaced, forgotten, or damaged personal items, including but not limited to:</p>
+                                <ul class="mb-2">
+                                    <li>Mobile phones</li>
+                                    <li>Wallets</li>
+                                    <li>Cash</li>
+                                    <li>Jewelry</li>
+                                    <li>Sports equipment</li>
+                                    <li>Bags</li>
+                                    <li>Clothing</li>
+                                    <li>Vehicles and vehicle contents</li>
+                                </ul>
+                                <p>6.3 Any items left on the premises may be turned over to management's Lost and Found section but retrieval is not guaranteed.</p>
+
+                                <h6>7. Property Damage</h6>
+                                <p>7.1 Players shall be responsible for any damage caused to court facilities, equipment, fixtures, furniture, or property resulting from negligence, misuse, intentional acts, or violations of court rules.</p>
+                                <p>7.2 The Royall Courts Cebu reserves the right to assess and recover the cost of repair or replacement from the responsible party.</p>
+
+                                <h6>8. Emergency Situations</h6>
+                                <p>8.1 In the event of an accident, injury, medical emergency, natural disaster, power interruption, government restriction, force majeure event, or any circumstance beyond reasonable control, The Royall Courts Cebu may suspend, delay, modify, or terminate court operations as necessary.</p>
+                                <p>8.2 The Royall Courts Cebu shall not be liable for any direct, indirect, incidental, consequential, or special damages arising from such events.</p>
+                                <p>8.3 Players authorize court personnel to contact emergency responders when deemed necessary. Any medical expenses incurred shall remain the sole responsibility of the affected individual.</p>
+
+                                <h6>9. Conduct and Compliance</h6>
+                                <p>9.1 All players must observe proper sportsmanship, respect fellow players, staff, and court facilities.</p>
+                                <p>9.2 The Royall Courts Cebu reserves the right to refuse entry, remove participants, or cancel access without refund for behavior deemed unsafe, disruptive, abusive, unlawful, or contrary to court policies.</p>
+
+                                <h6>10. Limitation of Liability</h6>
+                                <p>To the fullest extent permitted by applicable Philippine laws, The Royall Courts Cebu shall not be liable for any claims, losses, damages, injuries, expenses, costs, liabilities, or causes of action arising from:</p>
+                                <ul class="mb-2">
+                                    <li>Use of the court facilities;</li>
+                                    <li>Participation in sports activities;</li>
+                                    <li>Loss, theft, or damage of personal property;</li>
+                                    <li>Accidents or injuries occurring on the premises;</li>
+                                    <li>Booking disputes between players;</li>
+                                    <li>Force majeure events;</li>
+                                    <li>Technical issues affecting online reservations.</li>
+                                </ul>
+
+                                <h6>11. Acceptance of Terms</h6>
+                                <p>By completing an online reservation and payment through The Royall Courts Cebu website, the customer acknowledges and agrees to be legally bound by these Terms and Conditions.</p>
+                                <p class="mb-0">The customer further confirms that they have read, understood, and voluntarily accepted all risks associated with the use of The Royall Courts Cebu facilities.</p>
+                            </div>
+
+                            <div class="form-check">
+                                <input asp-for="AcceptedTerms" class="form-check-input" data-testid="terms-checkbox" />
+                                <label asp-for="AcceptedTerms" class="form-check-label">
+                                    I have read and agree to the Terms and Conditions. I understand that <strong>all bookings are final.</strong>
+                                </label>
+                            </div>
+                            <span asp-validation-for="AcceptedTerms" class="text-danger small d-block mt-1"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT: Summary -->
+                <div class="col-lg-5">
+                    <div class="card booking-summary sticky-top" style="top: 1rem;">
+                        <div class="card-header"><i class="fas fa-receipt mr-2"></i>Booking Summary</div>
+                        <div class="card-body">
+                            <dl class="summary-list">
+                                <dt>Court</dt>
+                                <dd id="summaryCourt">—</dd>
+
+                                <dt>Sport</dt>
+                                <dd id="summarySport">—</dd>
+
+                                <dt>Date</dt>
+                                <dd id="summaryDate">—</dd>
+
+                                <dt>Time</dt>
+                                <dd id="summaryTime">—</dd>
+
+                                <dt>Duration</dt>
+                                <dd id="summaryDuration">1 hour</dd>
+
+                                <dt>Hourly Rate</dt>
+                                <dd id="summaryRate">—</dd>
+                            </dl>
+                            <hr />
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="font-weight-bold">Total</span>
+                                <span class="summary-total" id="summaryTotal">0.00</span>
+                            </div>
+                            <div id="summaryPayMongoExpiryNote"
+                                 class="alert alert-warning small mt-3 mb-0"
+                                 style="@(showPayMongoNote ? "" : "display:none;")"
+                                 data-testid="summary-paymongo-expiry-note">
+                                <i class="fas fa-clock mr-1"></i>
+                                QR Ph payment must be completed within <strong>@qrExpiryMinutes minutes</strong>; expired bookings are cancelled automatically.
+                            </div>
+                      @*       @if (User.Identity?.IsAuthenticated == true)
+                            {
+                                <button type="submit" class="btn btn-primary btn-block btn-lg mt-3" id="submitBookingBtn" disabled>
+                                    <i class="fas fa-check mr-2"></i>Confirm Booking
+                                </button>
+                            }
+                            else
+                            {
+                                <div class="alert alert-info mb-2 py-2 small mt-3" role="alert">
+                                    <i class="fas fa-lock mr-1"></i>
+                                    Please contact support to confirm your booking.
+                                </div>
+                            } *@
+                            <button type="submit" class="btn btn-primary btn-block btn-lg mt-3" id="submitBookingBtn" disabled>
+                                <i class="fas fa-check mr-2"></i>Confirm Booking
+                            </button>
+                            <a asp-controller="Home" asp-action="Index" class="btn btn-link btn-block">Cancel</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function ($) {
+            "use strict";
+
+            const $court = $("#CourtId");
+            const $date = $("#BookingDate");
+            const $duration = $("#DurationHours");
+            const $slots = $("#slotsContainer");
+            const $startTime = $("#StartTime");
+            const $submit = $("#submitBookingBtn");
+            const $paymentMethod = $("input[name='PaymentMethod']");
+            const $acceptedTerms = $("#AcceptedTerms");
+            const payMongoValue = "@((int)PaymentMethod.PayMongoQrPh)";
+
+            let selectedSlot = null;
+
+            // Capture preselected time from the query string, when present.
+            let preselectedStart = @Html.Raw(System.Text.Json.JsonSerializer.Serialize((string)(ViewBag.PreselectedStart ?? "")));
+
+            function formatMoney(n) {
+                return Number(n).toFixed(2);
+            }
+
+            function formatDate(d) {
+                if (!d) return "—";
+                const dt = new Date(d + "T00:00:00");
+                return dt.toLocaleDateString(undefined, { weekday: "short", year: "numeric", month: "short", day: "numeric" });
+            }
+
+            function updateSummary() {
+                const opt = $court.find("option:selected");
+                const hrs = parseInt($duration.val(), 10) || 1;
+                const rate = selectedSlot ? selectedSlot.rate : 0;
+                const total = selectedSlot ? selectedSlot.total : 0;
+                const rateLabel = selectedSlot && selectedSlot.isMixed
+                    ? "Mixed rates"
+                    : formatMoney(rate) + " / hour" + (selectedSlot && selectedSlot.isPromo ? " (promo)" : "");
+                $("#summaryCourt").text(opt.text().split(" — ")[0] || "—");
+                $("#summarySport").text(opt.data("sport") || "—");
+                $("#summaryDate").text(formatDate($date.val()));
+                $("#summaryDuration").text(hrs + (hrs === 1 ? " hour" : " hours"));
+                $("#summaryRate").text(rateLabel);
+                $("#summaryTotal").text(formatMoney(total));
+                $("#summaryTime").text(selectedSlot ? selectedSlot.label : "—");
+                const isPayMongo = $paymentMethod.filter(":checked").val() === payMongoValue;
+                $("#paymongoExpiryNote, #summaryPayMongoExpiryNote").toggle(isPayMongo);
+                $submit.prop("disabled", !selectedSlot || !$paymentMethod.filter(":checked").length || !$acceptedTerms.is(":checked"));
+            }
+
+            function renderSlots(payload) {
+                $slots.empty();
+                if (payload.closed) {
+                    $slots.append('<div class="alert alert-warning mb-0 py-2">We are closed on this day.</div>');
+                    return;
+                }
+                if (!payload.slots || payload.slots.length === 0) {
+                    $slots.append('<div class="text-muted small">No slots in this window.</div>');
+                    return;
+                }
+                payload.slots.forEach(function (s) {
+                    const rateClass = s.isMixedRate ? " slot-mixed" : (s.isPromoRate ? " slot-promo" : "");
+                    const cls = (s.isAvailable ? "slot-btn" : "slot-btn slot-unavailable") + rateClass;
+                    const title = s.reason ? ' title="' + s.reason + '"' : '';
+                    const badge = s.isMixedRate
+                        ? '<span class="slot-rate-badge">Mixed</span>'
+                        : (s.isPromoRate ? '<span class="slot-rate-badge">Promo</span>' : '');
+                    const $b = $('<button type="button" class="' + cls + '"' + title + '><span class="slot-time">' + s.label + '</span>' + badge + '</button>');
+                    $b.data("start", s.startTime);
+                    $b.data("label", s.label);
+                    $b.data("rate", s.hourlyRate);
+                    $b.data("total", s.totalAmount);
+                    $b.data("promo", s.isPromoRate);
+                    $b.data("mixed", s.isMixedRate);
+                    if (!s.isAvailable) $b.attr("disabled", "disabled");
+                    $slots.append($b);
+                });
+            }
+
+            function highlightPreselected() {
+                if (!preselectedStart) return;
+                const $match = $slots.find(".slot-btn:not(.slot-unavailable)").filter(function () {
+                    return String($(this).data("start")) === preselectedStart;
+                }).first();
+                if ($match.length) {
+                    $match.trigger("click");
+                }
+                // Consume only once — manual filter changes shouldn't re-highlight.
+                preselectedStart = null;
+            }
+
+            function loadSlots() {
+                const courtId = $court.val();
+                const date = $date.val();
+                const dur = $duration.val();
+                if (!courtId || !date || !dur) return;
+
+                $slots.html('<div class="text-muted small"><i class="fas fa-spinner fa-spin mr-1"></i>Loading slots…</div>');
+                selectedSlot = null;
+                $startTime.val("");
+                updateSummary();
+
+                $.getJSON('@Url.Action("GetSlots", "Bookings")', { courtId: courtId, date: date, durationHours: dur })
+                    .done(function (payload) {
+                        renderSlots(payload);
+                        highlightPreselected();
+                    })
+                    .fail(function () {
+                        $slots.html('<div class="alert alert-danger mb-0 py-2">Failed to load slots. Please try again.</div>');
+                    });
+            }
+
+            $slots.on("click", ".slot-btn:not(.slot-unavailable)", function () {
+                $slots.find(".slot-btn").removeClass("active");
+                $(this).addClass("active");
+                selectedSlot = {
+                    start: $(this).data("start"),
+                    label: $(this).data("label"),
+                    rate: parseFloat($(this).data("rate")) || 0,
+                    total: parseFloat($(this).data("total")) || 0,
+                    isPromo: $(this).data("promo") === true,
+                    isMixed: $(this).data("mixed") === true
+                };
+                $startTime.val(selectedSlot.start);
+                updateSummary();
+            });
+
+            $court.on("change", loadSlots);
+            $date.on("change", loadSlots);
+            $duration.on("change", loadSlots);
+            $paymentMethod.on("change", updateSummary);
+            $acceptedTerms.on("change", function () {
+                if ($acceptedTerms.is(":checked")) {
+                    $("span[data-valmsg-for='AcceptedTerms']").empty().removeClass("field-validation-error").addClass("field-validation-valid");
+                    $acceptedTerms.removeClass("input-validation-error");
+                }
+                updateSummary();
+            });
+
+            // Initial render
+            updateSummary();
+            loadSlots();
+        })(jQuery);
+    </script>
+}

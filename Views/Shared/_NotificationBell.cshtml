@@ -1,0 +1,59 @@
+@using CourtBookingSystem.Data
+@using Microsoft.EntityFrameworkCore
+@inject ApplicationDbContext Db
+@{
+    var area = ViewContext.RouteData.Values["area"]?.ToString() ?? "Admin";
+    var unreadCount = await Db.Notifications.CountAsync(n => !n.IsRead);
+    var recent = await Db.Notifications
+        .OrderByDescending(n => n.CreatedDate)
+        .Take(8)
+        .ToListAsync();
+}
+
+<li class="nav-item dropdown">
+    <a class="nav-link" data-toggle="dropdown" href="#" aria-label="Notifications">
+        <i class="far fa-bell"></i>
+        @if (unreadCount > 0)
+        {
+            <span class="badge badge-warning navbar-badge">@(unreadCount > 99 ? "99+" : unreadCount.ToString())</span>
+        }
+    </a>
+    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right notification-dropdown">
+        <span class="dropdown-item dropdown-header">
+            @(unreadCount == 0 ? "No new notifications" : $"{unreadCount} unread notification{(unreadCount == 1 ? "" : "s")}")
+        </span>
+        <div class="dropdown-divider"></div>
+
+        @if (!recent.Any())
+        {
+            <div class="text-muted text-center py-3 small">You're all caught up.</div>
+        }
+        else
+        {
+            foreach (var n in recent)
+            {
+                <a asp-area="@area" asp-controller="Notifications" asp-action="Open" asp-route-id="@n.Id"
+                   class="dropdown-item notification-item @(n.IsRead ? "" : "notification-unread")">
+                    <i class="fas fa-bell mr-2 @(n.IsRead ? "text-muted" : "text-primary")"></i>
+                    <strong class="notification-text">@n.Title</strong>
+                    <div class="small text-muted notification-text ml-4">@n.Message</div>
+                    <span class="float-right text-muted text-sm mt-n4">
+                        @{
+                            var ago = DateTime.UtcNow - n.CreatedDate;
+                            var label = ago.TotalMinutes < 1 ? "just now"
+                                      : ago.TotalMinutes < 60 ? $"{(int)ago.TotalMinutes}m"
+                                      : ago.TotalHours < 24 ? $"{(int)ago.TotalHours}h"
+                                      : $"{(int)ago.TotalDays}d";
+                        }
+                        @label
+                    </span>
+                </a>
+                <div class="dropdown-divider"></div>
+            }
+        }
+
+        <a asp-area="@area" asp-controller="Notifications" asp-action="Index" class="dropdown-item dropdown-footer">
+            See all notifications
+        </a>
+    </div>
+</li>

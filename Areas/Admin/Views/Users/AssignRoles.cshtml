@@ -1,0 +1,60 @@
+@model CourtBookingSystem.Areas.Admin.ViewModels.AssignRolesViewModel
+@{
+    ViewData["Title"] = "Assign Roles";
+}
+
+<section class="content-header">
+    <div class="container-fluid"><h1>Assign Roles — @Model.Email</h1></div>
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <form asp-action="AssignRoles" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="UserId" />
+                    <input type="hidden" asp-for="Email" />
+
+                    @for (int i = 0; i < Model.Roles.Count; i++)
+                    {
+                        <div class="form-group form-check">
+                            <input type="hidden" asp-for="Roles[i].RoleName" />
+                            <input asp-for="Roles[i].Selected"
+                                   type="checkbox"
+                                   class="form-check-input role-checkbox" />
+                            <label class="form-check-label">@Model.Roles[i].RoleName</label>
+                        </div>
+                    }
+
+                    @if (!Model.Roles.Any())
+                    {
+                        <div class="alert alert-info">No roles are defined in the system yet.</div>
+                    }
+
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <a asp-action="Index" class="btn btn-default">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const checkboxes = document.querySelectorAll('.role-checkbox');
+            checkboxes.forEach(function (cb) {
+                cb.addEventListener('change', function () {
+                    if (this.checked) {
+                        checkboxes.forEach(function (other) {
+                            if (other !== cb) {
+                                other.checked = false;
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}

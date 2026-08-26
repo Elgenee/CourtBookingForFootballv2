@@ -1,0 +1,71 @@
+@model CourtBookingSystem.Areas.SuperAdmin.ViewModels.AboutContentViewModel
+@{
+    ViewData["Title"] = "About The Royall Courts";
+}
+
+<form asp-action="Index" method="post" data-testid="form-about">
+    @Html.AntiForgeryToken()
+
+    <div class="row">
+        <div class="col-lg-7 mb-4">
+            <div class="card cms-section-card h-100">
+                <div class="card-header"><i class="fas fa-info-circle mr-2"></i> About Section</div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label asp-for="Title"></label>
+                        <input asp-for="Title" class="form-control" data-testid="input-about-title" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Description"></label>
+                        <textarea asp-for="Description" class="form-control" rows="6" data-testid="input-about-description"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mb-0">
+                        <label asp-for="FacilitiesList"></label>
+                        <textarea asp-for="FacilitiesList" class="form-control" rows="8" data-testid="input-about-facilities"></textarea>
+                        <small class="form-text text-muted">One facility per line — these become the bulleted list on the public site.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5 mb-4">
+            <div class="card cms-section-card h-100">
+                <div class="card-header"><i class="fas fa-address-card mr-2"></i> Contact &amp; Hours</div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label asp-for="ContactPhone"></label>
+                        <input asp-for="ContactPhone" class="form-control" data-testid="input-about-phone" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ContactEmail"></label>
+                        <input asp-for="ContactEmail" class="form-control" data-testid="input-about-email" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Location"></label>
+                        <input asp-for="Location" class="form-control" data-testid="input-about-location" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="OpeningHoursDays"></label>
+                        <input asp-for="OpeningHoursDays" class="form-control" placeholder="e.g. Mon – Sun" data-testid="input-about-hours-days" />
+                    </div>
+                    <div class="form-group mb-0">
+                        <label asp-for="OpeningHoursTimes"></label>
+                        <input asp-for="OpeningHoursTimes" class="form-control" placeholder="e.g. 8:00 AM – 10:00 PM" data-testid="input-about-hours-times" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end mb-4">
+        <button type="submit" class="btn btn-primary btn-lg" data-testid="btn-save-about">
+            <i class="fas fa-save mr-1"></i> Save Changes
+        </button>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

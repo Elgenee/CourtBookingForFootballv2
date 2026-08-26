@@ -1,0 +1,127 @@
+@model CourtBookingSystem.Areas.Admin.ViewModels.CourtGroupFormViewModel
+@{
+    ViewData["Title"] = ViewData["Title"] ?? "Court Group";
+    var isEdit = Model.Id != 0;
+    var formAction = isEdit ? "Edit" : "Create";
+}
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-@(isEdit ? "edit" : "plus") mr-2"></i>@ViewData["Title"]
+                </h5>
+            </div>
+            <form asp-action="@formAction" method="post">
+                @Html.AntiForgeryToken()
+                @if (isEdit)
+                {
+                    <input type="hidden" asp-for="Id" />
+                }
+                <div class="card-body">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label asp-for="GroupCode"></label>
+                            <input asp-for="GroupCode" class="form-control text-uppercase" placeholder="MAIN_COURT" data-testid="court-group-code-input" />
+                            <small class="form-text text-muted">Uppercase letters, digits, _ or -</small>
+                            <span asp-validation-for="GroupCode" class="text-danger small"></span>
+                        </div>
+                        <div class="form-group col-md-8">
+                            <label asp-for="GroupName"></label>
+                            <input asp-for="GroupName" class="form-control" placeholder="Main Convertible Court" data-testid="court-group-name-input" />
+                            <span asp-validation-for="GroupName" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Description"></label>
+                        <textarea asp-for="Description" class="form-control" rows="2" placeholder="(optional) Notes about how this physical space converts between sports."></textarea>
+                    </div>
+                    <div class="custom-control custom-switch">
+                        <input asp-for="IsActive" type="checkbox" class="custom-control-input" id="IsActive" data-testid="court-group-active-toggle" />
+                        <label class="custom-control-label" for="IsActive">@Html.DisplayNameFor(m => m.IsActive)</label>
+                    </div>
+
+                    <hr />
+                    <h6 class="text-muted mb-3"><i class="fas fa-th-large mr-1"></i>Member courts</h6>
+                    @if (!Model.AvailableCourts.Any())
+                    {
+                        <div class="alert alert-warning small">
+                            No assignable courts found. Create the courts first from <a asp-controller="Courts" asp-action="Index">Courts</a>,
+                            then come back to add them to this group.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="row">
+                        @foreach (var c in Model.AvailableCourts)
+                        {
+                            var isChecked = Model.SelectedCourtIds.Contains(c.Id);
+                            <div class="col-md-6">
+                                <div class="custom-control custom-checkbox mb-1">
+                                    <input type="checkbox" class="custom-control-input"
+                                           id="court-@c.Id" name="SelectedCourtIds" value="@c.Id"
+                                           @(isChecked ? "checked" : "")
+                                           data-testid="court-group-member-checkbox-@c.Id" />
+                                    <label class="custom-control-label" for="court-@c.Id">
+                                        @c.CourtName
+                                        <small class="text-muted">— @c.SportType</small>
+                                        @if (c.IsFullCourt)
+                                        {
+                                            <span class="badge badge-primary ml-1" title="Full Court — booking it blocks all siblings">Full</span>
+                                        }
+                                    </label>
+                                </div>
+                            </div>
+                        }
+                        </div>
+                        <small class="form-text text-muted mt-2">
+                            Tip: mark exactly one court as <strong>Full Court</strong> on its <em>Court</em> page if booking it should
+                            block every sibling. Split courts only block the Full Court(s) of their group.
+                        </small>
+                    }
+                </div>
+                <div class="card-footer text-right">
+                    <a asp-action="Index" class="btn btn-link">Cancel</a>
+                    <button type="submit" class="btn btn-primary" data-testid="court-group-save-btn">
+                        <i class="fas fa-save mr-1"></i>@(isEdit ? "Save Changes" : "Save")
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (isEdit && Model.CurrentMembers.Any())
+    {
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header"><h6 class="card-title mb-0"><i class="fas fa-link mr-2"></i>Current members</h6></div>
+                <div class="list-group list-group-flush">
+                    @foreach (var c in Model.CurrentMembers)
+                    {
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>
+                                <strong>@c.CourtName</strong>
+                                <small class="text-muted ml-1">@c.SportType</small>
+                                @if (c.IsFullCourt) {<span class="badge badge-primary ml-1">Full</span>}
+                            </span>
+                            <form asp-action="RemoveCourt" method="post" class="d-inline"
+                                  onsubmit="return confirm('Remove this court from the group?');">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="groupId" value="@Model.Id" />
+                                <input type="hidden" name="courtId" value="@c.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger" data-testid="court-group-remove-member-@c.Id">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </form>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

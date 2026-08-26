@@ -1,0 +1,201 @@
+@model CourtBookingSystem.Models.Booking
+@{
+    ViewData["Title"] = "Booking " + Model.BookingReferenceNo;
+    string formatTime(TimeSpan t) => PhilippineTime.FormatTime(t);
+    var duration = OperatingHoursHelper.GetDuration(Model.StartTime, Model.EndTime);
+    var pay = Model.Payments.OrderByDescending(p => p.Id).FirstOrDefault();
+    var canApprovePayment = pay != null
+        && pay.PaymentMethod != PaymentMethod.PayMongoQrPh
+        && pay.PaymentStatus is PaymentStatus.Unpaid or PaymentStatus.Submitted or PaymentStatus.Rejected
+        && Model.BookingStatus is not (BookingStatus.Cancelled or BookingStatus.Completed);
+    var canRejectPayment = pay != null
+        && pay.PaymentMethod == PaymentMethod.GCash
+        && pay.PaymentStatus is PaymentStatus.Submitted or PaymentStatus.Unpaid
+        && Model.BookingStatus is not (BookingStatus.Cancelled or BookingStatus.Completed);
+    var canComplete = Model.BookingStatus == BookingStatus.Confirmed;
+    var canCancel = Model.BookingStatus is BookingStatus.Pending or BookingStatus.ForApproval or BookingStatus.Confirmed;
+    var canUploadProof = pay != null
+        && pay.PaymentMethod == PaymentMethod.GCash
+        && pay.PaymentStatus != PaymentStatus.Approved
+        && Model.BookingStatus is not (BookingStatus.Cancelled or BookingStatus.Completed);
+}
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fas fa-calendar-check mr-2"></i>Booking Details</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Reference</dt><dd class="col-sm-8 text-monospace" data-testid="admin-detail-ref">@Model.BookingReferenceNo</dd>
+                    <dt class="col-sm-4">Status</dt><dd class="col-sm-8"><span class="status-badge status-@Model.BookingStatus" data-testid="admin-detail-status">@Model.BookingStatus</span></dd>
+                    <dt class="col-sm-4">Court</dt><dd class="col-sm-8">@Model.Court?.CourtName <span class="badge badge-info">@Model.Court?.SportType</span></dd>
+                    <dt class="col-sm-4">Date</dt><dd class="col-sm-8">@Model.BookingDate.ToString("dddd, MMMM d, yyyy")</dd>
+                    <dt class="col-sm-4">Time</dt><dd class="col-sm-8">@formatTime(Model.StartTime) - @formatTime(Model.EndTime)</dd>
+                    <dt class="col-sm-4">Duration</dt><dd class="col-sm-8">@(duration.TotalHours.ToString("0.#")) hour(s)</dd>
+                    <dt class="col-sm-4">Customer</dt><dd class="col-sm-8">@Model.CustomerName<br /><small class="text-muted">@Model.CustomerEmail &middot; @Model.CustomerMobile</small></dd>
+                    @if (!string.IsNullOrWhiteSpace(Model.Notes)) {<dt class="col-sm-4">Notes</dt><dd class="col-sm-8">@Model.Notes</dd>}
+                    <dt class="col-sm-4">Total</dt><dd class="col-sm-8"><strong class="text-primary" data-testid="admin-detail-total">@Model.TotalAmount.ToString("0.00")</strong></dd>
+                    <dt class="col-sm-4">Created</dt><dd class="col-sm-8">@PhilippineTime.FromUtc(Model.CreatedDate).ToString("MMM d, yyyy h:mm tt")</dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h5 class="card-title mb-0"><i class="fas fa-money-check-alt mr-2"></i>Payments (@Model.Payments.Count)</h5></div>
+            <div class="card-body p-0">
+                @if (!Model.Payments.Any())
+                {
+                    <div class="p-4 text-muted text-center">No payments recorded.</div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                    <table class="table table-sm mb-0" data-testid="admin-detail-payments-table">
+                        <thead class="thead-light">
+                            <tr><th>Method</th><th>Amount</th><th>Status</th><th>Proof</th><th>Confirmed</th></tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var p in Model.Payments)
+                        {
+                            <tr>
+                                <td>@p.PaymentMethod</td>
+                                <td>@p.Amount.ToString("0.00")</td>
+                                <td><span class="status-badge payment-@p.PaymentStatus">@p.PaymentStatus</span></td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(p.ProofImagePath))
+                                    {
+                                        <img src="/@p.ProofImagePath" alt="Proof" class="proof-thumbnail"
+                                             data-toggle="modal" data-target="#proofModal"
+                                             data-src="/@p.ProofImagePath"
+                                             data-ref="@Model.BookingReferenceNo"
+                                             data-testid="admin-detail-proof-thumb" />
+                                    }
+                                    else if (p.PaymentMethod == PaymentMethod.GCash)
+                                    {
+                                        <span class="text-muted small"><i class="fas fa-camera-slash"></i> none</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (p.ConfirmedByUser != null)
+                                    {
+                                        <small>@p.ConfirmedByUser.FullName<br /><span class="text-muted">@(p.ConfirmedDate.HasValue ? PhilippineTime.FromUtc(p.ConfirmedDate.Value).ToString("MMM d, h:mm tt") : null)</span></small>
+                                    }
+                                    else { <small class="text-muted">-</small> }
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                    </div>
+                }
+            </div>
+        </div>
+
+        @if (canUploadProof)
+        {
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="fas fa-camera mr-2"></i>Upload GCash Proof</h5>
+                </div>
+                <div class="card-body">
+                    @if (TempData["UploadSuccess"] != null)
+                    {
+                        <div class="alert alert-success"><i class="fas fa-check mr-1"></i>@TempData["UploadSuccess"]</div>
+                    }
+                    @if (TempData["UploadError"] != null)
+                    {
+                        <div class="alert alert-danger"><i class="fas fa-times mr-1"></i>@TempData["UploadError"]</div>
+                    }
+                    <form asp-area="Admin"
+                          asp-controller="Bookings"
+                          asp-action="UploadProof"
+                          method="post"
+                          enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="reference" value="@Model.BookingReferenceNo" />
+                        <div class="form-group mb-2">
+                            <label for="proof" class="small text-muted">
+                                @(string.IsNullOrEmpty(pay!.ProofImagePath) ? "Upload GCash receipt screenshot" : "Replace receipt image")
+                                <span class="text-muted">(JPEG / PNG / WebP, max 5 MB)</span>
+                            </label>
+                            <input type="file" name="proof" id="proof" accept="image/jpeg,image/png,image/webp"
+                                   class="form-control-file" required data-testid="admin-detail-proof-input" />
+                        </div>
+                        <button type="submit" class="btn btn-primary" data-testid="admin-detail-proof-upload-btn">
+                            <i class="fas fa-upload mr-1"></i>
+                            @(string.IsNullOrEmpty(pay.ProofImagePath) ? "Upload Proof" : "Replace Proof")
+                        </button>
+                    </form>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header"><h5 class="card-title mb-0"><i class="fas fa-cog mr-2"></i>Actions</h5></div>
+            <div class="card-body">
+                @if (!canApprovePayment && !canRejectPayment && !canComplete && !canCancel)
+                {
+                    <div class="text-muted small">No actions available for this booking in its current state.</div>
+                }
+
+                @if (canApprovePayment)
+                {
+                    <form asp-action="ApprovePayment" asp-route-id="@Model.Id" method="post" class="mb-2">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="returnTo" value="details" />
+                        <button type="submit" class="btn btn-success btn-block" data-testid="admin-detail-approve-payment-btn">
+                            <i class="fas fa-check mr-1"></i>Approve Payment &amp; Confirm
+                        </button>
+                    </form>
+                }
+
+                @if (canRejectPayment)
+                {
+                    <form asp-action="RejectPayment" asp-route-id="@Model.Id" method="post" class="mb-2"
+                          onsubmit="return confirm('Reject this GCash payment proof? Booking will move back to Pending.');">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="returnTo" value="details" />
+                        <button type="submit" class="btn btn-outline-danger btn-block" data-testid="admin-detail-reject-payment-btn">
+                            <i class="fas fa-times mr-1"></i>Reject Payment
+                        </button>
+                    </form>
+                }
+
+                @if (canComplete)
+                {
+                    <form asp-action="Complete" asp-route-id="@Model.Id" method="post" class="mb-2">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="returnTo" value="details" />
+                        <button type="submit" class="btn btn-info btn-block" data-testid="admin-detail-complete-btn">
+                            <i class="fas fa-flag-checkered mr-1"></i>Mark Completed
+                        </button>
+                    </form>
+                }
+
+                @if (canCancel)
+                {
+                    <form asp-action="Cancel" asp-route-id="@Model.Id" method="post" class="mb-2"
+                          onsubmit="return confirm('Cancel this booking?');">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="returnTo" value="details" />
+                        <button type="submit" class="btn btn-outline-danger btn-block" data-testid="admin-detail-cancel-btn">
+                            <i class="fas fa-ban mr-1"></i>Cancel Booking
+                        </button>
+                    </form>
+                }
+
+                <a asp-action="Index" class="btn btn-link btn-block">Back to list</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<partial name="_ProofModal" />

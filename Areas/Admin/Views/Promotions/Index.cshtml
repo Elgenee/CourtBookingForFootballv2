@@ -1,0 +1,191 @@
+@model IEnumerable<CourtBookingSystem.Models.Cms.Promotion>
+@{
+    ViewData["Title"] = "Promotions";
+    string imageSrc(string path) => path.StartsWith("http", StringComparison.OrdinalIgnoreCase) || path.StartsWith("/")
+        ? path
+        : "/" + path;
+}
+
+<div class="row mb-4">
+    <div class="col-lg-4">
+        <div class="card admin-card">
+            <div class="card-header"><i class="fas fa-bullhorn mr-2"></i> Add Promotion</div>
+            <div class="card-body">
+                <form asp-action="Create" method="post" data-testid="form-create-promotion">
+                    @Html.AntiForgeryToken()
+                    <div class="form-group">
+                        <label for="AnnouncementType">Type</label>
+                        <input name="AnnouncementType" id="AnnouncementType" class="form-control" value="Promo" maxlength="80" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="Title">Title</label>
+                        <input name="Title" id="Title" class="form-control" maxlength="140" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="Description">Description</label>
+                        <textarea name="Description" id="Description" class="form-control" rows="3" maxlength="500" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="ImagePath">Image Path</label>
+                        <input name="ImagePath" id="ImagePath" class="form-control" value="/img/promos/months/august.svg" maxlength="260" required />
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-sm-6">
+                            <label for="ButtonLabel">Button Label</label>
+                            <input name="ButtonLabel" id="ButtonLabel" class="form-control" value="Book Now" maxlength="80" required />
+                        </div>
+                        <div class="form-group col-sm-6">
+                            <label for="ButtonUrl">Button URL</label>
+                            <input name="ButtonUrl" id="ButtonUrl" class="form-control" value="#booking-search" maxlength="260" required />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-sm-6">
+                            <label for="StartDate">Start Date</label>
+                            <input name="StartDate" id="StartDate" type="date" class="form-control" />
+                        </div>
+                        <div class="form-group col-sm-6">
+                            <label for="EndDate">End Date</label>
+                            <input name="EndDate" id="EndDate" type="date" class="form-control" />
+                        </div>
+                    </div>
+                    <input type="hidden" name="ImageAlt" value="" />
+                    <input type="hidden" name="IconHtml" value="&#x1F389;" />
+                    <div class="form-check mb-3">
+                        <input type="checkbox" name="IsActive" value="true" id="IsActive" class="form-check-input" checked />
+                        <label for="IsActive" class="form-check-label">Show when date is current</label>
+                        <input type="hidden" name="IsActive" value="false" />
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fas fa-plus mr-1"></i> Add Promotion
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card admin-card">
+            <div class="card-header">
+                <i class="fas fa-calendar-alt mr-2"></i> Promotion Cards
+                <span class="badge badge-secondary ml-1">@Model.Count() item(s)</span>
+            </div>
+            <div class="card-body">
+                @if (!Model.Any())
+                {
+                    <p class="text-muted mb-0">No promotions yet.</p>
+                }
+                else
+                {
+                    <form asp-action="Update" method="post" data-testid="form-update-promotions">
+                        @Html.AntiForgeryToken()
+                        <div class="promotion-admin-list">
+                            @{ var index = 0; }
+                            @foreach (var promo in Model.OrderBy(x => x.DisplayOrder).ThenBy(x => x.Id))
+                            {
+                                <div class="promotion-admin-item" data-testid="promotion-row-@promo.Id">
+                                    <input type="hidden" name="items[@index].Id" value="@promo.Id" />
+                                    <div class="promotion-admin-preview">
+                                        <img src="@imageSrc(promo.ImagePath)" alt="Preview for @promo.Title" loading="lazy"
+                                             onerror="this.src='/img/promos/months/august.svg'" />
+                                        <div class="mt-2">
+                                            <span class="badge @(promo.IsActive ? "badge-success" : "badge-secondary")">
+                                                @(promo.IsActive ? "Active" : "Hidden")
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="promotion-admin-fields">
+                                        <div class="form-row">
+                                            <div class="form-group col-md-3">
+                                                <label>Order</label>
+                                                <input name="items[@index].DisplayOrder" value="@promo.DisplayOrder" type="number" class="form-control form-control-sm" />
+                                            </div>
+                                            <div class="form-group col-md-3">
+                                                <label>Type</label>
+                                                <input name="items[@index].AnnouncementType" value="@promo.AnnouncementType" class="form-control form-control-sm" maxlength="80" required />
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label>Title</label>
+                                                <input name="items[@index].Title" value="@promo.Title" class="form-control form-control-sm" maxlength="140" required />
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Description</label>
+                                            <textarea name="items[@index].Description" rows="2" class="form-control form-control-sm" maxlength="500" required>@promo.Description</textarea>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-7">
+                                                <label>Image Path</label>
+                                                <input name="items[@index].ImagePath" value="@promo.ImagePath" class="form-control form-control-sm" maxlength="260" required />
+                                            </div>
+                                            <div class="form-group col-md-5">
+                                                <label>Alt Text</label>
+                                                <input name="items[@index].ImageAlt" value="@promo.ImageAlt" class="form-control form-control-sm" maxlength="180" />
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-4">
+                                                <label>Button Label</label>
+                                                <input name="items[@index].ButtonLabel" value="@promo.ButtonLabel" class="form-control form-control-sm" maxlength="80" required />
+                                            </div>
+                                            <div class="form-group col-md-5">
+                                                <label>Button URL</label>
+                                                <input name="items[@index].ButtonUrl" value="@promo.ButtonUrl" class="form-control form-control-sm" maxlength="260" required />
+                                            </div>
+                                            <div class="form-group col-md-3">
+                                                <label>Icon HTML</label>
+                                                <input name="items[@index].IconHtml" value="@promo.IconHtml" class="form-control form-control-sm" maxlength="40" required />
+                                            </div>
+                                        </div>
+                                        <div class="form-row align-items-end">
+                                            <div class="form-group col-md-4">
+                                                <label>Start Date</label>
+                                                <input name="items[@index].StartDate" value="@(promo.StartDate?.ToString("yyyy-MM-dd"))" type="date" class="form-control form-control-sm" />
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <label>End Date</label>
+                                                <input name="items[@index].EndDate" value="@(promo.EndDate?.ToString("yyyy-MM-dd"))" type="date" class="form-control form-control-sm" />
+                                            </div>
+                                            <div class="form-group col-md-2">
+                                                <div class="form-check">
+                                                    <input type="checkbox" name="items[@index].IsActive" value="true" id="promo-active-@promo.Id" class="form-check-input" @(promo.IsActive ? "checked" : "") />
+                                                    <label for="promo-active-@promo.Id" class="form-check-label">Active</label>
+                                                    <input type="hidden" name="items[@index].IsActive" value="false" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-md-2 text-md-right">
+                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="return submitDelete(@promo.Id)" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                index++;
+                            }
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-3">
+                            <i class="fas fa-save mr-1"></i> Save Promotions
+                        </button>
+                    </form>
+
+                    <form id="deleteForm" asp-action="Delete" method="post" class="d-none">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" id="deleteId" />
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function submitDelete(id) {
+            if (!confirm('Delete this promotion?')) return false;
+            document.getElementById('deleteId').value = id;
+            document.getElementById('deleteForm').submit();
+            return false;
+        }
+    </script>
+}

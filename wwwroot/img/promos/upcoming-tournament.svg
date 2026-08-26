@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+  <title id="title">Upcoming tournament at The Royall Courts</title>
+  <desc id="desc">A tournament poster with court lines, bracket paths, trophy, and The Royall Courts branding.</desc>
+  <defs>
+    <linearGradient id="posterBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#061b2f"/>
+      <stop offset="0.5" stop-color="#0f4c81"/>
+      <stop offset="1" stop-color="#1f7a67"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffe39a"/>
+      <stop offset="0.42" stop-color="#ffb627"/>
+      <stop offset="1" stop-color="#c57b0d"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#03101d" flood-opacity="0.34"/>
+    </filter>
+    <pattern id="courtGrid" width="96" height="96" patternUnits="userSpaceOnUse">
+      <path d="M96 0H0v96" fill="none" stroke="#ffffff" stroke-opacity="0.06" stroke-width="2"/>
+    </pattern>
+  </defs>
+
+  <rect width="960" height="540" fill="url(#posterBg)"/>
+  <rect width="960" height="540" fill="url(#courtGrid)"/>
+
+  <g fill="none" stroke="#ffffff" stroke-linecap="round">
+    <rect x="58" y="48" width="844" height="444" rx="22" stroke-opacity="0.26" stroke-width="5"/>
+    <path d="M120 402h720M120 270h720M120 138h720M238 72v396M480 72v396M722 72v396" stroke-opacity="0.16" stroke-width="5"/>
+    <path d="M86 456c118-88 223-92 316-12s211 72 348-26" stroke="#ffb627" stroke-opacity="0.26" stroke-width="10"/>
+  </g>
+
+  <g transform="translate(584 90)" opacity="0.88">
+    <path d="M28 26h88v58h92v58h82" fill="none" stroke="#ffffff" stroke-opacity="0.44" stroke-width="9" stroke-linejoin="round"/>
+    <path d="M28 258h88v-58h92v-58h82" fill="none" stroke="#ffffff" stroke-opacity="0.44" stroke-width="9" stroke-linejoin="round"/>
+    <circle cx="28" cy="26" r="13" fill="#ffb627"/>
+    <circle cx="28" cy="258" r="13" fill="#ffb627"/>
+    <circle cx="116" cy="84" r="13" fill="#ffffff" fill-opacity="0.9"/>
+    <circle cx="116" cy="200" r="13" fill="#ffffff" fill-opacity="0.9"/>
+    <circle cx="208" cy="142" r="15" fill="#ffb627"/>
+    <circle cx="290" cy="142" r="18" fill="#ffffff"/>
+  </g>
+
+  <g transform="translate(372 84)" filter="url(#softShadow)">
+    <circle cx="108" cy="108" r="104" fill="#ffffff" fill-opacity="0.12"/>
+    <circle cx="108" cy="108" r="82" fill="#ffffff" fill-opacity="0.1"/>
+    <path d="M42 50h132v36c0 64-35 107-81 119v34h38v28H85v-28h38v-34C77 193 42 150 42 86V50Z" fill="url(#gold)"/>
+    <path d="M42 76H18c0 46 22 78 55 91M174 76h24c0 46-22 78-55 91" fill="none" stroke="#ffe39a" stroke-width="18" stroke-linecap="round"/>
+    <rect x="65" y="268" width="86" height="22" rx="7" fill="#ffe39a"/>
+  </g>
+
+  <g font-family="Source Sans Pro, Arial, sans-serif">
+    <text x="86" y="106" fill="#ffdf8a" font-size="24" font-weight="800" letter-spacing="3">THE ROYALL COURTS</text>
+    <text x="84" y="370" fill="#ffffff" font-size="68" font-weight="900">Upcoming</text>
+    <text x="84" y="432" fill="#ffffff" font-size="68" font-weight="900">Tournament</text>
+    <text x="88" y="474" fill="#ffffff" fill-opacity="0.82" font-size="27" font-weight="600">Registration opens soon. Compete, rally, and rise.</text>
+  </g>
+
+  <g transform="translate(736 408)">
+    <rect x="0" y="0" width="136" height="44" rx="22" fill="#ffb627"/>
+    <text x="68" y="29" text-anchor="middle" fill="#10233a" font-family="Source Sans Pro, Arial, sans-serif" font-size="18" font-weight="900">VIEW DETAILS</text>
+  </g>
+</svg>

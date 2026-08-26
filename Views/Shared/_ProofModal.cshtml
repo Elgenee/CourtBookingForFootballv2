@@ -1,0 +1,25 @@
+<!-- Click-to-zoom proof image lightbox.
+     Triggered by elements with: data-toggle="modal" data-target="#proofModal" data-src="..." data-ref="..."
+     Binding lives in /wwwroot/js/site.js so it runs after jQuery is loaded. -->
+<div class="modal fade" id="proofModal" tabindex="-1" role="dialog" aria-labelledby="proofModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header py-2">
+                <h5 class="modal-title" id="proofModalLabel">Payment Proof</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-0 text-center bg-dark">
+                <img id="proofModalImage" src="" alt="Payment proof" class="img-fluid proof-modal-image" />
+            </div>
+            <div class="modal-footer py-2">
+                <small class="text-muted mr-auto">Booking: <code id="proofModalRef">—</code></small>
+                <a id="proofModalOpen" href="#" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-external-link-alt mr-1"></i>Open in new tab
+                </a>
+                <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

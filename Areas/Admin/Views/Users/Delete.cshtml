@@ -1,0 +1,30 @@
+@model CourtBookingSystem.Models.ApplicationUser
+@{
+    ViewData["Title"] = "Delete User";
+}
+
+<section class="content-header">
+    <div class="container-fluid"><h1>Delete User</h1></div>
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="card card-danger card-outline">
+            <div class="card-body">
+                <p class="lead">Are you sure you want to permanently delete this user?</p>
+                <dl class="row">
+                    <dt class="col-sm-2">Full Name</dt><dd class="col-sm-10">@Model.FullName</dd>
+                    <dt class="col-sm-2">Email</dt><dd class="col-sm-10">@Model.Email</dd>
+                    <dt class="col-sm-2">Username</dt><dd class="col-sm-10">@Model.UserName</dd>
+                    <dt class="col-sm-2">Phone</dt><dd class="col-sm-10">@Model.PhoneNumber</dd>
+                </dl>
+                <form asp-action="Delete" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <button type="submit" class="btn btn-danger">Yes, delete</button>
+                    <a asp-action="Index" class="btn btn-default">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

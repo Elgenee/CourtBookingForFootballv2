@@ -1,0 +1,54 @@
+@model List<CourtBookingSystem.Models.Notification>
+@{ ViewData["Title"] = "Notifications"; }
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0"><i class="fas fa-bell mr-2"></i>All Notifications (@Model.Count)</h5>
+        @if (Model.Any(n => !n.IsRead))
+        {
+            <form asp-action="MarkAllRead" method="post" class="d-inline">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-check-double mr-1"></i>Mark all read
+                </button>
+            </form>
+        }
+    </div>
+    <div class="card-body p-0">
+        @if (!Model.Any())
+        {
+            <div class="p-4 text-muted text-center">No notifications yet.</div>
+        }
+        else
+        {
+            <div class="list-group list-group-flush notification-list">
+                @foreach (var n in Model)
+                {
+                    <a asp-action="Open" asp-route-id="@n.Id"
+                       class="list-group-item list-group-item-action @(n.IsRead ? "" : "notification-unread")">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="notification-icon">
+                                    <i class="fas @(n.IsRead ? "fa-bell-slash text-muted" : "fa-bell text-primary")"></i>
+                                </div>
+                                <strong>@n.Title</strong>
+                                <div class="text-muted">@n.Message</div>
+                                <div class="small text-muted mt-1">
+                                    <i class="far fa-clock mr-1"></i>@PhilippineTime.FromUtc(n.CreatedDate).ToString("MMM d, yyyy h:mm tt")
+                                    @if (n.IsRead && n.ReadDate.HasValue)
+                                    {
+                                        <span class="ml-2"><i class="fas fa-check mr-1"></i>Read @PhilippineTime.FromUtc(n.ReadDate.Value).ToString("MMM d, h:mm tt")</span>
+                                    }
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                @if (!n.IsRead) {<span class="badge badge-primary">NEW</span>}
+                                <i class="fas fa-chevron-right text-muted ml-2"></i>
+                            </div>
+                        </div>
+                    </a>
+                }
+            </div>
+        }
+    </div>
+</div>

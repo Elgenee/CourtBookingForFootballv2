@@ -1,0 +1,141 @@
+@model IEnumerable<CourtBookingSystem.Models.Cms.GalleryImage>
+@{
+    ViewData["Title"] = "Gallery";
+}
+
+<div class="row mb-4">
+    <div class="col-lg-4">
+        <div class="card cms-section-card">
+            <div class="card-header"><i class="fas fa-upload mr-2"></i> Add Gallery Image</div>
+            <div class="card-body">
+                <form asp-action="Upload" method="post" enctype="multipart/form-data" data-testid="form-upload-gallery">
+                    @Html.AntiForgeryToken()
+                    <div class="form-group">
+                        <label for="Title">Title</label>
+                        <input name="Title" id="Title" class="form-control" required maxlength="140" data-testid="input-gallery-upload-title" />
+                    </div>
+                    <div class="form-group">
+                        <label for="Caption">Caption</label>
+                        <textarea name="Caption" id="Caption" class="form-control" rows="2" maxlength="400" data-testid="input-gallery-upload-caption"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="File">Image (PNG / JPG / WebP, max 10 MB)</label>
+                        <input name="File" id="File" type="file" accept="image/png,image/jpeg,image/webp" class="form-control-file" required data-testid="input-gallery-upload-file" />
+                    </div>
+                    <div class="form-check mb-3">
+                        <input type="checkbox" name="IsActive" value="true" id="IsActive" class="form-check-input" checked />
+                        <label for="IsActive" class="form-check-label">Show on website</label>
+                        <input type="hidden" name="IsActive" value="false" />
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" data-testid="btn-upload-gallery"><i class="fas fa-cloud-upload-alt mr-1"></i> Upload</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card cms-section-card">
+            <div class="card-header">
+                <i class="fas fa-images mr-2"></i> Gallery
+                <span class="badge badge-secondary ml-1">@Model.Count() image(s)</span>
+            </div>
+            <div class="card-body">
+                @if (!Model.Any())
+                {
+                    <p class="text-muted mb-0">No gallery images yet.</p>
+                }
+                else
+                {
+                    <form asp-action="Update" method="post" data-testid="form-update-gallery">
+                        @Html.AntiForgeryToken()
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th style="width:130px">Preview</th>
+                                        <th>Title</th>
+                                        <th>Caption</th>
+                                        <th style="width:90px">Order</th>
+                                        <th style="width:80px">Active</th>
+                                        <th style="width:160px">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{ var index = 0; }
+                                    @foreach (var g in Model.OrderBy(x => x.DisplayOrder))
+                                    {
+                                        <tr class="gallery-row" data-testid="gallery-row-@g.Id">
+                                            <td>
+                                                <input type="hidden" name="items[@index].Id" value="@g.Id" />
+                                                <img src="/@g.ImagePath" class="gallery-thumb" alt="@g.Title" loading="lazy"
+                                                     onerror="this.src='https://picsum.photos/seed/missing/640/420'" />
+                                            </td>
+                                            <td>
+                                                <input name="items[@index].Title" value="@g.Title" class="form-control form-control-sm" required maxlength="140" />
+                                            </td>
+                                            <td>
+                                                <textarea name="items[@index].Caption" rows="2" class="form-control form-control-sm" maxlength="400">@g.Caption</textarea>
+                                            </td>
+                                            <td>
+                                                <input name="items[@index].DisplayOrder" value="@g.DisplayOrder" type="number" class="form-control form-control-sm order-input" />
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" name="items[@index].IsActive" value="true" @(g.IsActive ? "checked" : "") />
+                                                <input type="hidden" name="items[@index].IsActive" value="false" />
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                        onclick="return submitMove(@g.Id, 'up')" title="Move up" data-testid="btn-gallery-up-@g.Id">
+                                                    <i class="fas fa-arrow-up"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                        onclick="return submitMove(@g.Id, 'down')" title="Move down" data-testid="btn-gallery-down-@g.Id">
+                                                    <i class="fas fa-arrow-down"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                                        onclick="return submitDelete(@g.Id)" title="Delete" data-testid="btn-gallery-delete-@g.Id">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        index++;
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <button type="submit" class="btn btn-primary" data-testid="btn-save-gallery">
+                            <i class="fas fa-save mr-1"></i> Save Changes
+                        </button>
+                    </form>
+
+                    <form id="moveForm" asp-action="Move" method="post" class="d-none">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" id="moveId" />
+                        <input type="hidden" name="direction" id="moveDir" />
+                    </form>
+                    <form id="deleteForm" asp-action="Delete" method="post" class="d-none">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" id="deleteId" />
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function submitMove(id, direction) {
+            document.getElementById('moveId').value = id;
+            document.getElementById('moveDir').value = direction;
+            document.getElementById('moveForm').submit();
+            return false;
+        }
+        function submitDelete(id) {
+            if (!confirm('Delete this gallery image?')) return false;
+            document.getElementById('deleteId').value = id;
+            document.getElementById('deleteForm').submit();
+            return false;
+        }
+    </script>
+}

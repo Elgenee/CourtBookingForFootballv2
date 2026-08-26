@@ -1,0 +1,114 @@
+@model CourtBookingSystem.Areas.SuperAdmin.ViewModels.WebsiteSettingsViewModel
+@{
+    ViewData["Title"] = "Branding & Hero";
+}
+
+<form asp-action="Website" method="post" enctype="multipart/form-data" data-testid="form-website-settings">
+    @Html.AntiForgeryToken()
+
+    <div class="row">
+        <!-- ============ BRANDING ============ -->
+        <div class="col-lg-6 mb-4">
+            <div class="card cms-section-card h-100">
+                <div class="card-header"><i class="fas fa-paint-brush mr-2"></i> Navbar Brand</div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label asp-for="WebsiteName"></label>
+                        <input asp-for="WebsiteName" class="form-control" data-testid="input-website-name" />
+                        <span asp-validation-for="WebsiteName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="WebsiteTagline"></label>
+                        <input asp-for="WebsiteTagline" class="form-control" data-testid="input-website-tagline" />
+                        <span asp-validation-for="WebsiteTagline" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="LogoFile"></label>
+                        @if (!string.IsNullOrEmpty(Model.ExistingLogoPath))
+                        {
+                            <div class="mb-2">
+                                <img src="/@Model.ExistingLogoPath" class="logo-preview" alt="Current logo" data-testid="img-current-logo" />
+                                <label class="d-block mt-2 small">
+                                    <input type="checkbox" asp-for="RemoveLogo" data-testid="checkbox-remove-logo" />
+                                    Remove current logo
+                                </label>
+                            </div>
+                        }
+                        <input asp-for="LogoFile" type="file" accept="image/png,image/jpeg,image/svg+xml" class="form-control-file" data-testid="input-logo-file" />
+                        <span asp-validation-for="LogoFile" class="text-danger"></span>
+                        <small class="form-text text-muted">PNG, JPG, or SVG · max 2 MB</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ HERO TEXT ============ -->
+        <div class="col-lg-6 mb-4">
+            <div class="card cms-section-card h-100">
+                <div class="card-header"><i class="fas fa-bullhorn mr-2"></i> Hero Section</div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label asp-for="HeroTitle"></label>
+                        <input asp-for="HeroTitle" class="form-control" data-testid="input-hero-title" />
+                        <span asp-validation-for="HeroTitle" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="HeroSubtitle"></label>
+                        <textarea asp-for="HeroSubtitle" class="form-control" rows="3" data-testid="input-hero-subtitle"></textarea>
+                        <span asp-validation-for="HeroSubtitle" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="HeroButtonText"></label>
+                        <input asp-for="HeroButtonText" class="form-control" data-testid="input-hero-button-text" />
+                        <span asp-validation-for="HeroButtonText" class="text-danger"></span>
+                    </div>
+                    <div class="alert alert-info mb-0">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Manage hero <strong>images</strong> on the <a asp-controller="HeroImages" asp-action="Index">Hero Images</a> page.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card cms-section-card mb-4">
+        <div class="card-header"><i class="fas fa-palette mr-2"></i> Landing Page Color Scheme</div>
+        <div class="card-body">
+            <p class="text-muted mb-3">Select a preset for the public landing page and all public pages that use the main website layout.</p>
+            <span asp-validation-for="LandingColorScheme" class="text-danger d-block mb-2"></span>
+            <div class="color-scheme-grid">
+                @foreach (var scheme in Model.ColorSchemes)
+                {
+                    var inputId = $"scheme_{scheme.Key}";
+                    <label class="color-scheme-option" for="@inputId">
+                        <input type="radio"
+                               asp-for="LandingColorScheme"
+                               id="@inputId"
+                               value="@scheme.Key"
+                               data-testid="radio-color-scheme-@scheme.Key" />
+                        <span class="color-scheme-card">
+                            <span class="color-scheme-swatches" aria-hidden="true">
+                                <span style="background:@scheme.Primary"></span>
+                                <span style="background:@scheme.PrimaryDark"></span>
+                                <span style="background:@scheme.Accent"></span>
+                                <span style="background:@scheme.BackgroundSoft"></span>
+                            </span>
+                            <span class="color-scheme-name">@scheme.Name</span>
+                            <span class="color-scheme-description">@scheme.Description</span>
+                        </span>
+                    </label>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end mb-4">
+        <button type="submit" class="btn btn-primary btn-lg" data-testid="btn-save-website-settings">
+            <i class="fas fa-save mr-1"></i> Save Changes
+        </button>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

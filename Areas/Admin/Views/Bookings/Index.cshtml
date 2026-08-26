@@ -1,0 +1,100 @@
+@model CourtBookingSystem.Areas.Admin.ViewModels.BookingFilterViewModel
+@{
+    ViewData["Title"] = "Bookings";
+    string formatTime(TimeSpan t) => PhilippineTime.FormatTime(t);
+}
+
+<div class="card">
+    <div class="card-header"><h5 class="card-title mb-0"><i class="fas fa-filter mr-2"></i>Filters</h5></div>
+    <div class="card-body">
+        <form method="get" asp-action="Index" class="form-row">
+            <div class="form-group col-md-2">
+                <label asp-for="FromDate" class="small">From</label>
+                <input asp-for="FromDate" type="date" class="form-control form-control-sm" />
+            </div>
+            <div class="form-group col-md-2">
+                <label asp-for="ToDate" class="small">To</label>
+                <input asp-for="ToDate" type="date" class="form-control form-control-sm" />
+            </div>
+            <div class="form-group col-md-2">
+                <label asp-for="CourtId" class="small">Court</label>
+                <select asp-for="CourtId" class="form-control form-control-sm">
+                    <option value="">All courts</option>
+                    @foreach (var c in Model.Courts) { <option value="@c.Id">@c.CourtName</option> }
+                </select>
+            </div>
+            <div class="form-group col-md-2">
+                <label asp-for="Sport" class="small">Sport</label>
+                <select asp-for="Sport" class="form-control form-control-sm" asp-items="Html.GetEnumSelectList<SportType>()">
+                    <option value="">All sports</option>
+                </select>
+            </div>
+            <div class="form-group col-md-2">
+                <label asp-for="Status" class="small">Status</label>
+                <select asp-for="Status" class="form-control form-control-sm" asp-items="Html.GetEnumSelectList<BookingStatus>()">
+                    <option value="">Any status</option>
+                </select>
+            </div>
+            <div class="form-group col-md-2">
+                <label asp-for="Search" class="small">Search</label>
+                <input asp-for="Search" type="text" class="form-control form-control-sm" placeholder="Ref / name / email" />
+            </div>
+            <div class="form-group col-12 text-right mb-0">
+                <a asp-action="Index" class="btn btn-link btn-sm">Reset</a>
+                <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-search mr-1"></i>Apply</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-list mr-2"></i>Results <span class="badge badge-secondary ml-2">@Model.Results.Count</span>
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        @if (!Model.Results.Any())
+        {
+            <div class="p-4 text-muted text-center">No bookings match your filters.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Reference</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Court</th>
+                            <th>Customer</th>
+                            <th>Status</th>
+                            <th class="text-right">Total</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var b in Model.Results)
+                    {
+                        <tr>
+                            <td class="text-monospace">@b.BookingReferenceNo</td>
+                            <td>@b.BookingDate.ToString("MMM d, yyyy")</td>
+                            <td>@formatTime(b.StartTime) – @formatTime(b.EndTime)</td>
+                            <td>@b.Court?.CourtName<br /><small class="text-muted">@b.Court?.SportType</small></td>
+                            <td>@b.CustomerName<br /><small class="text-muted">@b.CustomerEmail</small></td>
+                            <td><span class="status-badge status-@b.BookingStatus">@b.BookingStatus</span></td>
+                            <td class="text-right">@b.TotalAmount.ToString("0.00")</td>
+                            <td><a asp-action="Details" asp-route-id="@b.Id" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></a></td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+            @if (Model.Results.Count >= 200)
+            {
+                <div class="p-2 text-muted small text-center">Showing first 200 results. Refine your filters to narrow down.</div>
+            }
+        }
+    </div>
+</div>

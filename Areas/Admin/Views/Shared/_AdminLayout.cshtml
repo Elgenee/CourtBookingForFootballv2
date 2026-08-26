@@ -1,0 +1,179 @@
+@{
+    var ctrl = (ViewContext.RouteData.Values["controller"] ?? "").ToString();
+    var action = (ViewContext.RouteData.Values["action"] ?? "").ToString();
+    string active(string name) => string.Equals(ctrl, name, StringComparison.OrdinalIgnoreCase) ? "active" : "";
+    string activeBooking(string name) =>
+        string.Equals(ctrl, "Bookings", StringComparison.OrdinalIgnoreCase)
+        && (string.Equals(action, name, StringComparison.OrdinalIgnoreCase)
+            || (string.Equals(name, "Index", StringComparison.OrdinalIgnoreCase)
+                && string.Equals(action, "Details", StringComparison.OrdinalIgnoreCase)))
+            ? "active"
+            : "";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>@ViewData["Title"] - Admin · CourtBook</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+
+        <!-- ============ TOP NAVBAR ============ -->
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+                </li>
+                <li class="nav-item d-none d-sm-inline-block">
+                    <a asp-area="" asp-controller="Home" asp-action="Index" class="nav-link"><i class="fas fa-globe mr-1"></i> View Site</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+           @*      <partial name="_NotificationBell" /> *@
+                <partial name="_LoginPartial" />
+            </ul>
+        </nav>
+
+        <!-- ============ SIDEBAR ============ -->
+        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+            <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="brand-link">
+                <i class="fas fa-table-tennis-paddle-ball brand-image ml-3" style="font-size:1.6rem; color:var(--brand-accent);"></i>
+                <span class="brand-text font-weight-bold">CourtBook Admin</span>
+            </a>
+
+            <div class="sidebar">
+                <nav class="mt-3">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="nav-link @active("Dashboard")">
+                                <i class="nav-icon fas fa-tachometer-alt"></i><p>Dashboard</p>
+                            </a>
+                        </li>
+                        <li class="nav-header">OPERATIONS</li>
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="Bookings" asp-action="Index" class="nav-link @activeBooking("Index")">
+                                <i class="nav-icon fas fa-calendar-alt"></i><p>Bookings</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="Bookings" asp-action="Calendar" class="nav-link @activeBooking("Calendar")">
+                                <i class="nav-icon fas fa-calendar-week"></i><p>Calendar</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="Payments" asp-action="Index" class="nav-link @active("Payments")">
+                                <i class="nav-icon fas fa-money-check-alt"></i><p>Payments</p>
+                            </a>
+                        </li>
+          @*               <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="Notifications" asp-action="Index" class="nav-link @active("Notifications")">
+                                <i class="nav-icon fas fa-bell"></i><p>Notifications</p>
+                            </a>
+                        </li> *@
+                        <li class="nav-header">CONFIGURATION</li>
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="Courts" asp-action="Index" class="nav-link @active("Courts")">
+                                <i class="nav-icon fas fa-th-large"></i><p>Courts</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="CourtGroups" asp-action="Index" class="nav-link @active("CourtGroups")" data-testid="sidebar-court-groups-link">
+                                <i class="nav-icon fas fa-object-group"></i><p>Court Groups</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="BusinessHours" asp-action="Index" class="nav-link @active("BusinessHours")">
+                                <i class="nav-icon fas fa-clock"></i><p>Business Hours</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="Pricing" asp-action="Index" class="nav-link @active("Pricing")">
+                                <i class="nav-icon fas fa-tags"></i><p>Pricing</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="Promotions" asp-action="Index" class="nav-link @active("Promotions")">
+                                <i class="nav-icon fas fa-bullhorn"></i><p>Promotions</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="BlockedSlots" asp-action="Index" class="nav-link @active("BlockedSlots")">
+                                <i class="nav-icon fas fa-ban"></i><p>Blocked Slots</p>
+                            </a>
+                        </li>
+                        <li class="nav-header">SYSTEM</li>
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="Users" asp-action="Index" class="nav-link @active("Users")">
+                                <i class="nav-icon fas fa-users"></i><p>Users</p>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- ============ CONTENT ============ -->
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row align-items-center">
+                        <div class="col-sm-6">
+                            <h1 class="m-0">@ViewData["Title"]</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Admin</a></li>
+                                <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content">
+                <div class="container-fluid">
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert">×</button>
+                            <i class="fas fa-check mr-1"></i> @TempData["Success"]
+                        </div>
+                    }
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert">×</button>
+                            <i class="fas fa-times mr-1"></i> @TempData["Error"]
+                        </div>
+                    }
+                    @RenderBody()
+                </div>
+            </section>
+        </div>
+
+        <footer class="main-footer text-sm">
+            <strong>&copy; @PhilippineTime.Now.Year CourtBook</strong> — Admin Console
+            <div class="float-right d-none d-sm-inline-block"><b>v</b> 0.4.0</div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

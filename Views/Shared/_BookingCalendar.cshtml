@@ -1,0 +1,148 @@
+@model CourtBookingSystem.Areas.Admin.ViewModels.BookingCalendarViewModel
+@{
+    var area = (ViewContext.RouteData.Values["area"] ?? "").ToString();
+    var todayMonth = PhilippineTime.Today.ToString("yyyy-MM");
+    string formatTime(TimeSpan t) => PhilippineTime.FormatTime(t);
+    var weekDays = new[] { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+    var statusOptions = Html.GetEnumSelectList<BookingStatus>()
+        .Where(item => item.Value != ((int)BookingStatus.Cancelled).ToString());
+}
+
+<div class="card booking-calendar-toolbar">
+    <div class="card-body">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-3">
+            <div>
+                <h5 class="mb-1">@Model.Month.ToString("MMMM yyyy")</h5>
+                <div class="text-muted small">@Model.BookingCount booking@(Model.BookingCount == 1 ? "" : "s") visible in this calendar range</div>
+            </div>
+            <div class="btn-group mt-3 mt-lg-0" role="group" aria-label="Calendar navigation">
+                <a asp-action="Calendar"
+                   asp-route-month="@Model.PreviousMonth.ToString("yyyy-MM")"
+                   asp-route-courtId="@Model.CourtId"
+                   asp-route-sport="@Model.Sport"
+                   asp-route-status="@Model.Status"
+                   class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+                <a asp-action="Calendar"
+                   asp-route-month="@todayMonth"
+                   asp-route-courtId="@Model.CourtId"
+                   asp-route-sport="@Model.Sport"
+                   asp-route-status="@Model.Status"
+                   class="btn btn-outline-secondary btn-sm">Today</a>
+                <a asp-action="Calendar"
+                   asp-route-month="@Model.NextMonth.ToString("yyyy-MM")"
+                   asp-route-courtId="@Model.CourtId"
+                   asp-route-sport="@Model.Sport"
+                   asp-route-status="@Model.Status"
+                   class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <form method="get" asp-action="Calendar" class="form-row align-items-end">
+            <div class="form-group col-md-3 col-lg-2">
+                <label for="calendar-month" class="small">Month</label>
+                <input id="calendar-month" name="month" type="month" value="@Model.MonthKey" class="form-control form-control-sm" />
+            </div>
+            <div class="form-group col-md-3">
+                <label for="calendar-court" class="small">Court</label>
+                <select id="calendar-court" name="courtId" class="form-control form-control-sm">
+                    <option value="">All courts</option>
+                    @foreach (var court in Model.Courts)
+                    {
+                        if (Model.CourtId == court.Id)
+                        {
+                            <option value="@court.Id" selected>@court.CourtName</option>
+                        }
+                        else
+                        {
+                            <option value="@court.Id">@court.CourtName</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="form-group col-md-3 col-lg-2">
+                <label asp-for="Sport" class="small">Sport</label>
+                <select asp-for="Sport" name="sport" class="form-control form-control-sm" asp-items="Html.GetEnumSelectList<SportType>()">
+                    <option value="">All sports</option>
+                </select>
+            </div>
+            <div class="form-group col-md-3 col-lg-2">
+                <label asp-for="Status" class="small">Status</label>
+                <select asp-for="Status" name="status" class="form-control form-control-sm" asp-items="statusOptions">
+                    <option value="">Any status</option>
+                </select>
+            </div>
+            <div class="form-group col-md-12 col-lg-3 text-lg-right">
+                <a asp-action="Calendar" class="btn btn-link btn-sm">Reset</a>
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="fas fa-filter mr-1"></i>Apply
+                </button>
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm ml-1">
+                    <i class="fas fa-list mr-1"></i>List
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card booking-calendar-card">
+    <div class="card-body p-0">
+        <div class="booking-calendar">
+            @foreach (var dayName in weekDays)
+            {
+                <div class="booking-calendar-heading">@dayName</div>
+            }
+
+            @foreach (var day in Model.Days)
+            {
+                var dayClass = day.IsCurrentMonth ? "" : "is-muted";
+                var isToday = day.Date == PhilippineTime.Today;
+
+                <section class="booking-calendar-day @dayClass @(isToday ? "is-today" : "")">
+                    <div class="booking-calendar-date">
+                        <span>@day.Date.Day</span>
+                        @if (isToday)
+                        {
+                            <span class="booking-calendar-today">Today</span>
+                        }
+                    </div>
+
+                    @if (day.Bookings.Any())
+                    {
+                        <div class="booking-calendar-events">
+                            @foreach (var booking in day.Bookings)
+                            {
+                                var payment = booking.Payments.OrderByDescending(p => p.Id).FirstOrDefault();
+
+                                <a asp-area="@area"
+                                   asp-controller="Bookings"
+                                   asp-action="Details"
+                                   asp-route-id="@booking.Id"
+                                   class="booking-calendar-event status-edge-@booking.BookingStatus"
+                                   title="View @booking.BookingReferenceNo">
+                                    <span class="booking-calendar-event-time">@formatTime(booking.StartTime) - @formatTime(booking.EndTime)</span>
+                                    <span class="booking-calendar-event-title">@booking.Court?.CourtName</span>
+                                    <span class="booking-calendar-event-customer">@booking.CustomerName</span>
+                                    <span class="booking-calendar-event-meta">
+                                        <span class="status-badge status-@booking.BookingStatus">@booking.BookingStatus</span>
+                                        @if (payment != null)
+                                        {
+                                            <span class="status-badge payment-@payment.PaymentStatus">@payment.PaymentStatus</span>
+                                        }
+                                    </span>
+                                </a>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="booking-calendar-empty">No bookings</div>
+                    }
+                </section>
+            }
+        </div>
+    </div>
+</div>

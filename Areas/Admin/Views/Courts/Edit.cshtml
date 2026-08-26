@@ -1,0 +1,71 @@
+@model CourtBookingSystem.Areas.Admin.ViewModels.CourtFormViewModel
+@{ ViewData["Title"] = "Edit Court"; }
+
+<div class="row">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header"><h5 class="card-title mb-0"><i class="fas fa-edit mr-2"></i>Edit Court</h5></div>
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+                <div class="card-body">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                    <div class="form-group">
+                        <label asp-for="CourtName"></label>
+                        <input asp-for="CourtName" class="form-control" />
+                        <span asp-validation-for="CourtName" class="text-danger small"></span>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label asp-for="SportType"></label>
+                            <select asp-for="SportType" class="form-control" asp-items="Html.GetEnumSelectList<SportType>()"></select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Description"></label>
+                        <textarea asp-for="Description" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label asp-for="Status"></label>
+                            <select asp-for="Status" class="form-control" asp-items="Html.GetEnumSelectList<CourtStatus>()"></select>
+                        </div>
+                        <div class="form-group col-md-6 d-flex align-items-end">
+                            <div class="custom-control custom-switch">
+                                <input asp-for="IsActive" type="checkbox" class="custom-control-input" id="IsActive" />
+                                <label class="custom-control-label" for="IsActive">@Html.DisplayNameFor(m => m.IsActive)</label>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <h6 class="text-muted mb-3"><i class="fas fa-object-group mr-1"></i>Court group / shared physical area</h6>
+                    <div class="form-row">
+                        <div class="form-group col-md-7">
+                            <label asp-for="CourtGroupId"></label>
+                            <select asp-for="CourtGroupId" class="form-control" data-testid="court-group-select">
+                                <option value="">— Independent (no sharing) —</option>
+                                @foreach (var g in Model.AvailableGroups)
+                                {
+                                    <option value="@g.Id" selected="@(Model.CourtGroupId == g.Id)">@g.GroupName <text>(@g.GroupCode)</text></option>
+                                }
+                            </select>
+                            <small class="form-text text-muted">Pick a group when this court shares its physical area with others (e.g. a convertible Basketball/Pickleball court).</small>
+                        </div>
+                        <div class="form-group col-md-5 d-flex align-items-end">
+                            <div class="custom-control custom-switch">
+                                <input asp-for="IsFullCourt" type="checkbox" class="custom-control-input" id="IsFullCourt" data-testid="court-full-court-toggle" />
+                                <label class="custom-control-label" for="IsFullCourt">@Html.DisplayNameFor(m => m.IsFullCourt)</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer text-right">
+                    <a asp-action="Index" class="btn btn-link">Cancel</a>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i>Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

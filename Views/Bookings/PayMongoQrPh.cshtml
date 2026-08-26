@@ -1,0 +1,160 @@
+@model CourtBookingSystem.Models.Booking
+@{
+    ViewData["Title"] = "PayMongo QR Ph Payment";
+    var checkoutUrl = (string?)ViewBag.CheckoutUrl;
+    var isSandbox = ViewBag.IsSandbox is true;
+    var payment = Model.Payments.FirstOrDefault(p => p.PaymentMethod == CourtBookingSystem.Models.Enums.PaymentMethod.PayMongoQrPh);
+    var refNo = Model.BookingReferenceNo;
+    var expiresAtText = payment?.CheckoutExpiresAtUtc is DateTime expiresAtUtc
+        ? PhilippineTime.FromUtc(expiresAtUtc).ToString("h:mm tt")
+        : null;
+}
+
+<section class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            @if (isSandbox)
+            {
+                <div class="alert alert-warning small mb-3" data-testid="paymongo-sandbox-banner">
+                    <i class="fas fa-flask mr-1"></i>
+                    <strong>Sandbox mode.</strong> No real money will move. Use PayMongo test instructions to simulate a payment.
+                </div>
+            }
+
+            <div class="card booking-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0"><i class="fas fa-qrcode mr-2"></i>Scan to Pay — Booking <code>@refNo</code></h5>
+                    <span class="status-badge payment-Unpaid" data-testid="paymongo-status-badge">Awaiting Payment</span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-7">
+                            @if (!string.IsNullOrEmpty(checkoutUrl))
+                            {
+                                <div class="alert alert-warning border-warning shadow-sm" data-testid="paymongo-expiry-warning">
+                                    <h5 class="alert-heading mb-2">
+                                        <i class="fas fa-exclamation-triangle mr-1"></i>
+                                        Important before you proceed
+                                    </h5>
+                                    <p class="mb-2">
+                                        This QR Ph checkout expires after <strong>3 minutes</strong>@(expiresAtText != null ? $" at {expiresAtText}" : "").
+                                    </p>
+                                    <p class="mb-0">
+                                        Once it expires, this booking is automatically cancelled and cannot be refreshed.
+                                    </p>
+                                </div>
+
+                            @*     <p class="text-muted mb-2">Scan the QR code below using GCash, Maya, BPI, BDO, UnionBank or any QR Ph-compatible app.</p>
+                                <div class="border rounded p-2 bg-white" data-testid="paymongo-iframe-wrapper">
+                                    <iframe
+                                        src="@checkoutUrl"
+                                        width="100%"
+                                        height="640"
+                                        frameborder="0"
+                                        scrolling="auto"
+                                        data-testid="paymongo-checkout-iframe">
+                                    </iframe>
+                                </div>
+                                <p class="small text-muted mt-2">
+                                    Trouble loading the QR? <a href="@checkoutUrl" target="_blank" rel="noopener" data-testid="paymongo-open-external">Open the secure PayMongo page</a> in a new tab.
+                                </p> *@
+
+                                <p class="text-muted">
+                                    Redirecting to secure PayMongo payment page...
+                                </p>
+
+                                <script>
+                                    window.location.href = '@checkoutUrl';
+                                </script>
+
+                                <a href="@checkoutUrl"
+                                   class="btn btn-primary"
+                                   data-testid="paymongo-continue-to-checkout">
+                                    <i class="fas fa-qrcode mr-1"></i>Continue to PayMongo
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="alert alert-danger" data-testid="paymongo-no-session">
+                                    We couldn't start the PayMongo session. Please create a new booking or choose another payment method on the
+                                    <a asp-action="Confirmation" asp-route-reference="@refNo">booking confirmation page</a>.
+                                </div>
+                            }
+                        </div>
+                        <div class="col-md-5">
+                            <dl class="summary-list">
+                                <dt>Booking</dt>
+                                <dd><code>@refNo</code></dd>
+                                <dt>Court</dt>
+                                <dd>@Model.Court?.CourtName</dd>
+                                <dt>When</dt>
+                                <dd>
+                                    @Model.BookingDate.ToString("ddd, MMM d")
+                                    <br />
+                                    @PhilippineTime.FormatTime(Model.StartTime)
+                                    – @PhilippineTime.FormatTime(Model.EndTime)
+                                </dd>
+                                <dt>Amount</dt>
+                                <dd class="font-weight-bold text-success" data-testid="paymongo-amount">@Model.TotalAmount.ToString("0.00") PHP</dd>
+                                <dt>Reference</dt>
+                                <dd><code>@(payment?.QrReference ?? "—")</code></dd>
+                            </dl>
+
+                            <div class="alert alert-info small">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Once your payment goes through, this booking is <strong>auto-confirmed</strong>.
+                                No staff approval needed.
+                            </div>
+
+                            <a asp-action="Confirmation" asp-route-reference="@refNo"
+                               class="btn btn-outline-secondary btn-block"
+                               data-testid="paymongo-back-to-confirmation">
+                                <i class="fas fa-arrow-right mr-1"></i>Check status / view booking
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer small text-muted">
+                    Powered by <a href="https://paymongo.com" target="_blank" rel="noopener">PayMongo</a> &middot;
+                    QR Ph is processed securely on PayMongo's hosted page. We never see your bank or wallet credentials.
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Poll for webhook or local expiry updates and move the customer back to
+    // the booking page once the outcome is known.
+    (function () {
+        const ref = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(refNo));
+        const statusUrl = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Url.Action("ConfirmationStatus", "Bookings")));
+        const target = "/Bookings/Confirmation?reference=" + encodeURIComponent(ref);
+
+        async function poll() {
+            try {
+                const r = await fetch(statusUrl + "?reference=" + encodeURIComponent(ref), { cache: "no-store" });
+                if (r.ok) {
+                    const data = await r.json();
+                    if (data.bookingStatus === "Confirmed" || data.bookingStatus === "Cancelled") {
+                        window.location.href = target;
+                        return;
+                    }
+                }
+            } catch (e) {
+                try {
+                    const r = await fetch(target, { redirect: "follow" });
+                    const t = await r.text();
+                    if (t.includes("status-Confirmed") || t.includes(">Confirmed<") || t.includes("status-Cancelled")) {
+                        window.location.href = target;
+                        return;
+                    }
+                } catch (_) {
+                }
+            }
+
+            setTimeout(poll, 5000);
+        }
+        setTimeout(poll, 5000);
+    })();
+</script>

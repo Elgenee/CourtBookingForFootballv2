@@ -1,0 +1,96 @@
+@model IEnumerable<CourtBookingSystem.Models.Cms.HeroImage>
+@{
+    ViewData["Title"] = "Hero Images";
+}
+
+<div class="row mb-4">
+    <div class="col-lg-4">
+        <div class="card cms-section-card">
+            <div class="card-header"><i class="fas fa-upload mr-2"></i> Upload Hero Image</div>
+            <div class="card-body">
+                <form asp-action="Upload" method="post" enctype="multipart/form-data" data-testid="form-upload-hero">
+                    @Html.AntiForgeryToken()
+                    <div class="form-group">
+                        <label for="Title">Title</label>
+                        <input name="Title" id="Title" class="form-control" required maxlength="140" data-testid="input-hero-upload-title" />
+                    </div>
+                    <div class="form-group">
+                        <label for="File">Image (PNG / JPG / WebP, max 10 MB)</label>
+                        <input name="File" id="File" type="file" accept="image/png,image/jpeg,image/jpg,image/webp,.png,.jpg,.jpeg,.webp" class="form-control-file" required data-testid="input-hero-upload-file" />
+                    </div>
+                    <div class="form-check mb-3">
+                        <input type="checkbox" name="IsActive" value="true" id="IsActive" class="form-check-input" checked data-testid="checkbox-hero-active" />
+                        <label for="IsActive" class="form-check-label">Active</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" data-testid="btn-upload-hero"><i class="fas fa-cloud-upload-alt mr-1"></i> Upload</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card cms-section-card">
+            <div class="card-header">
+                <i class="fas fa-images mr-2"></i> Library
+                <span class="badge badge-secondary ml-1">@Model.Count() image(s)</span>
+            </div>
+            <div class="card-body">
+                @if (!Model.Any())
+                {
+                    <p class="text-muted mb-0">No hero images yet. Upload your first image on the left.</p>
+                }
+                else
+                {
+                    <div class="row">
+                        @foreach (var h in Model)
+                        {
+                            <div class="col-md-6 mb-4">
+                                <div class="card hero-card @(h.IsDefault ? "is-active" : "")" data-testid="hero-card-@h.Id">
+                                    @if (h.IsDefault)
+                                    {
+                                        <span class="badge badge-default">ACTIVE</span>
+                                    }
+                                    <img src="/@h.ImagePath" class="card-img-top hero-preview" alt="@h.Title" loading="lazy" data-testid="hero-img-@h.Id"
+                                         onerror="this.src='https://picsum.photos/seed/hero-placeholder/640/360'" />
+                                    <div class="card-body">
+                                        <h6 class="mb-2">@h.Title</h6>
+                                        <p class="small text-muted mb-2">
+                                            @(h.IsActive ? "Active" : "Inactive")
+                                            @if (h.IsDefault) { <span class="text-success">· Default</span> }
+                                        </p>
+                                        <div class="btn-group btn-group-sm">
+                                            @if (!h.IsDefault)
+                                            {
+                                                <form asp-action="SetDefault" method="post" class="d-inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@h.Id" />
+                                                    <button type="submit" class="btn btn-outline-primary" data-testid="btn-hero-set-default-@h.Id">
+                                                        <i class="fas fa-star mr-1"></i> Set Active
+                                                    </button>
+                                                </form>
+                                            }
+                                            <form asp-action="ToggleActive" method="post" class="d-inline ml-1">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@h.Id" />
+                                                <button type="submit" class="btn btn-outline-secondary" data-testid="btn-hero-toggle-@h.Id">
+                                                    <i class="fas fa-power-off mr-1"></i> @(h.IsActive ? "Disable" : "Enable")
+                                                </button>
+                                            </form>
+                                            <form asp-action="Delete" method="post" class="d-inline ml-1" onsubmit="return confirm('Delete this hero image?');">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@h.Id" />
+                                                <button type="submit" class="btn btn-outline-danger" data-testid="btn-hero-delete-@h.Id">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

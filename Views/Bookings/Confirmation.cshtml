@@ -1,0 +1,335 @@
+@model CourtBookingSystem.Models.Booking
+@using CourtBookingSystem.Models.Enums
+@{
+    ViewData["Title"] = "Booking Confirmation";
+    var payment = Model.Payments.OrderByDescending(p => p.Id).FirstOrDefault();
+    var isPayMongo = payment?.PaymentMethod == PaymentMethod.PayMongoQrPh;
+    string formatTime(TimeSpan t) => PhilippineTime.FormatTime(t);
+    string bookingBadge(BookingStatus s) => $"status-badge status-{s}";
+    string paymentBadge(PaymentStatus s) => $"status-badge payment-{s}";
+
+    var hero = Model.BookingStatus switch
+    {
+        BookingStatus.Confirmed => (
+            Icon: "fa-check",
+            Title: "Booking Confirmed!",
+            Lead: isPayMongo
+                ? "Your PayMongo QR Ph payment was received and your slot is confirmed."
+                : "Your slot is confirmed. Please keep your booking reference handy."
+        ),
+        BookingStatus.ForApproval => (
+            Icon: "fa-hourglass-half",
+            Title: "Payment Submitted",
+            Lead: "Your proof has been uploaded. Our team will verify it shortly."
+        ),
+        BookingStatus.Cancelled => (
+            Icon: "fa-times",
+            Title: "Booking Cancelled",
+            Lead: "This booking is no longer active. Please create a new booking if you still need a slot."
+        ),
+        BookingStatus.Completed => (
+            Icon: "fa-flag-checkered",
+            Title: "Booking Completed",
+            Lead: "This booking has already been completed."
+        ),
+        _ when isPayMongo => (
+            Icon: "fa-qrcode",
+            Title: "Awaiting PayMongo Payment",
+            Lead: "Complete your QR Ph payment. This page will update automatically after PayMongo confirms it."
+        ),
+        _ when payment?.PaymentMethod == PaymentMethod.GCash => (
+            Icon: "fa-camera",
+            Title: "Upload Payment Proof",
+            Lead: "Your slot is reserved while we wait for your GCash receipt upload."
+        ),
+        _ => (
+            Icon: "fa-money-bill-wave",
+            Title: "Booking Created",
+            Lead: "We have reserved your slot. Please complete payment to finalize your booking."
+        )
+    };
+}
+
+<section class="section-default">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger">
+                        <i class="fas fa-times-circle mr-1"></i>@TempData["Error"]
+                    </div>
+                }
+
+                <div class="confirmation-hero">
+                    <div class="confirmation-check confirmation-check-@Model.BookingStatus">
+                        <i class="fas @hero.Icon"></i>
+                    </div>
+                    <h2 class="mb-1">@hero.Title</h2>
+                    <p class="text-muted mb-3">@hero.Lead</p>
+                    <div class="confirmation-ref">
+                        <span class="label">Booking Reference</span>
+                        <span class="value">@Model.BookingReferenceNo</span>
+                    </div>
+                </div>
+
+                <div class="card booking-card mt-4">
+                    <div class="card-header"><i class="fas fa-calendar-check mr-2"></i>Booking Details</div>
+                    <div class="card-body">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">Court</dt>
+                            <dd class="col-sm-8">@Model.Court?.CourtName <span class="badge badge-info ml-1">@Model.Court?.SportType</span></dd>
+
+                            <dt class="col-sm-4">Date</dt>
+                            <dd class="col-sm-8">@Model.BookingDate.ToString("dddd, MMMM d, yyyy")</dd>
+
+                            <dt class="col-sm-4">Time</dt>
+                            <dd class="col-sm-8">@formatTime(Model.StartTime) - @formatTime(Model.EndTime)</dd>
+
+                            <dt class="col-sm-4">Customer</dt>
+                            <dd class="col-sm-8">
+                                @Model.CustomerName<br />
+                                <small class="text-muted">@Model.CustomerEmail &middot; @Model.CustomerMobile</small>
+                            </dd>
+
+                            @if (!string.IsNullOrWhiteSpace(Model.Notes))
+                            {
+                                <dt class="col-sm-4">Notes</dt>
+                                <dd class="col-sm-8">@Model.Notes</dd>
+                            }
+
+                            <dt class="col-sm-4">Booking Status</dt>
+                            <dd class="col-sm-8">
+                                <span id="booking-status" class="@bookingBadge(Model.BookingStatus)" data-testid="confirmation-booking-status">@Model.BookingStatus</span>
+                            </dd>
+
+                            @if (payment != null)
+                            {
+                                <dt class="col-sm-4">Payment Method</dt>
+                                <dd class="col-sm-8">@payment.PaymentMethod</dd>
+
+                                <dt class="col-sm-4">Payment Status</dt>
+                                <dd class="col-sm-8">
+                                    <span id="payment-status" class="@paymentBadge(payment.PaymentStatus)" data-testid="confirmation-payment-status">@payment.PaymentStatus</span>
+                                </dd>
+
+                                @if (!string.IsNullOrWhiteSpace(payment.GatewayTransactionId))
+                                {
+                                    <dt class="col-sm-4">Transaction ID</dt>
+                                    <dd class="col-sm-8"><code>@payment.GatewayTransactionId</code></dd>
+                                }
+
+                                @if (payment.PaidDate.HasValue)
+                                {
+                                    <dt class="col-sm-4">Paid Date</dt>
+                                    <dd class="col-sm-8">@PhilippineTime.FromUtc(payment.PaidDate.Value).ToString("MMM d, yyyy h:mm tt")</dd>
+                                }
+                            }
+
+                            <dt class="col-sm-4">Total Amount</dt>
+                            <dd class="col-sm-8"><strong class="confirmation-amount">@Model.TotalAmount.ToString("0.00") PHP</strong></dd>
+                        </dl>
+                    </div>
+                </div>
+
+                @if (payment != null)
+                {
+                    <div class="card booking-card mt-3 @(payment.PaymentMethod == PaymentMethod.GCash ? "border-info" : payment.PaymentMethod == PaymentMethod.PayMongoQrPh ? "border-primary" : "border-secondary")">
+                        <div class="card-header">
+                            @if (payment.PaymentMethod == PaymentMethod.Cash)
+                            {
+                                <i class="fas fa-money-bill-wave mr-2"></i><span>Payment Instructions - Cash</span>
+                            }
+                            else if (payment.PaymentMethod == PaymentMethod.PayMongoQrPh)
+                            {
+                                <i class="fas fa-qrcode mr-2"></i><span>Payment - QR Ph (PayMongo)</span>
+                                <span class="@paymentBadge(payment.PaymentStatus) ml-2">@payment.PaymentStatus</span>
+                            }
+                            else
+                            {
+                                <i class="fas fa-mobile-alt mr-2"></i><span>Payment Instructions - GCash</span>
+                            }
+                        </div>
+                        <div class="card-body">
+                            @if (payment.PaymentMethod == PaymentMethod.Cash)
+                            {
+                                <ol class="mb-0 pl-3">
+                                    <li>Arrive at the venue at least <strong>15 minutes before your slot</strong>.</li>
+                                    <li>Show your booking reference <code>@Model.BookingReferenceNo</code> at the front desk.</li>
+                                    <li>Pay <strong>@Model.TotalAmount.ToString("0.00") PHP</strong> in cash to confirm your booking.</li>
+                                    <li>Our staff will check you in and assign your court.</li>
+                                </ol>
+                            }
+                            else if (payment.PaymentMethod == PaymentMethod.PayMongoQrPh)
+                            {
+                                @if (payment.PaymentStatus == PaymentStatus.Approved)
+                                {
+                                    <div class="alert alert-success mb-0">
+                                        <i class="fas fa-check-circle mr-1"></i>
+                                        Payment received via PayMongo QR Ph. Booking auto-confirmed.
+                                    </div>
+                                }
+                                else if (payment.PaymentStatus == PaymentStatus.Rejected)
+                                {
+                                    <div class="alert alert-danger">
+                                        <i class="fas fa-times-circle mr-1"></i>
+                                        PayMongo payment was not completed. If the QR Ph checkout expired, please create a new booking.
+                                    </div>
+                                }
+                                else
+                                {
+                                    <ol class="mb-3 pl-3">
+                                        <li>Open the PayMongo QR page using the button below.</li>
+                                        <li>Scan the QR with <strong>GCash, Maya, BPI, BDO, UnionBank</strong> or any QR Ph app.</li>
+                                        <li>Pay <strong>@Model.TotalAmount.ToString("0.00") PHP</strong>.</li>
+                                        <li>Complete payment within <strong>3 minutes</strong>. Expired QR Ph bookings are automatically cancelled and cannot be refreshed.</li>
+                                    </ol>
+                                    <a asp-action="PayMongoStart" asp-route-reference="@Model.BookingReferenceNo"
+                                       class="btn btn-primary"
+                                       data-testid="paymongo-continue-btn">
+                                        <i class="fas fa-qrcode mr-1"></i>Continue to QR Ph
+                                    </a>
+                                    <span class="small text-muted ml-2" data-testid="paymongo-polling-note">
+                                        Waiting for PayMongo confirmation...
+                                    </span>
+                                }
+                            }
+                            else
+                            {
+                                <ol class="mb-3 pl-3">
+                                    <li>Send <strong>@Model.TotalAmount.ToString("0.00") PHP</strong> via GCash to <strong>0917-XXX-XXXX</strong> (CourtBook).</li>
+                                    <li>Use reference <code>@Model.BookingReferenceNo</code> in the message.</li>
+                                    <li><strong>Upload your GCash receipt below</strong> so our team can verify within 1 hour.</li>
+                                </ol>
+                                <div class="alert alert-info mb-0">
+                                    <i class="fas fa-info-circle mr-1"></i>
+                                    Your slot is held for <strong>2 hours</strong>. Unpaid bookings will be auto-cancelled.
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    @if (payment.PaymentMethod == PaymentMethod.GCash)
+                    {
+                        <div class="card booking-card mt-3">
+                            <div class="card-header">
+                                <i class="fas fa-camera mr-2"></i>
+                                <span>Payment Proof</span>
+                                <span class="@paymentBadge(payment.PaymentStatus) ml-2">@payment.PaymentStatus</span>
+                            </div>
+                            <div class="card-body">
+                                @if (TempData["UploadSuccess"] != null)
+                                {
+                                    <div class="alert alert-success">
+                                        <i class="fas fa-check mr-1"></i>@TempData["UploadSuccess"]
+                                    </div>
+                                }
+                                @if (TempData["UploadError"] != null)
+                                {
+                                    <div class="alert alert-danger">
+                                        <i class="fas fa-times mr-1"></i>@TempData["UploadError"]
+                                    </div>
+                                }
+
+                                @if (!string.IsNullOrEmpty(payment.ProofImagePath))
+                                {
+                                    <div class="proof-uploaded mb-3">
+                                        <a href="/@payment.ProofImagePath" target="_blank" rel="noopener">
+                                            <img src="/@payment.ProofImagePath" alt="Payment proof" class="proof-thumbnail-lg" />
+                                        </a>
+                                        <div class="mt-2 small text-muted">
+                                            Uploaded @(payment.PaidDate.HasValue ? PhilippineTime.FromUtc(payment.PaidDate.Value).ToString("MMM d, yyyy h:mm tt") : null).
+                                            @if (payment.PaymentStatus == PaymentStatus.Approved)
+                                            {
+                                                <span class="text-success ml-1"><i class="fas fa-check-circle"></i> Approved</span>
+                                            }
+                                            else if (payment.PaymentStatus == PaymentStatus.Rejected)
+                                            {
+                                                <span class="text-danger ml-1"><i class="fas fa-times-circle"></i> Rejected - please re-upload</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-info ml-1"><i class="fas fa-hourglass-half"></i> Awaiting verification</span>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (payment.PaymentStatus != PaymentStatus.Approved)
+                                {
+                                    <form asp-action="UploadProof" method="post" enctype="multipart/form-data" class="proof-upload-form">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="reference" value="@Model.BookingReferenceNo" />
+                                        <div class="form-group mb-2">
+                                            <label for="proof" class="small text-muted">
+                                                @(string.IsNullOrEmpty(payment.ProofImagePath) ? "Upload screenshot of GCash receipt" : "Replace receipt image")
+                                                <span class="text-muted">(JPEG / PNG / WebP, max 5 MB)</span>
+                                            </label>
+                                            <input type="file" name="proof" id="proof" accept="image/jpeg,image/png,image/webp" class="form-control-file" required />
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-upload mr-1"></i>
+                                            @(string.IsNullOrEmpty(payment.ProofImagePath) ? "Upload Proof" : "Replace Proof")
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    }
+                }
+
+                <div class="text-center mt-4 mb-3" data-testid="confirmation-actions">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary" data-testid="btn-back-home">
+                        <i class="fas fa-home mr-1"></i>Back to Home
+                    </a>
+                    @if (Model.BookingStatus != BookingStatus.Cancelled)
+                    {
+                        <a asp-action="Receipt" asp-route-reference="@Model.BookingReferenceNo" class="btn btn-primary ml-2" data-testid="btn-view-receipt" target="_blank" rel="noopener">
+                            <i class="fas fa-print mr-1"></i>Print Receipt
+                        </a>
+                        <a asp-action="ReceiptPdf" asp-route-reference="@Model.BookingReferenceNo" class="btn btn-outline-secondary ml-2" data-testid="btn-download-pdf-receipt">
+                            <i class="fas fa-file-pdf mr-1"></i>Download PDF
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <style media="print">
+        .main-header, .main-footer, .btn { display: none !important; }
+        .section-default { padding: 0 !important; }
+    </style>
+
+    @if (isPayMongo && payment?.PaymentStatus != PaymentStatus.Approved && Model.BookingStatus != BookingStatus.Cancelled)
+    {
+        <script>
+            (function () {
+                const ref = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.BookingReferenceNo));
+                const currentBookingStatus = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.BookingStatus.ToString()));
+                const currentPaymentStatus = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(payment?.PaymentStatus.ToString()));
+                const statusUrl = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Url.Action("ConfirmationStatus", "Bookings")));
+
+                async function pollStatus() {
+                    try {
+                        const response = await fetch(statusUrl + "?reference=" + encodeURIComponent(ref), { cache: "no-store" });
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.bookingStatus !== currentBookingStatus || data.paymentStatus !== currentPaymentStatus) {
+                                window.location.reload();
+                                return;
+                            }
+                        }
+                    } catch (error) {
+                    }
+
+                    window.setTimeout(pollStatus, 5000);
+                }
+
+                window.setTimeout(pollStatus, 5000);
+            })();
+        </script>
+    }
+}

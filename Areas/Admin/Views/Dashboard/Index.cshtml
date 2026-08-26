@@ -1,0 +1,105 @@
+@model CourtBookingSystem.Areas.Admin.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    string formatTime(TimeSpan t) => PhilippineTime.FormatTime(t);
+}
+
+<div class="row">
+    <div class="col-lg-3 col-6">
+        <div class="small-box admin-stat admin-stat-primary">
+            <div class="inner"><h3>@Model.ActiveCourts</h3><p>Active Courts</p></div>
+            <div class="icon"><i class="fas fa-th-large"></i></div>
+            <a asp-controller="Courts" asp-action="Index" class="small-box-footer">Manage <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="small-box admin-stat admin-stat-info">
+            <div class="inner"><h3>@Model.BookingsToday</h3><p>Bookings Today</p></div>
+            <div class="icon"><i class="fas fa-calendar-day"></i></div>
+            <a asp-controller="Bookings" asp-action="Index" asp-route-FromDate="@PhilippineTime.Today.ToString("yyyy-MM-dd")" asp-route-ToDate="@PhilippineTime.Today.ToString("yyyy-MM-dd")" class="small-box-footer">View <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="small-box admin-stat admin-stat-warning">
+            <div class="inner"><h3>@Model.PendingPaymentsCount</h3><p>Pending Payments</p></div>
+            <div class="icon"><i class="fas fa-hourglass-half"></i></div>
+            <a asp-controller="Payments" asp-action="Index" class="small-box-footer">Verify <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="small-box admin-stat admin-stat-success">
+            <div class="inner"><h3>@Model.RevenueThisMonth.ToString("0.00")</h3><p>Revenue (Month)</p></div>
+            <div class="icon"><i class="fas fa-coins"></i></div>
+            <span class="small-box-footer">&nbsp;</span>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header"><h5 class="card-title mb-0"><i class="fas fa-clock mr-2"></i>Recent Bookings</h5></div>
+            <div class="card-body p-0">
+                @if (!Model.RecentBookings.Any())
+                {
+                    <div class="p-4 text-muted text-center">No bookings yet.</div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Reference</th>
+                                    <th>Customer</th>
+                                    <th>Court</th>
+                                    <th>When</th>
+                                    <th>Status</th>
+                                    <th class="text-right">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var b in Model.RecentBookings)
+                            {
+                                <tr>
+                                    <td><a asp-controller="Bookings" asp-action="Details" asp-route-id="@b.Id" class="text-monospace">@b.BookingReferenceNo</a></td>
+                                    <td>@b.CustomerName<br /><small class="text-muted">@b.CustomerEmail</small></td>
+                                    <td>@b.Court?.CourtName</td>
+                                    <td>@b.BookingDate.ToString("MMM d") &middot; @formatTime(b.StartTime)</td>
+                                    <td><span class="status-badge status-@b.BookingStatus">@b.BookingStatus</span></td>
+                                    <td class="text-right">@b.TotalAmount.ToString("0.00")</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header"><h5 class="card-title mb-0"><i class="fas fa-chart-pie mr-2"></i>Bookings by Sport</h5></div>
+            <div class="card-body">
+                @if (!Model.BookingsBySport.Any())
+                {
+                    <div class="text-muted text-center">No data yet.</div>
+                }
+                else
+                {
+                    var total = Model.BookingsBySport.Sum(x => x.Value);
+                    foreach (var kv in Model.BookingsBySport.OrderByDescending(x => x.Value))
+                    {
+                        var pct = total == 0 ? 0 : (int)(kv.Value * 100.0 / total);
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between"><strong>@kv.Key</strong><span class="text-muted">@kv.Value (@pct%)</span></div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-primary" role="progressbar" style="width:@(pct)%"></div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>

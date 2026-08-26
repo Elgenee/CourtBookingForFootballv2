@@ -1,0 +1,90 @@
+@model CourtBookingSystem.Areas.Staff.ViewModels.StaffDashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    string formatTime(TimeSpan t) => PhilippineTime.FormatTime(t);
+}
+
+<div class="row">
+    <div class="col-lg-3 col-6">
+        <div class="small-box admin-stat staff-stat-1">
+            <div class="inner"><h3>@Model.TodayBookingsCount</h3><p>Bookings Today</p></div>
+            <div class="icon"><i class="fas fa-calendar-day"></i></div>
+            <a asp-controller="Bookings" asp-action="Today" class="small-box-footer">View list <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="small-box admin-stat staff-stat-2">
+            <div class="inner"><h3>@Model.PendingApprovalCount</h3><p>Pending Approval</p></div>
+            <div class="icon"><i class="fas fa-hourglass-half"></i></div>
+            <a asp-controller="Payments" asp-action="Index" class="small-box-footer">Action queue <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="small-box admin-stat staff-stat-3">
+            <div class="inner"><h3>@Model.ConfirmedTodayCount</h3><p>Confirmed Today</p></div>
+            <div class="icon"><i class="fas fa-circle-check"></i></div>
+            <span class="small-box-footer">&nbsp;</span>
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="small-box admin-stat staff-stat-4">
+            <div class="inner"><h3>@Model.RevenueToday.ToString("0.00")</h3><p>Revenue Today</p></div>
+            <div class="icon"><i class="fas fa-coins"></i></div>
+            <span class="small-box-footer">@Model.WalkInsToday walk-ins</span>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0"><i class="fas fa-clock mr-2"></i>Upcoming Today</h5>
+                <a asp-controller="Bookings" asp-action="Today" class="btn btn-sm btn-outline-primary">All today &rarr;</a>
+            </div>
+            <div class="card-body p-0">
+                @if (!Model.UpcomingToday.Any())
+                {
+                    <div class="p-4 text-muted text-center">Nothing on the schedule.</div>
+                }
+                else
+                {
+                    <table class="table table-hover mb-0">
+                        <thead class="thead-light">
+                            <tr><th>Time</th><th>Court</th><th>Customer</th><th>Status</th><th class="text-right">Total</th></tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var b in Model.UpcomingToday)
+                        {
+                            <tr>
+                                <td><strong>@formatTime(b.StartTime)</strong><br /><small class="text-muted">to @formatTime(b.EndTime)</small></td>
+                                <td>@b.Court?.CourtName<br /><small class="text-muted">@b.Court?.SportType</small></td>
+                                <td>@b.CustomerName<br /><small class="text-muted">@b.CustomerMobile</small></td>
+                                <td><span class="status-badge status-@b.BookingStatus">@b.BookingStatus</span></td>
+                                <td class="text-right">@b.TotalAmount.ToString("0.00")</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card staff-quick">
+            <div class="card-header"><h5 class="card-title mb-0"><i class="fas fa-bolt mr-2"></i>Quick Actions</h5></div>
+            <div class="card-body">
+                <a asp-controller="WalkIn" asp-action="Create" class="btn btn-primary btn-block btn-lg">
+                    <i class="fas fa-person-walking mr-2"></i>New Walk-In Booking
+                </a>
+                <a asp-controller="Bookings" asp-action="Today" class="btn btn-outline-primary btn-block">
+                    <i class="fas fa-calendar-day mr-2"></i>Today's Bookings
+                </a>
+                <a asp-controller="Payments" asp-action="Index" class="btn btn-outline-secondary btn-block">
+                    <i class="fas fa-money-check-alt mr-2"></i>Verify Payments
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
