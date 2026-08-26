@@ -11,7 +11,7 @@ namespace CourtBookingSystem.Models.Cms
         public int Id { get; set; }
 
         [Required, StringLength(120)]
-        public string WebsiteName { get; set; } = "Royal Court";
+        public string WebsiteName { get; set; } = "Giuseppe Football";
 
         [StringLength(240)]
         public string? WebsiteTagline { get; set; }
@@ -31,7 +31,7 @@ namespace CourtBookingSystem.Models.Cms
         public string? HeroSubtitle { get; set; }
 
         [Required, StringLength(80)]
-        public string HeroButtonText { get; set; } = "Find Available Times";
+        public string HeroButtonText { get; set; } = "Find Available Field Times";
 
         public DateTime UpdatedDate { get; set; } = DateTime.UtcNow;
     }

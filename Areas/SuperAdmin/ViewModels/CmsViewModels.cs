@@ -8,7 +8,7 @@ namespace CourtBookingSystem.Areas.SuperAdmin.ViewModels
     {
         [Required, StringLength(120)]
         [Display(Name = "Website Name")]
-        public string WebsiteName { get; set; } = "Royal Court";
+        public string WebsiteName { get; set; } = "Giuseppe Football";
 
         [StringLength(240)]
         [Display(Name = "Website Tagline")]
@@ -38,7 +38,7 @@ namespace CourtBookingSystem.Areas.SuperAdmin.ViewModels
 
         [Required, StringLength(80)]
         [Display(Name = "Hero Button Text")]
-        public string HeroButtonText { get; set; } = "Find Available Times";
+        public string HeroButtonText { get; set; } = "Find Available Field Times";
     }
 
     public class HeroImageUploadViewModel

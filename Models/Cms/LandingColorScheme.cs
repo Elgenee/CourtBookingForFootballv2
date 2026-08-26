@@ -34,8 +34,8 @@ namespace CourtBookingSystem.Models.Cms
 
         public static IReadOnlyList<LandingColorScheme> All { get; } =
         [
-            new("royal-blue", "Royal Blue", "Deep blue with warm court-gold accents.", "#0f4c81", "#0a3a64", "#ffb627", "#f4f6f9", "#1c2434"),
-            new("emerald-court", "Emerald Court", "Fresh green with a bright lime highlight.", "#047857", "#065f46", "#a3e635", "#f0fdf4", "#17251f"),
+            new("royal-blue", "Sport Blue", "Deep blue with warm field-gold accents.", "#0f4c81", "#0a3a64", "#ffb627", "#f4f6f9", "#1c2434"),
+            new("emerald-court", "Emerald Field", "Fresh green with a bright lime highlight.", "#047857", "#065f46", "#a3e635", "#f0fdf4", "#17251f"),
             new("midnight-gold", "Midnight Gold", "Premium navy with polished gold accents.", "#111827", "#030712", "#f59e0b", "#f8fafc", "#111827"),
             new("sunrise-clay", "Sunrise Clay", "Warm terracotta with clean sky-blue contrast.", "#b45309", "#7c2d12", "#38bdf8", "#fff7ed", "#2f241c"),
             new("ocean-teal", "Ocean Teal", "Cool teal with a crisp coral action color.", "#0f766e", "#134e4a", "#fb7185", "#f0fdfa", "#17252a"),

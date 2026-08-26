@@ -1,10 +1,10 @@
 @model CourtBookingSystem.Areas.Admin.ViewModels.CourtFormViewModel
-@{ ViewData["Title"] = "New Court"; }
+@{ ViewData["Title"] = "New Field"; }
 
 <div class="row">
     <div class="col-lg-7">
         <div class="card">
-            <div class="card-header"><h5 class="card-title mb-0"><i class="fas fa-plus mr-2"></i>New Court</h5></div>
+            <div class="card-header"><h5 class="card-title mb-0"><i class="fas fa-plus mr-2"></i>New Field</h5></div>
             <form asp-action="Create" method="post">
                 @Html.AntiForgeryToken()
                 <div class="card-body">
@@ -39,7 +39,7 @@
                         </div>
                     </div>
                     <hr />
-                    <h6 class="text-muted mb-3"><i class="fas fa-object-group mr-1"></i>Court group / shared physical area</h6>
+                    <h6 class="text-muted mb-3"><i class="fas fa-object-group mr-1"></i>Field group / shared physical area</h6>
                     <div class="form-row">
                         <div class="form-group col-md-7">
                             <label asp-for="CourtGroupId"></label>
@@ -50,7 +50,7 @@
                                     <option value="@g.Id">@g.GroupName <text>(@g.GroupCode)</text></option>
                                 }
                             </select>
-                            <small class="form-text text-muted">Pick a group when this court shares its physical area with others (e.g. a convertible Basketball/Pickleball court).</small>
+                            <small class="form-text text-muted">Pick a group when this field shares its physical area with others (e.g. a shared football field).</small>
                         </div>
                         <div class="form-group col-md-5 d-flex align-items-end">
                             <div class="custom-control custom-switch">

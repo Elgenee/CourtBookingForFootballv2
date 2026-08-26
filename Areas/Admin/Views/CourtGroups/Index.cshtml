@@ -1,9 +1,9 @@
 @model IEnumerable<CourtBookingSystem.Models.CourtGroup>
-@{ ViewData["Title"] = "Court Groups"; }
+@{ ViewData["Title"] = "Field Groups"; }
 
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="card-title mb-0"><i class="fas fa-object-group mr-2"></i>Court Groups <span class="badge badge-secondary ml-2">@Model.Count()</span></h5>
+        <h5 class="card-title mb-0"><i class="fas fa-object-group mr-2"></i>Field Groups <span class="badge badge-secondary ml-2">@Model.Count()</span></h5>
         <a asp-action="Create" class="btn btn-primary btn-sm"><i class="fas fa-plus mr-1"></i>New Court Group</a>
     </div>
     <div class="card-body p-0">
@@ -11,7 +11,7 @@
         {
             <div class="p-4 text-muted text-center">
                 No court groups yet. Use a group to model courts that share the same physical playing area
-                (e.g. a convertible Basketball / Pickleball court).
+                (e.g. a shared football field).
             </div>
         }
         else
@@ -39,7 +39,7 @@
                             {
                                 @foreach (var c in g.Courts)
                                 {
-                                    <span class="badge badge-pill @(c.IsFullCourt ? "badge-primary" : "badge-light border")" title="@(c.IsFullCourt ? "Full Court" : "Split Court")">
+                                    <span class="badge badge-pill @(c.IsFullCourt ? "badge-primary" : "badge-light border")" title="@(c.IsFullCourt ? "Full Field" : "Split Field")">
                                         @c.CourtName
                                         @if (c.IsFullCourt) {<i class="fas fa-expand-arrows-alt ml-1"></i>}
                                     </span>
@@ -55,7 +55,7 @@
                         <td class="text-right">
                             <a asp-action="Edit" asp-route-id="@g.Id" class="btn btn-sm btn-outline-primary" data-testid="court-group-edit-btn-@g.Id"><i class="fas fa-edit"></i></a>
                             <form asp-action="Delete" asp-route-id="@g.Id" method="post" class="d-inline"
-                                  onsubmit="return confirm('Delete this group? Member courts will become independent (no sharing).');">
+                                  onsubmit="return confirm('Delete this group? Member fields will become independent (no sharing).');">
                                 @Html.AntiForgeryToken()
                                 <button type="submit" class="btn btn-sm btn-outline-danger" data-testid="court-group-delete-btn-@g.Id"><i class="fas fa-trash"></i></button>
                             </form>
@@ -69,7 +69,7 @@
     </div>
     <div class="card-footer text-muted small">
         <i class="fas fa-info-circle mr-1"></i>
-        Full Court members (<i class="fas fa-expand-arrows-alt"></i>) block every sibling when booked.
-        Split Court members only block the Full Court(s) of their group.
+        Full Field members (<i class="fas fa-expand-arrows-alt"></i>) block every sibling when booked.
+        Split Field members only block the Full Field(s) of their group.
     </div>
 </div>

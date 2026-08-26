@@ -1,10 +1,10 @@
-# Royal Court Booking System — Simplified Booking & Payment Statuses
+# Giuseppe Football Booking System — Simplified Booking & Payment Statuses
 
 ## Original problem statement
 Pulled from `https://github.com/Elgenee/CourtBookingSystem`. Implement the
 simplified Booking Status (Pending, ForApproval, Confirmed, Completed,
 Cancelled) and Payment Status (Unpaid, Submitted, Approved, Rejected)
-workflow on a new feature branch `feature/royal-court-booking-enhancements`,
+workflow on a new feature branch `feature/giuseppe-football-booking-enhancements`,
 preserving existing functionality and matching the existing C#/ASP.NET Core
 8 MVC project style.
 
@@ -16,7 +16,7 @@ preserving existing functionality and matching the existing C#/ASP.NET Core
 - QuestPDF for receipts, no JS framework
 
 ## Branch
-`feature/royal-court-booking-enhancements` (off `master`, 2 commits ahead).
+`feature/giuseppe-football-booking-enhancements` (off `master`, 2 commits ahead).
 
 ## What's implemented (Jan 2026 / iteration 9)
 - `Models/Enums/BookingStatus.cs` reduced to 5 values; `PaymentStatus.cs`
@@ -127,11 +127,11 @@ No schema changes. Only data remapping of `Bookings.BookingStatus` and
 
 ## Test credentials
 Default seeded admin (unchanged from upstream):
-- email: `admin@courtbooking.com`
+- email: `admin@giuseppefootball.com`
 - password: `Admin@123`
 
 ## Next action items
-1. Open a PR from `feature/royal-court-booking-enhancements` → `master`
+1. Open a PR from `feature/giuseppe-football-booking-enhancements` → `master`
    via the Save-to-GitHub flow (or `git push origin feature/...`).
 2. Run `dotnet ef database update` against the staging SQL Server before
    production deployment.

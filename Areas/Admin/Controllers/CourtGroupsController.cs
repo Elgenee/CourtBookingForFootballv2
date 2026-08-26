@@ -61,7 +61,7 @@ namespace CourtBookingSystem.Areas.Admin.Controllers
 
             await AssignCourtsAsync(group.Id, vm.SelectedCourtIds);
 
-            TempData["Success"] = $"Court group '{group.GroupName}' created.";
+            TempData["Success"] = $"Field group '{group.GroupName}' created.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -108,7 +108,7 @@ namespace CourtBookingSystem.Areas.Admin.Controllers
 
             await AssignCourtsAsync(group.Id, vm.SelectedCourtIds);
 
-            TempData["Success"] = $"Court group '{group.GroupName}' updated.";
+            TempData["Success"] = $"Field group '{group.GroupName}' updated.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -123,7 +123,7 @@ namespace CourtBookingSystem.Areas.Admin.Controllers
             _db.CourtGroups.Remove(group);
             await _db.SaveChangesAsync();
 
-            TempData["Success"] = $"Court group '{group.GroupName}' deleted; member courts are now independent.";
+            TempData["Success"] = $"Field group '{group.GroupName}' deleted; member fields are now independent.";
             return RedirectToAction(nameof(Index));
         }
 

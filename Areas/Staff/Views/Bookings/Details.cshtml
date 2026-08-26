@@ -35,7 +35,7 @@
                 <dl class="row mb-0">
                     <dt class="col-sm-4">Reference</dt><dd class="col-sm-8 text-monospace" data-testid="staff-detail-ref">@Model.BookingReferenceNo</dd>
                     <dt class="col-sm-4">Status</dt><dd class="col-sm-8"><span class="status-badge status-@Model.BookingStatus" data-testid="staff-detail-status">@Model.BookingStatus</span></dd>
-                    <dt class="col-sm-4">Court</dt><dd class="col-sm-8">@Model.Court?.CourtName <span class="badge badge-info">@Model.Court?.SportType</span></dd>
+                    <dt class="col-sm-4">Field</dt><dd class="col-sm-8">@Model.Court?.CourtName <span class="badge badge-info">@Model.Court?.SportType</span></dd>
                     <dt class="col-sm-4">Date</dt><dd class="col-sm-8">@Model.BookingDate.ToString("dddd, MMMM d, yyyy")</dd>
                     <dt class="col-sm-4">Time</dt><dd class="col-sm-8">@formatTime(Model.StartTime) – @formatTime(Model.EndTime)</dd>
                     <dt class="col-sm-4">Duration</dt><dd class="col-sm-8">@(duration.TotalHours.ToString("0.#")) hour(s)</dd>

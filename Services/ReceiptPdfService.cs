@@ -64,7 +64,7 @@ namespace CourtBookingSystem.Services
                             Row("Customer", booking.CustomerName);
                             Row("Email", booking.CustomerEmail);
                             Row("Mobile", booking.CustomerMobile);
-                            Row("Court", $"{booking.Court?.CourtName} ({booking.Court?.SportType})");
+                            Row("Field", $"{booking.Court?.CourtName} ({booking.Court?.SportType})");
                             Row("Sport", booking.Court?.SportType.ToString() ?? "-");
                             Row("Date", booking.BookingDate.ToString("dddd, MMMM d, yyyy"));
                             Row("Time", $"{FormatTime(booking.StartTime)} – {FormatTime(booking.EndTime)}");

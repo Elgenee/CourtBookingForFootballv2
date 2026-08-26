@@ -1,6 +1,6 @@
 # Documentation
 
-This folder contains operational and architectural documentation for the Royal Court Booking System.
+This folder contains operational and architectural documentation for the Giuseppe Football Booking System.
 
 | File | Audience | Contents |
 |------|----------|----------|

@@ -1,5 +1,5 @@
 @model CourtBookingSystem.Areas.Admin.ViewModels.CourtFormViewModel
-@{ ViewData["Title"] = "Edit Court"; }
+@{ ViewData["Title"] = "Edit Field"; }
 
 <div class="row">
     <div class="col-lg-7">
@@ -38,7 +38,7 @@
                         </div>
                     </div>
                     <hr />
-                    <h6 class="text-muted mb-3"><i class="fas fa-object-group mr-1"></i>Court group / shared physical area</h6>
+                    <h6 class="text-muted mb-3"><i class="fas fa-object-group mr-1"></i>Field group / shared physical area</h6>
                     <div class="form-row">
                         <div class="form-group col-md-7">
                             <label asp-for="CourtGroupId"></label>
@@ -49,7 +49,7 @@
                                     <option value="@g.Id" selected="@(Model.CourtGroupId == g.Id)">@g.GroupName <text>(@g.GroupCode)</text></option>
                                 }
                             </select>
-                            <small class="form-text text-muted">Pick a group when this court shares its physical area with others (e.g. a convertible Basketball/Pickleball court).</small>
+                            <small class="form-text text-muted">Pick a group when this field shares its physical area with others (e.g. a shared football field).</small>
                         </div>
                         <div class="form-group col-md-5 d-flex align-items-end">
                             <div class="custom-control custom-switch">

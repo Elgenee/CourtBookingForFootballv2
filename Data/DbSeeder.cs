@@ -58,6 +58,7 @@ namespace CourtBookingSystem.Data
             await SeedHeroImagesAsync(db);
             await SeedGalleryImagesAsync(db);
             await SeedPromotionsAsync(db);
+            await ApplyGiuseppeFootballDefaultsAsync(db);
         }
 
         private static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
@@ -94,7 +95,7 @@ namespace CourtBookingSystem.Data
 
         private static async Task SeedDefaultSuperAdminAsync(UserManager<ApplicationUser> userManager, IConfiguration configuration)
         {
-            var email = configuration["DefaultSuperAdmin:Email"] ?? "superadmin@courtbooking.com";
+            var email = configuration["DefaultSuperAdmin:Email"] ?? "superadmin@giuseppefootball.com";
             var password = configuration["DefaultSuperAdmin:Password"] ?? "SuperAdmin@123";
             var fullName = configuration["DefaultSuperAdmin:FullName"] ?? "Super Administrator";
 
@@ -121,7 +122,7 @@ namespace CourtBookingSystem.Data
 
         private static async Task SeedDefaultAdminAsync(UserManager<ApplicationUser> userManager, IConfiguration configuration)
         {
-            var adminEmail = configuration["DefaultAdmin:Email"] ?? "admin@courtbooking.com";
+            var adminEmail = configuration["DefaultAdmin:Email"] ?? "admin@giuseppefootball.com";
             var adminPassword = configuration["DefaultAdmin:Password"] ?? "Admin@123";
             var adminFullName = configuration["DefaultAdmin:FullName"] ?? "System Administrator";
 
@@ -146,7 +147,7 @@ namespace CourtBookingSystem.Data
 
         private static async Task SeedDefaultStaffAsync(UserManager<ApplicationUser> userManager, IConfiguration configuration)
         {
-            var email = configuration["DefaultStaff:Email"] ?? "staff@courtbooking.com";
+            var email = configuration["DefaultStaff:Email"] ?? "staff@giuseppefootball.com";
             var password = configuration["DefaultStaff:Password"] ?? "Staff@123";
             var fullName = configuration["DefaultStaff:FullName"] ?? "Front Desk Staff";
 
@@ -195,18 +196,16 @@ namespace CourtBookingSystem.Data
 
             var courts = new List<Court>
             {
-                // MAIN_COURT — convertible Basketball / Pickleball 1-3
-                new() { CourtName = "Basketball Court",   SportType = SportType.Basketball, Description = "Main convertible full-size basketball court", HourlyRate = 0m, Status = CourtStatus.Available, IsActive = true,  IsFullCourt = true  },
-                new() { CourtName = "Pickleball Court 1", SportType = SportType.Pickleball, Description = "Split court on the main convertible area",     HourlyRate = 0m, Status = CourtStatus.Available, IsActive = true,  IsFullCourt = false },
-                new() { CourtName = "Pickleball Court 2", SportType = SportType.Pickleball, Description = "Split court on the main convertible area",     HourlyRate = 0m, Status = CourtStatus.Available, IsActive = true,  IsFullCourt = false },
-                new() { CourtName = "Pickleball Court 3", SportType = SportType.Pickleball, Description = "Split court on the main convertible area",     HourlyRate = 0m, Status = CourtStatus.Available, IsActive = true,  IsFullCourt = false },
-
-                // PB4 — standalone pickleball court
-                new() { CourtName = "Pickleball Court 4", SportType = SportType.Pickleball, Description = "Independent pickleball court",                  HourlyRate = 0m, Status = CourtStatus.Available, IsActive = true,  IsFullCourt = false },
-
-                // Independent (no group)
-                //new() { CourtName = "Badminton Court 1",  SportType = SportType.Badminton,  Description = "Standard badminton court", HourlyRate = 0m, Status = CourtStatus.Available, IsActive = true },
-                //new() { CourtName = "Tennis Court 1",     SportType = SportType.Tennis,     Description = "Outdoor tennis court",     HourlyRate = 0m, Status = CourtStatus.Available, IsActive = true }
+                new()
+                {
+                    CourtName = "Giuseppe Football Field",
+                    SportType = SportType.Football,
+                    Description = "Football field available for regular matches, training, and private bookings.",
+                    HourlyRate = 0m,
+                    Status = CourtStatus.Available,
+                    IsActive = true,
+                    IsFullCourt = true
+                }
             };
 
             await db.Courts.AddRangeAsync(courts);
@@ -272,57 +271,30 @@ namespace CourtBookingSystem.Data
             await db.SaveChangesAsync();
         }
 
-        // Seeds the sample MAIN_COURT and PB4 groups described in the spec,
-        // and idempotently assigns matching seed courts to them. Safe to run
-        // repeatedly — only inserts groups that are missing and only assigns
-        // courts that currently have no group.
+        // Keeps one simple field group for the football setup. The internal
+        // model still uses Court/CourtGroup names to avoid a database rename.
         private static async Task SeedCourtGroupsAsync(ApplicationDbContext db)
         {
-            var mainGroup = await db.CourtGroups.FirstOrDefaultAsync(g => g.GroupCode == "MAIN_COURT");
-            if (mainGroup == null)
+            var footballGroup = await db.CourtGroups.FirstOrDefaultAsync(g => g.GroupCode == "FOOTBALL_FIELD");
+            if (footballGroup == null)
             {
-                mainGroup = new CourtGroup
+                footballGroup = new CourtGroup
                 {
-                    GroupCode = "MAIN_COURT",
-                    GroupName = "Main Convertible Court",
-                    Description = "Basketball + Pickleball 1-3 share the same physical area.",
+                    GroupCode = "FOOTBALL_FIELD",
+                    GroupName = "Giuseppe Football Field",
+                    Description = "Primary football field booking area.",
                     IsActive = true
                 };
-                db.CourtGroups.Add(mainGroup);
-            }
-
-            var pb4Group = await db.CourtGroups.FirstOrDefaultAsync(g => g.GroupCode == "PB4");
-            if (pb4Group == null)
-            {
-                pb4Group = new CourtGroup
-                {
-                    GroupCode = "PB4",
-                    GroupName = "Pickleball Court 4",
-                    Description = "Independent pickleball court (single-member group).",
-                    IsActive = true
-                };
-                db.CourtGroups.Add(pb4Group);
+                db.CourtGroups.Add(footballGroup);
             }
 
             await db.SaveChangesAsync();
 
-            // Assign known seed courts to the matching group only if they
-            // aren't already in a group — never overwrite admin-managed config.
-            string[] mainCourtNames = { "Basketball Court", "Pickleball Court 1", "Pickleball Court 2", "Pickleball Court 3" };
-            var mainCourts = await db.Courts
-                .Where(c => mainCourtNames.Contains(c.CourtName) && c.CourtGroupId == null)
-                .ToListAsync();
-            foreach (var c in mainCourts)
+            var field = await db.Courts.FirstOrDefaultAsync(c => c.CourtName == "Giuseppe Football Field");
+            if (field != null && field.CourtGroupId == null)
             {
-                c.CourtGroupId = mainGroup.Id;
-                if (c.CourtName == "Basketball Court") c.IsFullCourt = true;
-            }
-
-            var pb4Court = await db.Courts
-                .FirstOrDefaultAsync(c => c.CourtName == "Pickleball Court 4" && c.CourtGroupId == null);
-            if (pb4Court != null)
-            {
-                pb4Court.CourtGroupId = pb4Group.Id;
+                field.CourtGroupId = footballGroup.Id;
+                field.IsFullCourt = true;
             }
 
             await db.SaveChangesAsync();
@@ -430,13 +402,13 @@ namespace CourtBookingSystem.Data
 
             db.WebsiteSettings.Add(new WebsiteSetting
             {
-                WebsiteName = "Royal Court",
-                WebsiteTagline = "Premium Sports Center",
+                WebsiteName = "Giuseppe Football",
+                WebsiteTagline = "Football Field",
                 NavbarLogoPath = null,
                 LandingColorScheme = LandingColorSchemeCatalog.DefaultKey,
-                HeroTitle = "Book Your Next Game",
-                HeroSubtitle = "Premium courts for Pickleball, Badminton, Basketball and Tennis — book online in seconds or just walk in.",
-                HeroButtonText = "Find Available Times",
+                HeroTitle = "Book Your Next Football Game",
+                HeroSubtitle = "Reserve the Giuseppe Football field online in seconds for matches, training sessions, and friendly games.",
+                HeroButtonText = "Find Available Field Times",
                 UpdatedDate = DateTime.UtcNow
             });
             await db.SaveChangesAsync();
@@ -448,13 +420,12 @@ namespace CourtBookingSystem.Data
 
             db.AboutContents.Add(new AboutContent
             {
-                Title = "About Royal Court",
-                Description = "Royal Court is a modern sports center built for players of all skill levels. " +
-                              "Whether you're booking for casual games, training sessions, friendly matches, or competitive play, " +
-                              "Royal Court provides premium courts, flexible schedules, and a simple online booking experience.",
+                Title = "About Giuseppe Football",
+                Description = "Giuseppe Football is a dedicated football field built for casual games, training sessions, friendly matches, and competitive play. " +
+                              "Players can reserve field time online, review available schedules, and arrive ready to play.",
                 FacilitiesList = string.Join('\n', new[]
                 {
-                    "Premium indoor courts",
+                    "Well-kept football field",
                     "Clean changing rooms",
                     "Comfortable waiting area",
                     "Parking area",
@@ -462,9 +433,9 @@ namespace CourtBookingSystem.Data
                     "Friendly staff",
                     "Online & walk-in booking"
                 }),
-                ContactPhone = "+63 917 123 4567",
-                ContactEmail = "hello@royalcourt.ph",
-                Location = "123 Sports Avenue, Makati City, Philippines",
+                ContactPhone = "0917 622 0308",
+                ContactEmail = "hello@giuseppefootball.ph",
+                Location = "Giuseppe Football Club Sanchez Compound Banilad 6000 Cebu (PH)",
                 OpeningHoursDays = "Mon – Sun",
                 OpeningHoursTimes = "8:00 AM – 10:00 PM",
                 UpdatedDate = DateTime.UtcNow
@@ -482,22 +453,22 @@ namespace CourtBookingSystem.Data
             {
                 new HeroImage
                 {
-                    Title = "Professional Pickleball Court",
-                    ImagePath = "https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=1920&q=80",
+                    Title = "Giuseppe Football Field",
+                    ImagePath = "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?auto=format&fit=crop&w=1920&q=80",
                     IsDefault = true,
                     IsActive = true
                 },
                 new HeroImage
                 {
-                    Title = "Premium Badminton Court",
-                    ImagePath = "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?auto=format&fit=crop&w=1920&q=80",
+                    Title = "Football Training Sessions",
+                    ImagePath = "https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&w=1920&q=80",
                     IsDefault = false,
                     IsActive = true
                 },
                 new HeroImage
                 {
-                    Title = "Mixed Sports Facility",
-                    ImagePath = "https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=1920&q=80",
+                    Title = "Match Day Football",
+                    ImagePath = "https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=1920&q=80",
                     IsDefault = false,
                     IsActive = true
                 }
@@ -513,14 +484,10 @@ namespace CourtBookingSystem.Data
 
             var items = new[]
             {
-                ("Pickleball Court", "Premium indoor pickleball court designed for casual and competitive play.", "https://picsum.photos/seed/pickleball-court/640/420"),
-                ("Badminton Court", "Pro-grade synthetic flooring and tournament-standard lighting.", "https://picsum.photos/seed/badminton-court/640/420"),
-                ("Basketball Court", "Full-size hardwood court with adjustable rims.", "https://picsum.photos/seed/basketball-court/640/420"),
-                ("Tennis Court", "Outdoor hard-court surface with professional net systems.", "https://picsum.photos/seed/tennis-court/640/420"),
-                ("Lounge Area", "Relax and refuel between sessions in our cozy lounge.", "https://picsum.photos/seed/lounge-area/640/420"),
-                ("Reception Area", "Friendly check-in desk and gear rental counter.", "https://picsum.photos/seed/reception-area/640/420"),
-                ("Training Session", "Coaching and skill clinics for all ability levels.", "https://picsum.photos/seed/training-session/640/420"),
-                ("Tournament Event", "Where champions are made — our court hosts regular tournaments.", "https://picsum.photos/seed/tournament-event/640/420")
+                ("Football Field", "A well-kept field for casual games, league matches, and private bookings.", "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?auto=format&fit=crop&w=640&q=80"),
+                ("Training Session", "Open space for drills, team practice, and skill development.", "https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&w=640&q=80"),
+                ("Match Day", "Reserve your schedule and arrive ready for kickoff.", "https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=640&q=80"),
+                ("Team Play", "Flexible booking for friendly matches and competitive games.", "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=640&q=80")
             };
 
             var order = 0;
@@ -557,9 +524,9 @@ namespace CourtBookingSystem.Data
                 {
                     AnnouncementType = "Monthly Promo",
                     Title = title,
-                    Description = $"Edit this {monthNames[i]} promotion with your court rates, event details, or facility announcement.",
+                    Description = $"Edit this {monthNames[i]} promotion with your field rates, event details, or facility announcement.",
                     ImagePath = $"/img/promos/months/{monthNames[i].ToLowerInvariant()}.svg",
-                    ImageAlt = $"{title} artwork for The Royall Courts",
+                    ImageAlt = $"{title} artwork for Giuseppe Football",
                     ButtonLabel = "Book Now",
                     ButtonUrl = "#booking-search",
                     IconHtml = "&#x1F389;",
@@ -573,5 +540,192 @@ namespace CourtBookingSystem.Data
 
             await db.SaveChangesAsync();
         }
+
+        private static async Task ApplyGiuseppeFootballDefaultsAsync(ApplicationDbContext db)
+        {
+            var now = DateTime.UtcNow;
+
+            foreach (var settings in await db.WebsiteSettings.ToListAsync())
+            {
+                if (ContainsOldBrand(settings.WebsiteName)
+                    || ContainsOldBrand(settings.HeroSubtitle)
+                    || ContainsMisspelledBrand(settings.WebsiteName)
+                    || ContainsMisspelledBrand(settings.HeroSubtitle)
+                    || ContainsOldSport(settings.HeroSubtitle))
+                {
+                    settings.WebsiteName = "Giuseppe Football";
+                    settings.WebsiteTagline = "Football Field";
+                    settings.HeroTitle = "Book Your Next Football Game";
+                    settings.HeroSubtitle = "Reserve the Giuseppe Football field online in seconds for matches, training sessions, and friendly games.";
+                    settings.HeroButtonText = "Find Available Field Times";
+                    settings.UpdatedDate = now;
+                }
+            }
+
+            foreach (var about in await db.AboutContents.ToListAsync())
+            {
+                if (ContainsOldBrand(about.Title)
+                    || ContainsOldBrand(about.Description)
+                    || ContainsMisspelledBrand(about.Title)
+                    || ContainsMisspelledBrand(about.Description)
+                    || ContainsPlaceholderContact(about.ContactPhone)
+                    || ContainsPlaceholderLocation(about.Location)
+                    || ContainsOldSport(about.Description)
+                    || ContainsOldSport(about.FacilitiesList))
+                {
+                    about.Title = "About Giuseppe Football";
+                    about.Description = "Giuseppe Football is a dedicated football field built for casual games, training sessions, friendly matches, and competitive play. " +
+                                        "Players can reserve field time online, review available schedules, and arrive ready to play.";
+                    about.FacilitiesList = string.Join('\n', new[]
+                    {
+                        "Well-kept football field",
+                        "Clean changing rooms",
+                        "Comfortable waiting area",
+                        "Parking area",
+                        "Equipment rental",
+                        "Friendly staff",
+                        "Online & walk-in booking"
+                    });
+                    about.ContactPhone = "0917 622 0308";
+                    about.ContactEmail = "hello@giuseppefootball.ph";
+                    about.Location = "Giuseppe Football Club Sanchez Compound Banilad 6000 Cebu (PH)";
+                    about.UpdatedDate = now;
+                }
+            }
+
+            var oldSeedNames = new[]
+            {
+                "Basketball Court",
+                "Pickleball Court 1",
+                "Pickleball Court 2",
+                "Pickleball Court 3",
+                "Pickleball Court 4"
+            };
+            var existingCourts = await db.Courts.OrderBy(c => c.Id).ToListAsync();
+            var footballField = existingCourts.FirstOrDefault(c => c.CourtName == "Giuseppe Football Field")
+                ?? existingCourts.FirstOrDefault(c => ContainsMisspelledBrand(c.CourtName))
+                ?? existingCourts.FirstOrDefault(c => oldSeedNames.Contains(c.CourtName));
+
+            if (footballField == null)
+            {
+                footballField = new Court
+                {
+                    CourtName = "Giuseppe Football Field",
+                    HourlyRate = 0m,
+                    Status = CourtStatus.Available,
+                    IsActive = true,
+                    IsFullCourt = true
+                };
+                db.Courts.Add(footballField);
+            }
+
+            footballField.CourtName = "Giuseppe Football Field";
+            footballField.SportType = SportType.Football;
+            footballField.Description = "Football field available for regular matches, training, and private bookings.";
+            footballField.Status = CourtStatus.Available;
+            footballField.IsActive = true;
+            footballField.IsFullCourt = true;
+
+            foreach (var court in existingCourts.Where(c => c.Id != footballField.Id))
+            {
+                court.SportType = SportType.Football;
+                if (ContainsMisspelledBrand(court.CourtName))
+                {
+                    court.CourtName = court.CourtName.Replace(MisspelledGiuseppe, "Giuseppe", StringComparison.OrdinalIgnoreCase);
+                }
+
+                if (oldSeedNames.Contains(court.CourtName))
+                {
+                    court.IsActive = false;
+                }
+            }
+
+            var footballGroup = await db.CourtGroups.FirstOrDefaultAsync(g => g.GroupCode == "FOOTBALL_FIELD");
+            if (footballGroup == null)
+            {
+                footballGroup = await db.CourtGroups.FirstOrDefaultAsync(g => g.GroupCode == "MAIN_COURT")
+                    ?? new CourtGroup { GroupCode = "FOOTBALL_FIELD" };
+                if (footballGroup.Id == 0)
+                {
+                    db.CourtGroups.Add(footballGroup);
+                }
+            }
+            footballGroup.GroupCode = "FOOTBALL_FIELD";
+            footballGroup.GroupName = "Giuseppe Football Field";
+            footballGroup.Description = "Primary football field booking area.";
+            footballGroup.IsActive = true;
+            footballField.CourtGroup = footballGroup;
+
+            foreach (var group in await db.CourtGroups.Where(g => g.GroupCode == "PB4").ToListAsync())
+            {
+                group.IsActive = false;
+            }
+
+            foreach (var hero in await db.HeroImages.ToListAsync())
+            {
+                if (hero.IsDefault && (ContainsOldBrand(hero.Title) || ContainsMisspelledBrand(hero.Title) || ContainsOldSport(hero.Title)))
+                {
+                    hero.Title = "Giuseppe Football Field";
+                    hero.ImagePath = "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?auto=format&fit=crop&w=1920&q=80";
+                }
+            }
+
+            foreach (var promo in await db.Promotions.ToListAsync())
+            {
+                var needsUpdate = ContainsOldBrand(promo.ImageAlt)
+                    || ContainsOldBrand(promo.Description)
+                    || ContainsMisspelledBrand(promo.ImageAlt)
+                    || ContainsMisspelledBrand(promo.Description)
+                    || ContainsOldSport(promo.Description);
+                if (promo.Description.Contains("court rates", StringComparison.OrdinalIgnoreCase))
+                {
+                    promo.Description = promo.Description.Replace("court rates", "field rates", StringComparison.OrdinalIgnoreCase);
+                    needsUpdate = true;
+                }
+
+                if (needsUpdate)
+                {
+                    promo.ImageAlt = $"{promo.Title} artwork for Giuseppe Football";
+                    promo.UpdatedDate = now;
+                }
+            }
+
+            await db.SaveChangesAsync();
+        }
+
+        private const string MisspelledGiuseppe = "Gui" + "ssepe";
+        private const string PreviousRoyalBrand = "Royal " + "Court";
+        private const string PreviousDoubleLBrand = "Roy" + "all";
+        private const string PreviousSystemBrand = "Court" + "Book";
+        private const string PreviousGcshPlaceholder = "0917-" + "XXX-XXXX";
+        private const string PreviousSportsAvenue = "123 Sports " + "Avenue";
+        private const string PreviousMakatiLocation = "Makati " + "City";
+
+        private static bool ContainsOldBrand(string? value) =>
+            !string.IsNullOrWhiteSpace(value)
+            && (value.Contains(PreviousRoyalBrand, StringComparison.OrdinalIgnoreCase)
+                || value.Contains(PreviousDoubleLBrand, StringComparison.OrdinalIgnoreCase)
+                || value.Contains(PreviousSystemBrand, StringComparison.OrdinalIgnoreCase));
+
+        private static bool ContainsMisspelledBrand(string? value) =>
+            !string.IsNullOrWhiteSpace(value)
+            && value.Contains(MisspelledGiuseppe, StringComparison.OrdinalIgnoreCase);
+
+        private static bool ContainsPlaceholderContact(string? value) =>
+            string.IsNullOrWhiteSpace(value)
+            || value.Contains(PreviousGcshPlaceholder, StringComparison.OrdinalIgnoreCase)
+            || value.Contains("+63 917 123 4567", StringComparison.OrdinalIgnoreCase);
+
+        private static bool ContainsPlaceholderLocation(string? value) =>
+            string.IsNullOrWhiteSpace(value)
+            || value.Contains(PreviousSportsAvenue, StringComparison.OrdinalIgnoreCase)
+            || value.Contains(PreviousMakatiLocation, StringComparison.OrdinalIgnoreCase);
+
+        private static bool ContainsOldSport(string? value) =>
+            !string.IsNullOrWhiteSpace(value)
+            && (value.Contains("Pickleball", StringComparison.OrdinalIgnoreCase)
+                || value.Contains("Badminton", StringComparison.OrdinalIgnoreCase)
+                || value.Contains("Basketball", StringComparison.OrdinalIgnoreCase)
+                || value.Contains("Tennis", StringComparison.OrdinalIgnoreCase));
     }
 }

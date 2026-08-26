@@ -1,7 +1,7 @@
 # PayMongo QR Ph Integration Guide
 
 > **Scope:** This document describes the PayMongo QR Ph integration added to
-> Royal Court's booking system. **Manual GCash payment processing is
+> Giuseppe Football's booking system. **Manual GCash payment processing is
 > deliberately untouched** — PayMongo QR Ph is an *additional* payment
 > method, never a replacement.
 
@@ -82,8 +82,8 @@ export PayMongo__SecretKey="sk_live_YYY"
 export PayMongo__PublicKey="pk_live_YYY"
 export PayMongo__WebhookSecret="whsec_YYY"
 export PayMongo__IsSandbox=false
-export PayMongo__SuccessUrl="https://royalcourt.example/Bookings/PayMongoReturn"
-export PayMongo__CancelUrl="https://royalcourt.example/Bookings/PayMongoReturn"
+export PayMongo__SuccessUrl="https://giuseppefootball.example/Bookings/PayMongoReturn"
+export PayMongo__CancelUrl="https://giuseppefootball.example/Bookings/PayMongoReturn"
 ```
 
 If `SecretKey` or `WebhookSecret` is empty:
@@ -140,7 +140,7 @@ PayMongo whenever you spin up a new tunnel.
 
 ### A. Successful payment (sandbox)
 
-1. Open `/Bookings/Create`, pick a court / time
+1. Open `/Bookings/Create`, pick a field / time
 2. Select **QR Ph (PayMongo)** as the payment method
 3. Submit — you'll land on `/Bookings/PayMongoStart` and see the PayMongo
    QR iframe

@@ -10,7 +10,7 @@ namespace CourtBookingSystem.Models
 
         [Required]
         [StringLength(100)]
-        [Display(Name = "Court Name")]
+        [Display(Name = "Field Name")]
         public string CourtName { get; set; } = string.Empty;
 
         [Required]
@@ -52,14 +52,14 @@ namespace CourtBookingSystem.Models
 
         // ----- Court Group / shared physical area -----
         // Null = independent court (no sharing).
-        [Display(Name = "Court Group")]
+        [Display(Name = "Field Group")]
         public int? CourtGroupId { get; set; }
         public CourtGroup? CourtGroup { get; set; }
 
-        // A "Full Court" occupies the entire shared area in its group, so
+        // A "Full Field" occupies the entire shared area in its group, so
         // booking it makes every sibling unavailable. A non-full ("Split")
-        // court only blocks the Full Court(s) in the group when booked.
-        [Display(Name = "Is Full Court")]
+        // court only blocks the Full Field(s) in the group when booked.
+        [Display(Name = "Is Full Field")]
         public bool IsFullCourt { get; set; }
 
         // Navigation

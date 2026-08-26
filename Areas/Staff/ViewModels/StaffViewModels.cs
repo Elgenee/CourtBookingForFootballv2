@@ -17,7 +17,7 @@ namespace CourtBookingSystem.Areas.Staff.ViewModels
 
     public class WalkInFormViewModel
     {
-        [Required, Display(Name = "Court")]
+        [Required, Display(Name = "Field")]
         public int CourtId { get; set; }
 
         [Required, DataType(DataType.Date), Display(Name = "Date")]

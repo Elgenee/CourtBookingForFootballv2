@@ -6,14 +6,14 @@ using Microsoft.EntityFrameworkCore;
 namespace CourtBookingSystem.Services
 {
     /// <summary>
-    /// Computes "shared physical court" conflicts using the configuration in
+    /// Computes "shared physical field" conflicts using the configuration in
     /// <see cref="Models.CourtGroup"/> + <see cref="Models.Court.IsFullCourt"/>.
     /// The class deliberately holds NO hard-coded relationships — every rule
     /// flows from the group membership and the IsFullCourt flag.
     ///
     /// Rule recap (from the spec):
-    ///   • Full Court booked  → every sibling (Full or Split) is unavailable.
-    ///   • Split Court booked → only Full Court siblings become unavailable.
+    ///   • Full Field booked  → every sibling (Full or Split) is unavailable.
+    ///   • Split Field booked → only Full Field siblings become unavailable.
     ///   • Independent courts (no group) are unaffected by anyone else.
     /// </summary>
     public class CourtGroupAvailabilityService
@@ -32,8 +32,8 @@ namespace CourtBookingSystem.Services
         {
             public string Reason =>
                 SiblingIsFullCourt
-                    ? $"Unavailable — {SiblingCourtName} booking (Full Court)"
-                    : $"Unavailable — shared court ({SiblingCourtName}) in use";
+                    ? $"Unavailable — {SiblingCourtName} booking (Full Field)"
+                    : $"Unavailable — shared field ({SiblingCourtName}) in use";
         }
 
         /// <summary>
@@ -63,9 +63,9 @@ namespace CourtBookingSystem.Services
 
             if (siblings.Count == 0) return new List<GroupConflict>();
 
-            // Determine which siblings can actually block this court.
-            //   - If this court is a Full Court, ANY sibling booking blocks it.
-            //   - If this court is a Split Court, only Full Court siblings block it.
+            // Determine which siblings can actually block this field.
+            //   - If this field is a Full Field, ANY sibling booking blocks it.
+            //   - If this field is a Split Field, only Full Field siblings block it.
             var blockingSiblingIds = court.IsFullCourt
                 ? siblings.Select(s => s.Id).ToHashSet()
                 : siblings.Where(s => s.IsFullCourt).Select(s => s.Id).ToHashSet();
@@ -106,7 +106,7 @@ namespace CourtBookingSystem.Services
         /// <summary>
         /// Convenience helper: returns the first group conflict that overlaps
         /// the [start, end) window, or null if none. Used to compute the
-        /// "Unavailable — shared court" reason for individual slots without
+        /// "Unavailable — shared field" reason for individual slots without
         /// re-querying.
         /// </summary>
         public static GroupConflict? FindOverlap(IEnumerable<GroupConflict> conflicts, DateTime start, DateTime end)

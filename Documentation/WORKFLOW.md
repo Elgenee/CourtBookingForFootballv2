@@ -1,4 +1,4 @@
-# Royal Court Booking System — End-to-End Workflow Documentation
+# Giuseppe Football Booking System — End-to-End Workflow Documentation
 
 > **Version:** 0.10 · **Last updated:** 2026-02 · **Stack:** ASP.NET Core 8 MVC + EF Core + SQL Server + Identity + Bootstrap 4 + AdminLTE 3 + jQuery
 
@@ -7,23 +7,23 @@
 ## A. System Overview
 
 ### Purpose
-Royal Court is a court-booking platform for a multi-sport facility supporting **Pickleball, Badminton, Basketball, and Tennis**. The system allows the public to discover available courts, book online (with optional payment-proof upload), and gives staff/admin a console to manage operations end-to-end.
+Giuseppe Football is a football field-booking platform for a multi-sport facility supporting **Football**. The system allows the public to discover available fields, book online (with optional payment-proof upload), and gives staff/admin a console to manage operations end-to-end.
 
 ### Scope
-- Public landing page + court browsing
+- Public landing page + field browsing
 - Guest booking (no account required)
 - Member registration and login (ASP.NET Core Identity)
 - Cash & GCash payment recording (manual verification)
 - Staff console: walk-in bookings, check-in, payment verification
-- Admin console: courts CRUD, business hours, blocked slots, all bookings, payment approval, notifications
+- Admin console: fields CRUD, business hours, blocked slots, all bookings, payment approval, notifications
 - Shared notification system (Admin + Staff)
-- Cross-court "Find Available Time" search
+- Cross-field "Find Available Field Time" search
 
 ### Features (shipped)
-- Landing page (hero + Quick Booking Widget + About + Gallery + Sport/Court grids)
-- Find Available Time page (sport/date/duration → grouped slot results)
+- Landing page (hero + Quick Booking Widget + About + Gallery + Sport/Field grids)
+- Find Available Field Time page (sport/date/duration → grouped slot results)
 - Public booking + confirmation page with GCash proof upload
-- Admin area: Dashboard, Bookings (filterable), Courts CRUD, Business Hours, Blocked Slots, Payments verification, Notifications
+- Admin area: Dashboard, Bookings (filterable), Fields CRUD, Business Hours, Blocked Slots, Payments verification, Notifications
 - Staff area: Dashboard, Today's Bookings, Walk-In, Payments, Notifications
 - Notification bell on Admin & Staff layouts with unread badge + dropdown
 
@@ -40,7 +40,7 @@ Royal Court is a court-booking platform for a multi-sport facility supporting **
 ## B. User Roles
 
 ### Guest
-- **Responsibilities:** Casual visitor; books courts without an account.
+- **Responsibilities:** Casual visitor; books fields without an account.
 - **Permissions:** Browse, search availability, create bookings, upload GCash proof.
 - **Accessible pages:** `/`, `/Availability/Find`, `/Bookings/Create`, `/Bookings/Confirmation?reference=...`, `/Bookings/UploadProof`.
 
@@ -51,12 +51,12 @@ Royal Court is a court-booking platform for a multi-sport facility supporting **
 
 ### Staff
 - **Responsibilities:** Operate front desk — check-ins, walk-ins, payment verification.
-- **Permissions:** All Staff-area operations; view shared notifications; cannot manage courts/business-hours.
+- **Permissions:** All Staff-area operations; view shared notifications; cannot manage fields/business-hours.
 - **Accessible pages:** `/Staff/Dashboard`, `/Staff/Bookings/Today`, `/Staff/WalkIn/Create`, `/Staff/Payments`, `/Staff/Notifications`.
 
 ### Admin
 - **Responsibilities:** Full system control + receives all notifications.
-- **Permissions:** Everything Staff can do + Courts CRUD, BusinessHours, BlockedSlots, change any booking status, manage all bookings/payments.
+- **Permissions:** Everything Staff can do + Fields CRUD, BusinessHours, BlockedSlots, change any booking status, manage all bookings/payments.
 - **Accessible pages:** All `/Admin/*` + `/Staff/*` (admin can use staff console).
 
 ---
@@ -68,13 +68,13 @@ Royal Court is a court-booking platform for a multi-sport facility supporting **
       ↓
 [Quick Widget: Sport + Date + Duration]
       ↓
-[/Availability/Find shows all open slots across courts]
+[/Availability/Find shows all open slots across fields]
       ↓
 [Click slot] → [/Bookings/Create?courtId=&date=&time= pre-filled]
       ↓
 [Fill Customer Name / Email / Mobile + pick Cash or GCash]
       ↓
-[POST /Bookings/Create]   ← booking ref RC-yyyyMMdd-XXXXXX generated
+[POST /Bookings/Create]   ← booking ref GFC-yyyyMMdd-XXXXXX generated
       ↓
 [/Bookings/Confirmation?reference=...]
       ├── Cash: show desk-payment instructions; status stays Pending
@@ -108,7 +108,7 @@ Royal Court is a court-booking platform for a multi-sport facility supporting **
       ↓
 [Login at /Identity/Account/Login]
       ↓
-[Same Find Available Times flow as Guest, but BookingsController pre-fills name/email/mobile from ApplicationUser]
+[Same Find Available Field Times flow as Guest, but BookingsController pre-fills name/email/mobile from ApplicationUser]
       ↓
 [POST /Bookings/Create — Booking.UserId = current user's Id]
       ↓
@@ -131,7 +131,7 @@ Royal Court is a court-booking platform for a multi-sport facility supporting **
 | Review today's bookings | `/Staff/Bookings/Today` (filterable by date) | List of all bookings on a given day |
 | Review payment proofs | `/Staff/Payments` | Approve (cascade booking → Confirmed) or Reject |
 | Manage schedules | (Admin only — Business Hours / Blocked Slots) | n/a for Staff |
-| Manage court availability | (Admin only — Courts CRUD / Status) | n/a for Staff |
+| Manage court availability | (Admin only — Fields CRUD / Status) | n/a for Staff |
 | Walk-in bookings | `/Staff/WalkIn/Create` | Booking auto-Confirmed; Cash auto-Approved, GCash → Submitted |
 | Approve payment + confirm | `/Staff/Bookings/Today` row action | Booking → Confirmed, Payment → Approved |
 | Mark complete / cancel | `/Staff/Bookings/Today` row actions | Manual override for completion or cancellation |
@@ -146,7 +146,7 @@ Royal Court is a court-booking platform for a multi-sport facility supporting **
 | Approve booking | `/Admin/Payments` → Approve (sets Booking to Confirmed, Payment to Approved) |
 | Reject booking | `/Admin/Payments` → Reject (Payment Rejected, Booking back to Pending) |
 | Cancel booking | `/Admin/Bookings/Details/{id}` → ChangeStatus to Cancelled (fires notification) |
-| Manage courts | `/Admin/Courts` — Create / Edit / Delete (smart soft-delete) |
+| Manage fields | `/Admin/Courts` — Create / Edit / Delete (smart soft-delete) |
 | Manage calendar | `/Admin/BusinessHours` + `/Admin/BlockedSlots` |
 | Manage reports | (Backlog — not yet implemented) |
 
@@ -171,7 +171,7 @@ Payment Approved   ConfirmedByUserId   Payment Rejected   Booking → Pending
    ↓               ConfirmedDate        ↓                 (so customer can
 Booking Confirmed                       Notification        re-upload)
    ↓                                    fires
-[Notification: "Booking RC-... approved"]
+[Notification: "Booking GFC-... approved"]
 ```
 
 **Cash flow:** Customer pays at the counter → Staff uses the "Approve" row action on `/Staff/Bookings/Today` → Payment becomes `Approved` and Booking becomes `Confirmed` in one click. Walk-in bookings created by Staff start at `Confirmed` already, with Cash payments auto-Approved.
@@ -199,11 +199,11 @@ Booking Confirmed                       Notification        re-upload)
 ### Notification types (shipped)
 | Trigger | Title | Message |
 |---------|-------|---------|
-| New booking | New Booking | "New booking RC-... submitted for approval." |
-| Proof uploaded | Payment Proof | "Payment proof uploaded for Booking RC-..." |
-| Payment approved | Booking Approved | "Booking RC-... has been approved." |
-| Payment rejected | Payment Rejected | "Payment proof for booking RC-... was rejected. Customer may re-upload." |
-| Status → Cancelled | Booking Cancelled | "Booking RC-... has been cancelled." |
+| New booking | New Booking | "New booking GFC-... submitted for approval." |
+| Proof uploaded | Payment Proof | "Payment proof uploaded for Booking GFC-..." |
+| Payment approved | Booking Approved | "Booking GFC-... has been approved." |
+| Payment rejected | Payment Rejected | "Payment proof for booking GFC-... was rejected. Customer may re-upload." |
+| Status → Cancelled | Booking Cancelled | "Booking GFC-... has been cancelled." |
 | Reschedule | Booking Rescheduled | *(future — not implemented; reschedule flow is backlog)* |
 
 ---
@@ -211,14 +211,14 @@ Booking Confirmed                       Notification        re-upload)
 ## I. Calendar Workflow
 
 ### Customer-facing
-- **Find Available Time** (`/Availability/Find`) — Sport + Date + Duration → AJAX results grouped by court → click slot → Bookings/Create pre-filled.
-- **Booking time picker** (`/Bookings/Create`) — Loads slots for one court+date via `GET /Bookings/GetSlots` AJAX endpoint. Past slots auto-greyed; booked/blocked slots disabled.
+- **Find Available Field Time** (`/Availability/Find`) — Sport + Date + Duration → AJAX results grouped by field → click slot → Bookings/Create pre-filled.
+- **Booking time picker** (`/Bookings/Create`) — Loads slots for one field+date via `GET /Bookings/GetSlots` AJAX endpoint. Past slots auto-greyed; booked/blocked slots disabled.
 
 ### Admin-facing
 - **Business Hours** (`/Admin/BusinessHours`) — Set open/close per `DayOfWeek` or close a day entirely.
-- **Blocked Slots** (`/Admin/BlockedSlots`) — Add court+date+start+end+reason for maintenance/private events.
+- **Blocked Slots** (`/Admin/BlockedSlots`) — Add field+date+start+end+reason for maintenance/private events.
 - **Drag-and-drop rescheduling** — *Backlog (uses FullCalendar.js when iteration ships).*
-- **Court availability management** — `/Admin/Courts` toggles `Status` (Available / Reserved / UnderMaintenance / Closed) and `IsActive`.
+- **Field availability management** — `/Admin/Courts` toggles `Status` (Available / Reserved / UnderMaintenance / Closed) and `IsActive`.
 
 ---
 
@@ -280,9 +280,9 @@ Cancelled
 ### Public
 | Screen | URL | Purpose | Main components | Actions |
 |--------|-----|---------|-----------------|---------|
-| Landing | `/` | Marketing + entry point | Hero, Quick Widget, About, Gallery, Sport cards, Court grid | Book Now, Find a Slot |
-| Find Availability | `/Availability/Find` | Cross-court slot search | Sport/Date/Duration form, grouped result tiles | Pick slot → Bookings/Create |
-| Booking Form | `/Bookings/Create` | Create booking | Court dropdown, date, slot picker, customer fields, payment method | Submit booking |
+| Landing | `/` | Marketing + entry point | Hero, Quick Widget, About, Gallery, Sport cards, Field grid | Book Now, Find a Slot |
+| Find Availability | `/Availability/Find` | Cross-field slot search | Sport/Date/Duration form, grouped result tiles | Pick slot → Bookings/Create |
+| Booking Form | `/Bookings/Create` | Create booking | Field dropdown, date, slot picker, customer fields, payment method | Submit booking |
 | Confirmation | `/Bookings/Confirmation?reference=` | Show ref + payment instructions | Ref box, payment-method-specific instructions, proof upload (GCash) | Upload proof, print, back home |
 | Login | `/Identity/Account/Login` | Identity sign-in | Email/password form | Login |
 | Register | `/Identity/Account/Register` | Member registration | Email/password + FullName | Register |
@@ -291,7 +291,7 @@ Cancelled
 | Screen | URL | Main components |
 |--------|-----|-----------------|
 | Dashboard | `/Admin/Dashboard` | 4 stat tiles, Recent Bookings, Sport breakdown |
-| Bookings | `/Admin/Bookings` | Filters (date range / court / sport / status / search) + table |
+| Bookings | `/Admin/Bookings` | Filters (date range / field / sport / status / search) + table |
 | Booking Details | `/Admin/Bookings/Details/{id}` | Booking info, payments table, ChangeStatus form |
 | Courts | `/Admin/Courts` | List + Create/Edit/Delete actions |
 | Business Hours | `/Admin/BusinessHours` | Inline edit of 7 days |
@@ -304,7 +304,7 @@ Cancelled
 |--------|-----|-----------------|
 | Dashboard | `/Staff/Dashboard` | 4 stat tiles + Upcoming Today + Quick Actions |
 | Today's Bookings | `/Staff/Bookings/Today` | Date-filterable list + smart per-row actions |
-| Walk-In | `/Staff/WalkIn/Create` | Quick form (court, time, customer, payment) |
+| Walk-In | `/Staff/WalkIn/Create` | Quick form (field, time, customer, payment) |
 | Payments | `/Staff/Payments` | Pending queue (Unpaid/Submitted) with thumbnail + Verify/Reject |
 | Notifications | `/Staff/Notifications` | Shared notification list |
 
@@ -359,7 +359,7 @@ Booking         1 ────* Payments (Cascade)
 | **Email notifications** | Booking confirmations + reminders + receipt copies |
 | **Auto-cancel hosted service** | Background job cancels Pending bookings after 2 hours, frees slot |
 | **Reschedule flow** | `/Bookings/Reschedule/{ref}` with conflict check (notification trigger already named) |
-| **Reports & analytics** | Revenue per sport, court utilisation, peak hours, monthly export |
+| **Reports & analytics** | Revenue per sport, field utilisation, peak hours, monthly export |
 | **OCR receipt auto-verify** | Run uploaded GCash image through OCR → auto-flag matching amounts green |
 | **SignalR live notifications** | Real-time bell badge updates without page reload |
 | **Pagination on Admin Bookings** | Currently capped at 200 rows |
@@ -368,14 +368,14 @@ Booking         1 ────* Payments (Cascade)
 
 ## Business Rules (key invariants)
 
-- Each booking has exactly one Court, one date, and a contiguous start/end TimeSpan.
+- Each booking has exactly one Field, one date, and a contiguous start/end TimeSpan.
 - Slots are 1-hour granularity; duration 1–4 hours.
 - Time-range overlap rule: two intervals overlap iff `A.Start < B.End AND A.End > B.Start`. Used everywhere for conflict checks.
 - Conflict checks **exclude** Cancelled bookings so cancelled slots free up.
 - Booking-date max horizon: today + 90 days (UI constraint).
-- Booking reference format: `RC-yyyyMMdd-XXXXXX` (6 random uppercase hex).
+- Booking reference format: `GFC-yyyyMMdd-XXXXXX` (6 random uppercase hex).
 - Payment proof must be JPEG / PNG / WebP ≤ 5 MB; stored under `/wwwroot/uploads/payments/{guid}.{ext}` with sanitized filenames.
-- Walk-in bookings auto-generate placeholder email `walkin-{ref}@courtbook.local` if blank.
+- Walk-in bookings auto-generate placeholder email `walkin-{ref}@giuseppefootball.local` if blank.
 - Booking refs are unique (DB-enforced).
 
 ## Assumptions
@@ -390,8 +390,8 @@ Booking         1 ────* Payments (Cascade)
 
 | Role | Email | Password |
 |------|-------|----------|
-| Admin | `admin@courtbooking.com` | `Admin@123` |
-| Staff | `staff@courtbooking.com` | `Staff@123` |
+| Admin | `admin@giuseppefootball.com` | `Admin@123` |
+| Staff | `staff@giuseppefootball.com` | `Staff@123` |
 
 Seeded automatically on first run via `Data/DbSeeder.cs`. Passwords are config-driven (`appsettings.json` → `DefaultAdmin` / `DefaultStaff`). **Change in production.**
 

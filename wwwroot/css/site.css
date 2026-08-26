@@ -1,5 +1,5 @@
 /* ============================================================
-   Court Booking System — site.css
+   Football Field Booking System — site.css
    Bootstrap 4 + AdminLTE 3 customisation
    ============================================================ */
 
@@ -616,7 +616,7 @@ section.home-hero-content .container {
 .sport-card-link:hover { color: inherit; text-decoration: none; }
 
 /* ============================================================
-   About Royal Court section
+   About Giuseppe Football section
    ============================================================ */
 .section-eyebrow {
     display: inline-block;

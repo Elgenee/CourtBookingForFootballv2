@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "Find Available Time";
+    ViewData["Title"] = "Find Available Field Time";
     var sport = (SportType)ViewBag.Sport;
     var date = (string)ViewBag.Date;
     var duration = (int)ViewBag.Duration;
@@ -11,8 +11,8 @@
     <div class="container">
         <div class="row mb-3">
             <div class="col">
-                <h2 class="mb-1"><i class="fas fa-search-location mr-2 text-primary"></i>Find Available Time</h2>
-                <p class="text-muted">Pick a sport, date, and duration — we'll show every open slot across our courts.</p>
+                <h2 class="mb-1"><i class="fas fa-search-location mr-2 text-primary"></i>Find Available Field Time</h2>
+                <p class="text-muted">Pick a sport, date, and duration — we'll show every open slot across our fields.</p>
             </div>
         </div>
 
@@ -100,7 +100,7 @@
                     var slots = byCourt[court];
                     html += '<div class="card availability-card mb-3">';
                     html += '<div class="card-header d-flex justify-content-between align-items-center">';
-                    html += '<h6 class="mb-0"><i class="fas fa-table-tennis-paddle-ball mr-2 text-primary"></i>' + court + '</h6>';
+                    html += '<h6 class="mb-0"><i class="fas fa-futbol mr-2 text-primary"></i>' + court + '</h6>';
                     html += '<span class="text-muted small">' + slots.length + ' open · ' + slots[0].sportType + '</span>';
                     html += '</div>';
                     html += '<div class="card-body p-2"><div class="availability-slots">';
