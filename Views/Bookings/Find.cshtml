@@ -1,0 +1,44 @@
+@model CourtBookingSystem.ViewModels.FindBookingViewModel
+@{
+    ViewData["Title"] = "Find Booking";
+}
+
+<section class="section-default">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card booking-card">
+                    <div class="card-header">
+                        <i class="fas fa-search mr-2"></i>Find Your Booking
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="Find" method="post">
+                            @Html.AntiForgeryToken()
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                            <div class="form-group">
+                                <label asp-for="BookingReferenceNo"></label>
+                                <input asp-for="BookingReferenceNo" class="form-control text-uppercase" placeholder="GFC-YYYYMMDD-XXXXXX" autocomplete="off" />
+                                <span asp-validation-for="BookingReferenceNo" class="text-danger small"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="CustomerMobile"></label>
+                                <input asp-for="CustomerMobile" class="form-control" placeholder="Mobile number used when booking" autocomplete="tel" />
+                                <span asp-validation-for="CustomerMobile" class="text-danger small"></span>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-block">
+                                <i class="fas fa-search mr-1"></i>Find Booking
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

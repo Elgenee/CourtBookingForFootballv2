@@ -27,6 +27,7 @@ namespace CourtBookingSystem.Areas.Staff.Controllers
                 .Include(p => p.Booking)
                     .ThenInclude(b => b!.Court)
                 .Where(p => p.PaymentStatus == PaymentStatus.Unpaid || p.PaymentStatus == PaymentStatus.Submitted)
+                .Where(p => p.PaymentMethod != PaymentMethod.PayMongoQrPh)
                 .OrderByDescending(p => p.Id)
                 .Take(100)
                 .ToListAsync();
@@ -38,6 +39,12 @@ namespace CourtBookingSystem.Areas.Staff.Controllers
         {
             var payment = await _db.Payments.Include(p => p.Booking).FirstOrDefaultAsync(p => p.Id == id);
             if (payment == null) return NotFound();
+
+            if (payment.PaymentMethod == PaymentMethod.PayMongoQrPh)
+            {
+                TempData["Error"] = $"PayMongo payment for {payment.Booking?.BookingReferenceNo} must be confirmed by webhook.";
+                return RedirectToAction(nameof(Index));
+            }
 
             var user = await _userManager.GetUserAsync(User);
             payment.PaymentStatus = PaymentStatus.Approved;
@@ -60,6 +67,12 @@ namespace CourtBookingSystem.Areas.Staff.Controllers
         {
             var payment = await _db.Payments.Include(p => p.Booking).FirstOrDefaultAsync(p => p.Id == id);
             if (payment == null) return NotFound();
+
+            if (payment.PaymentMethod == PaymentMethod.PayMongoQrPh)
+            {
+                TempData["Error"] = $"PayMongo payment for {payment.Booking?.BookingReferenceNo} must be updated by webhook.";
+                return RedirectToAction(nameof(Index));
+            }
 
             var user = await _userManager.GetUserAsync(User);
             payment.PaymentStatus = PaymentStatus.Rejected;

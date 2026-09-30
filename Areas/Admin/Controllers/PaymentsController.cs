@@ -50,6 +50,12 @@ namespace CourtBookingSystem.Areas.Admin.Controllers
                 .FirstOrDefaultAsync(p => p.Id == id);
             if (payment == null) return NotFound();
 
+            if (payment.PaymentMethod == PaymentMethod.PayMongoQrPh)
+            {
+                TempData["Error"] = $"PayMongo payment for booking {payment.Booking?.BookingReferenceNo} must be confirmed by webhook.";
+                return RedirectToAction(nameof(Index));
+            }
+
             if (payment.PaymentStatus is PaymentStatus.Approved or PaymentStatus.Rejected)
             {
                 TempData["Error"] = $"Payment for booking {payment.Booking?.BookingReferenceNo} is already {payment.PaymentStatus} and cannot be changed.";
@@ -84,6 +90,12 @@ namespace CourtBookingSystem.Areas.Admin.Controllers
                 .Include(p => p.Booking)
                 .FirstOrDefaultAsync(p => p.Id == id);
             if (payment == null) return NotFound();
+
+            if (payment.PaymentMethod == PaymentMethod.PayMongoQrPh)
+            {
+                TempData["Error"] = $"PayMongo payment for booking {payment.Booking?.BookingReferenceNo} must be updated by webhook.";
+                return RedirectToAction(nameof(Index));
+            }
 
             if (payment.PaymentStatus is PaymentStatus.Approved or PaymentStatus.Rejected)
             {

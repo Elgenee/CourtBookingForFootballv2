@@ -133,15 +133,24 @@ namespace CourtBookingSystem.Areas.Staff.Controllers
 
             var user = await _userManager.GetUserAsync(User);
 
+            var touched = false;
             foreach (var p in booking.Payments)
             {
+                if (p.PaymentMethod == PaymentMethod.PayMongoQrPh) continue;
                 if (p.PaymentStatus is PaymentStatus.Unpaid or PaymentStatus.Submitted or PaymentStatus.Rejected)
                 {
                     p.PaymentStatus = PaymentStatus.Approved;
                     p.PaidDate ??= DateTime.UtcNow;
                     p.ConfirmedByUserId = user?.Id;
                     p.ConfirmedDate = DateTime.UtcNow;
+                    touched = true;
                 }
+            }
+
+            if (!touched)
+            {
+                TempData["Error"] = $"No manual payment to approve on {booking.BookingReferenceNo}. PayMongo payments are webhook-driven.";
+                return RedirectAfterAction(returnTo, id);
             }
 
             booking.BookingStatus = BookingStatus.Confirmed;

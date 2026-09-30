@@ -35,6 +35,7 @@ namespace CourtBookingSystem.Data
                 // left over from the pre-simplification workflow.
                 await RemapLegacyStatusesAsync(db);
                 await EnsureSqliteCmsSchemaAsync(db);
+                await EnsureSqlitePartialPaymentSchemaAsync(db);
             }
             else
             {
@@ -332,6 +333,20 @@ namespace CourtBookingSystem.Data
                     IsActive INTEGER NOT NULL,
                     UpdatedDate TEXT NOT NULL
                 );");
+        }
+
+        private static async Task EnsureSqlitePartialPaymentSchemaAsync(ApplicationDbContext db)
+        {
+            try
+            {
+                await db.Database.ExecuteSqlRawAsync(
+                    "ALTER TABLE Payments ADD COLUMN PaymentPurpose INTEGER NOT NULL DEFAULT 1;");
+            }
+            catch (SqliteException ex) when (ex.SqliteErrorCode == 1 &&
+                                             ex.Message.Contains("duplicate column name", StringComparison.OrdinalIgnoreCase))
+            {
+                // Existing SQLite database already has the partial-payment column.
+            }
         }
 
         private static async Task EnsureBookingPricingSchemaAsync(ApplicationDbContext db)

@@ -18,6 +18,7 @@ namespace CourtBookingSystem.Services
         public byte[] Generate(Booking booking, WebsiteSetting settings)
         {
             var payment = booking.Payments?.OrderByDescending(p => p.Id).FirstOrDefault();
+            var summary = PaymentSummaryHelper.Calculate(booking);
 
             var doc = Document.Create(c =>
             {
@@ -71,15 +72,26 @@ namespace CourtBookingSystem.Services
                             Row("Booking Status", booking.BookingStatus.ToString());
                             Row("Payment Status", payment?.PaymentStatus.ToString() ?? "—");
                             Row("Payment Method", payment?.PaymentMethod.ToString() ?? "—");
+                            Row("Amount Paid", summary.AmountPaid.ToString("0.00"));
+                            Row("Remaining Balance", summary.RemainingBalance.ToString("0.00"));
                         });
 
                         col.Item().LineHorizontal(1).LineColor("#e6e8ee");
+
+                        if (booking.Court?.SportType == SportType.Football
+                            && booking.BookingStatus != BookingStatus.Cancelled)
+                        {
+                            col.Item().Border(1).BorderColor("#bfdbfe").Background("#eff6ff").Padding(10).Text(
+                                "Payment confirmation of Full Payment will need to be presented before entry into play area. " +
+                                "In order to avoid delays, please settle payment before your scheduled booking.")
+                                .FontSize(10).FontColor("#1d4ed8");
+                        }
 
                         // Total
                         col.Item().Row(r =>
                         {
                             r.RelativeItem().Text("Total Amount").FontSize(12).FontColor("#6b7280");
-                            r.ConstantItem(160).AlignRight().Text(booking.TotalAmount.ToString("0.00"))
+                            r.ConstantItem(160).AlignRight().Text(summary.TotalAmount.ToString("0.00"))
                                 .Bold().FontSize(20).FontColor("#0d3b66");
                         });
                     });

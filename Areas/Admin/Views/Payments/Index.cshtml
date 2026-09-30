@@ -40,7 +40,8 @@
                 <tbody>
                 @foreach (var p in Model)
                 {
-                    var canChangePaymentStatus = p.PaymentStatus is PaymentStatus.Unpaid or PaymentStatus.Submitted;
+                    var canChangePaymentStatus = p.PaymentMethod != PaymentMethod.PayMongoQrPh
+                        && p.PaymentStatus is PaymentStatus.Unpaid or PaymentStatus.Submitted;
                     <tr>
                         <td>
                             <a asp-controller="Bookings" asp-action="Details" asp-route-id="@p.BookingId" class="text-monospace">

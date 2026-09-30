@@ -4,8 +4,12 @@
     ViewData["Title"] = "Payment Pending";
     var payment = Model.Payments
         .Where(p => p.PaymentMethod == PaymentMethod.PayMongoQrPh)
-        .OrderByDescending(p => p.Id)
+        .OrderByDescending(p => p.PaymentStatus == PaymentStatus.Unpaid || p.PaymentStatus == PaymentStatus.Submitted)
+        .ThenByDescending(p => p.PaymentPurpose == PaymentPurpose.Balance)
+        .ThenByDescending(p => p.Id)
         .FirstOrDefault();
+    var summary = CourtBookingSystem.Services.PaymentSummaryHelper.Calculate(Model);
+    var isBalancePayment = payment?.PaymentPurpose == PaymentPurpose.Balance;
     string formatTime(TimeSpan t) => PhilippineTime.FormatTime(t);
     string bookingBadge(BookingStatus s) => $"status-badge status-{s}";
     string paymentBadge(PaymentStatus? s) => $"status-badge payment-{s}";
@@ -21,7 +25,8 @@
                     </div>
                     <h2 class="mb-1">Your payment is still being verified</h2>
                     <p class="text-muted mb-3">
-                        We are waiting for PayMongo to confirm your QR Ph payment. QR Ph checkout expires after 3 minutes, and expired bookings are cancelled automatically.
+                        We are waiting for PayMongo to confirm your QR Ph payment. QR Ph checkout expires after 3 minutes.
+                        @(isBalancePayment ? "If this balance checkout expires, your partially paid booking remains active." : "Expired reservation checkouts are cancelled automatically.")
                     </p>
                     <div class="confirmation-ref">
                         <span class="label">Booking Reference</span>
@@ -54,8 +59,14 @@
                                 <span id="payment-status" class="@paymentBadge(payment?.PaymentStatus)" data-testid="payment-pending-payment-status">@(payment?.PaymentStatus.ToString() ?? "Submitted")</span>
                             </dd>
 
+                            <dt class="col-sm-4">Payment Amount</dt>
+                            <dd class="col-sm-8"><strong class="confirmation-amount">@((payment?.Amount ?? Model.TotalAmount).ToString("0.00")) PHP</strong></dd>
+
                             <dt class="col-sm-4">Total Amount</dt>
-                            <dd class="col-sm-8"><strong class="confirmation-amount">@Model.TotalAmount.ToString("0.00") PHP</strong></dd>
+                            <dd class="col-sm-8">@summary.TotalAmount.ToString("0.00") PHP</dd>
+
+                            <dt class="col-sm-4">Remaining Balance</dt>
+                            <dd class="col-sm-8">@summary.RemainingBalance.ToString("0.00") PHP</dd>
                         </dl>
                     </div>
                 </div>
@@ -67,9 +78,10 @@
                     <div class="card-body">
                         <div class="alert alert-info mb-3">
                             <i class="fas fa-info-circle mr-1"></i>
-                            Your payment is still being verified. PayMongo will notify us once the payment is approved, or this booking will be cancelled when the 3-minute checkout window expires.
+                            Your payment is still being verified. PayMongo will notify us once the payment is approved.
+                            @(isBalancePayment ? "If the checkout expires, you can start a new remaining-balance payment from the booking page." : "If the reservation checkout expires, this booking will be cancelled.")
                         </div>
-                        <a asp-action="PayMongoStart" asp-route-reference="@Model.BookingReferenceNo"
+                        <a asp-action="PayMongoStart" asp-route-reference="@Model.BookingReferenceNo" asp-route-paymentId="@payment?.Id"
                            class="btn btn-primary"
                            data-testid="payment-pending-continue-btn">
                             <i class="fas fa-qrcode mr-1"></i>Return to PayMongo
@@ -90,6 +102,7 @@
     <script>
         (function () {
             const ref = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.BookingReferenceNo));
+            const isBalancePayment = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(isBalancePayment));
             const statusUrl = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Url.Action("ConfirmationStatus", "Bookings")));
             const receiptUrl = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Url.Action("Receipt", "Bookings", new { reference = Model.BookingReferenceNo })));
 
@@ -98,7 +111,7 @@
                     const response = await fetch(statusUrl + "?reference=" + encodeURIComponent(ref), { cache: "no-store" });
                     if (response.ok) {
                         const data = await response.json();
-                        if (data.paymentStatus === "Approved" || data.bookingStatus === "Confirmed") {
+                        if (data.paymentStatus === "Approved" || data.bookingStatus === "Confirmed" || (!isBalancePayment && data.bookingStatus === "PartiallyPaid")) {
                             window.location.href = receiptUrl;
                             return;
                         }

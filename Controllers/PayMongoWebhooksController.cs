@@ -127,24 +127,39 @@ namespace CourtBookingSystem.Controllers
                     payment.CheckoutExpiresAtUtc ??= checkoutExpiresAtUtc;
                     payment.PaymentStatus = PaymentStatus.Rejected;
                     payment.CheckoutUrl = null;
-                    payment.Booking.BookingStatus = BookingStatus.Cancelled;
+                    if (ShouldCancelBookingOnRejectedPayment(payment))
+                    {
+                        payment.Booking.BookingStatus = BookingStatus.Cancelled;
+                    }
                     notifyTitle = "Late PayMongo Payment Received";
-                    notifyMessage = $"Payment for booking {payment.Booking.BookingReferenceNo} arrived after the 3-minutes QR Ph expiry and the booking remains cancelled.";
+                    notifyMessage = ShouldCancelBookingOnRejectedPayment(payment)
+                        ? $"Payment for booking {payment.Booking.BookingReferenceNo} arrived after the 3-minutes QR Ph expiry and the booking remains cancelled."
+                        : $"Balance payment for booking {payment.Booking.BookingReferenceNo} arrived after the 3-minutes QR Ph expiry and was rejected; the partially paid booking remains active.";
                 }
                 else
                 {
                     payment.PaymentStatus = PaymentStatus.Approved;
                     payment.ConfirmedDate = DateTime.UtcNow;
-                    payment.Booking.BookingStatus = BookingStatus.Confirmed;
+                    var summary = Services.PaymentSummaryHelper.Calculate(payment.Booking);
+                    payment.Booking.BookingStatus = summary.RemainingBalance <= 0m
+                        ? BookingStatus.Confirmed
+                        : payment.PaymentPurpose == PaymentPurpose.Reservation
+                            ? BookingStatus.PartiallyPaid
+                            : payment.Booking.BookingStatus;
                     notifyTitle = "PayMongo Payment Received";
-                    notifyMessage = $"Booking {payment.Booking.BookingReferenceNo} auto-confirmed via PayMongo QR Ph.";
+                    notifyMessage = payment.Booking.BookingStatus == BookingStatus.PartiallyPaid
+                        ? $"Booking {payment.Booking.BookingReferenceNo} reservation payment received via PayMongo QR Ph."
+                        : $"Booking {payment.Booking.BookingReferenceNo} auto-confirmed via PayMongo QR Ph.";
                 }
             }
             else if (isFailedEvent)
             {
                 payment.PaymentStatus = PaymentStatus.Rejected;
                 payment.CheckoutUrl = null;
-                payment.Booking.BookingStatus = BookingStatus.Cancelled;
+                if (ShouldCancelBookingOnRejectedPayment(payment))
+                {
+                    payment.Booking.BookingStatus = BookingStatus.Cancelled;
+                }
                 notifyTitle = "PayMongo Payment Failed";
                 notifyMessage = $"Payment for booking {payment.Booking.BookingReferenceNo} failed via PayMongo.";
             }
@@ -152,7 +167,10 @@ namespace CourtBookingSystem.Controllers
             {
                 payment.PaymentStatus = PaymentStatus.Rejected;
                 payment.CheckoutUrl = null;
-                payment.Booking.BookingStatus = BookingStatus.Cancelled;
+                if (ShouldCancelBookingOnRejectedPayment(payment))
+                {
+                    payment.Booking.BookingStatus = BookingStatus.Cancelled;
+                }
                 notifyTitle = "PayMongo QR Expired";
                 notifyMessage = $"QR payment for booking {payment.Booking.BookingReferenceNo} expired before payment.";
             }
@@ -174,10 +192,21 @@ namespace CourtBookingSystem.Controllers
 
         private async Task<Payment?> FindPaymentAsync(WebhookPaymentResult webhook, CancellationToken ct)
         {
+            if (webhook.LocalPaymentId > 0)
+            {
+                var byLocalPaymentId = await _db.Payments
+                    .Include(p => p.Booking)
+                        .ThenInclude(b => b!.Payments)
+                    .FirstOrDefaultAsync(p => p.Id == webhook.LocalPaymentId
+                        && p.PaymentMethod == PaymentMethod.PayMongoQrPh, ct);
+                if (byLocalPaymentId != null) return byLocalPaymentId;
+            }
+
             if (!string.IsNullOrWhiteSpace(webhook.PaymentId))
             {
                 var byGatewayId = await _db.Payments
                     .Include(p => p.Booking)
+                        .ThenInclude(b => b!.Payments)
                     .FirstOrDefaultAsync(p => p.GatewayTransactionId == webhook.PaymentId, ct);
                 if (byGatewayId != null) return byGatewayId;
             }
@@ -186,20 +215,29 @@ namespace CourtBookingSystem.Controllers
             {
                 var bySession = await _db.Payments
                     .Include(p => p.Booking)
+                        .ThenInclude(b => b!.Payments)
                     .Where(p => p.QrReference == webhook.CheckoutSessionId
                         && p.PaymentMethod == PaymentMethod.PayMongoQrPh)
-                    .OrderByDescending(p => p.Id)
                     .FirstOrDefaultAsync(ct);
                 if (bySession != null) return bySession;
             }
 
             if (webhook.BookingId > 0)
             {
-                var byBookingId = await _db.Payments
+                var byBookingIdQuery = _db.Payments
                     .Include(p => p.Booking)
+                        .ThenInclude(b => b!.Payments)
                     .Where(p => p.BookingId == webhook.BookingId
-                        && p.PaymentMethod == PaymentMethod.PayMongoQrPh)
-                    .OrderByDescending(p => p.Id)
+                        && p.PaymentMethod == PaymentMethod.PayMongoQrPh);
+
+                if (TryParsePaymentPurpose(webhook.PaymentPurpose, out var purpose))
+                {
+                    byBookingIdQuery = byBookingIdQuery.Where(p => p.PaymentPurpose == purpose);
+                }
+
+                var byBookingId = await byBookingIdQuery
+                    .OrderByDescending(p => p.PaymentPurpose == PaymentPurpose.Reservation)
+                    .ThenByDescending(p => p.Id)
                     .FirstOrDefaultAsync(ct);
                 if (byBookingId != null) return byBookingId;
             }
@@ -208,19 +246,32 @@ namespace CourtBookingSystem.Controllers
             {
                 return await _db.Payments
                     .Include(p => p.Booking)
+                        .ThenInclude(b => b!.Payments)
                     .Where(p => p.PaymentMethod == PaymentMethod.PayMongoQrPh
+                        && p.PaymentPurpose == PaymentPurpose.FullPayment
                         && (p.Booking!.BookingReferenceNo == webhook.BookingReference
                             || p.ReferenceNo == webhook.BookingReference))
-                    .OrderByDescending(p => p.Id)
                     .FirstOrDefaultAsync(ct);
             }
 
             return null;
         }
 
+        private static bool ShouldCancelBookingOnRejectedPayment(Payment payment)
+        {
+            return payment.PaymentPurpose != PaymentPurpose.Balance;
+        }
+
+        private static bool TryParsePaymentPurpose(string? value, out PaymentPurpose purpose)
+        {
+            return Enum.TryParse(value, ignoreCase: true, out purpose)
+                && Enum.IsDefined(typeof(PaymentPurpose), purpose);
+        }
+
         private static WebhookPaymentResult ParseWebhook(JsonElement root)
         {
             var data = GetObject(root, "data");
+            var eventId = GetString(data, "id");
             var eventType = GetString(data, "type");
             var resource = GetObject(data, "data");
 
@@ -238,26 +289,29 @@ namespace CourtBookingSystem.Controllers
 
             if (string.Equals(resourceType, "checkout_session", StringComparison.OrdinalIgnoreCase))
             {
-                return ParseCheckoutSessionWebhook(eventType, resourceId, resourceAttributes);
+                return ParseCheckoutSessionWebhook(eventId, eventType, resourceId, resourceAttributes);
             }
 
             if (string.Equals(resourceType, "qrph", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(resourceType, "qr", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(resourceType, "qr_code", StringComparison.OrdinalIgnoreCase))
             {
-                return ParseQrWebhook(eventType, resourceId, resourceAttributes);
+                return ParseQrWebhook(eventId, eventType, resourceId, resourceAttributes);
             }
 
-            return ParsePaymentWebhook(eventType, resourceId, resourceAttributes);
+            return ParsePaymentWebhook(eventId, eventType, resourceId, resourceAttributes);
         }
 
         private static WebhookPaymentResult ParseCheckoutSessionWebhook(
+            string? eventId,
             string? eventType,
             string? checkoutSessionId,
             JsonElement attributes)
         {
             var metadata = GetObject(attributes, "metadata");
             var bookingId = GetInt(metadata, "bookingId");
+            var localPaymentId = GetInt(metadata, "paymentId");
+            var paymentPurpose = GetString(metadata, "paymentPurpose");
             var bookingReference = GetString(metadata, "bookingReference")
                 ?? GetString(attributes, "reference_number");
             var paymentIntentId = GetString(GetObject(attributes, "payment_intent"), "id");
@@ -289,25 +343,34 @@ namespace CourtBookingSystem.Controllers
                         ?? GetLong(paymentAttributes, "created_at");
                     bookingReference ??= GetString(paymentAttributes, "external_reference_number");
                     paymentIntentId ??= GetString(paymentAttributes, "payment_intent_id");
+                    var paymentMetadata = GetObject(paymentAttributes, "metadata");
+                    localPaymentId = localPaymentId > 0 ? localPaymentId : GetInt(paymentMetadata, "paymentId");
+                    paymentPurpose ??= GetString(paymentMetadata, "paymentPurpose");
                 }
             }
 
             return new WebhookPaymentResult(
+                eventId,
                 eventType,
                 paymentId ?? paymentIntentId,
                 checkoutSessionId,
+                localPaymentId,
                 bookingId,
                 bookingReference,
+                paymentPurpose,
                 paidAt);
         }
 
         private static WebhookPaymentResult ParsePaymentWebhook(
+            string? eventId,
             string? eventType,
             string? paymentId,
             JsonElement attributes)
         {
             var metadata = GetObject(attributes, "metadata");
             var bookingId = GetInt(metadata, "bookingId");
+            var localPaymentId = GetInt(metadata, "paymentId");
+            var paymentPurpose = GetString(metadata, "paymentPurpose");
             var bookingReference = GetString(metadata, "bookingReference")
                 ?? GetString(attributes, "external_reference_number");
             var checkoutSessionId = GetString(GetObject(attributes, "source"), "id");
@@ -316,21 +379,27 @@ namespace CourtBookingSystem.Controllers
                 ?? GetLong(attributes, "created_at");
 
             return new WebhookPaymentResult(
+                eventId,
                 eventType,
                 paymentId,
                 checkoutSessionId,
+                localPaymentId,
                 bookingId,
                 bookingReference,
+                paymentPurpose,
                 paidAt);
         }
 
         private static WebhookPaymentResult ParseQrWebhook(
+            string? eventId,
             string? eventType,
             string? qrId,
             JsonElement attributes)
         {
             var metadata = GetObject(attributes, "metadata");
             var bookingId = GetInt(metadata, "bookingId");
+            var localPaymentId = GetInt(metadata, "paymentId");
+            var paymentPurpose = GetString(metadata, "paymentPurpose");
             var bookingReference = GetString(metadata, "bookingReference")
                 ?? GetString(attributes, "reference_number")
                 ?? GetString(attributes, "external_reference_number");
@@ -339,11 +408,14 @@ namespace CourtBookingSystem.Controllers
             var sourceId = GetString(GetObject(attributes, "source"), "id");
 
             return new WebhookPaymentResult(
+                eventId,
                 eventType,
                 paymentIntentId ?? qrId,
                 sourceId ?? qrId,
+                localPaymentId,
                 bookingId,
                 bookingReference,
+                paymentPurpose,
                 null);
         }
 
@@ -365,8 +437,19 @@ namespace CourtBookingSystem.Controllers
 
         private static int GetInt(JsonElement parent, string propertyName)
         {
-            var value = GetString(parent, propertyName);
-            return int.TryParse(value, out var result) ? result : 0;
+            if (!TryGetPropertyIgnoreCase(parent, propertyName, out var value))
+            {
+                return 0;
+            }
+
+            if (value.ValueKind == JsonValueKind.Number && value.TryGetInt32(out var number))
+            {
+                return number;
+            }
+
+            return value.ValueKind == JsonValueKind.String && int.TryParse(value.GetString(), out number)
+                ? number
+                : 0;
         }
 
         private static long? GetLong(JsonElement parent, string propertyName)
@@ -405,11 +488,14 @@ namespace CourtBookingSystem.Controllers
         }
 
         private sealed record WebhookPaymentResult(
+            string? EventId,
             string? EventType,
             string? PaymentId,
             string? CheckoutSessionId,
+            int LocalPaymentId,
             int BookingId,
             string? BookingReference,
+            string? PaymentPurpose,
             long? PaidAtUnix);
     }
 }
