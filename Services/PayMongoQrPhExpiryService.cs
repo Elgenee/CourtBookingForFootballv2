@@ -8,7 +8,7 @@ namespace CourtBookingSystem.Services
 {
     public class PayMongoQrPhExpiryService
     {
-        public static readonly TimeSpan CheckoutLifetime = TimeSpan.FromMinutes(3);
+        public static readonly TimeSpan CheckoutLifetime = TimeSpan.FromMinutes(8);
 
         private readonly ApplicationDbContext _db;
         private readonly IPayMongoClient _payMongo;

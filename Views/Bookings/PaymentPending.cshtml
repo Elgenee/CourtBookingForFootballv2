@@ -10,6 +10,7 @@
         .FirstOrDefault();
     var summary = CourtBookingSystem.Services.PaymentSummaryHelper.Calculate(Model);
     var isBalancePayment = payment?.PaymentPurpose == PaymentPurpose.Balance;
+    var qrExpiryMinutes = (int)CourtBookingSystem.Services.PayMongoQrPhExpiryService.CheckoutLifetime.TotalMinutes;
     string formatTime(TimeSpan t) => PhilippineTime.FormatTime(t);
     string bookingBadge(BookingStatus s) => $"status-badge status-{s}";
     string paymentBadge(PaymentStatus? s) => $"status-badge payment-{s}";
@@ -25,7 +26,7 @@
                     </div>
                     <h2 class="mb-1">Your payment is still being verified</h2>
                     <p class="text-muted mb-3">
-                        We are waiting for PayMongo to confirm your QR Ph payment. QR Ph checkout expires after 3 minutes.
+                        We are waiting for PayMongo to confirm your QR Ph payment. QR Ph checkout expires after @qrExpiryMinutes minutes.
                         @(isBalancePayment ? "If this balance checkout expires, your partially paid booking remains active." : "Expired reservation checkouts are cancelled automatically.")
                     </p>
                     <div class="confirmation-ref">

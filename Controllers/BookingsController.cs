@@ -421,7 +421,7 @@ namespace CourtBookingSystem.Controllers
 
             if (await _qrPhExpiry.CancelIfExpiredAsync(booking, payment))
             {
-                TempData["Error"] = "This booking was cancelled because the QR Ph payment expired after 3 minutes. Please create a new booking if you still need a slot.";
+                TempData["Error"] = $"This booking was cancelled because the QR Ph payment expired after {QrPhExpiryMinutes} minutes. Please create a new booking if you still need a slot.";
                 return RedirectToAction(nameof(Confirmation), new { reference });
             }
 
@@ -538,7 +538,7 @@ namespace CourtBookingSystem.Controllers
 
             if (await _qrPhExpiry.CancelIfExpiredAsync(booking, payment))
             {
-                TempData["Error"] = "This booking was cancelled because the QR Ph payment expired after 3 minutes. Please create a new booking if you still need a slot.";
+                TempData["Error"] = $"This booking was cancelled because the QR Ph payment expired after {QrPhExpiryMinutes} minutes. Please create a new booking if you still need a slot.";
                 return RedirectToAction(nameof(Confirmation), new { reference });
             }
 
@@ -844,6 +844,9 @@ namespace CourtBookingSystem.Controllers
             var reservationAmount = Math.Round(totalAmount * configuredPercent / 100m, 2, MidpointRounding.AwayFromZero);
             return Math.Min(reservationAmount, totalAmount);
         }
+
+        private static int QrPhExpiryMinutes =>
+            (int)PayMongoQrPhExpiryService.CheckoutLifetime.TotalMinutes;
 
         private static Payment? SelectActivePayMongoPayment(Booking booking)
         {

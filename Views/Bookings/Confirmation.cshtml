@@ -5,6 +5,7 @@
     var payment = Model.Payments.OrderByDescending(p => p.Id).FirstOrDefault();
     var summary = CourtBookingSystem.Services.PaymentSummaryHelper.Calculate(Model);
     var isPayMongo = payment?.PaymentMethod == PaymentMethod.PayMongoQrPh;
+    var qrExpiryMinutes = (int)CourtBookingSystem.Services.PayMongoQrPhExpiryService.CheckoutLifetime.TotalMinutes;
     string formatTime(TimeSpan t) => PhilippineTime.FormatTime(t);
     string bookingBadge(BookingStatus s) => $"status-badge status-{s}";
     string paymentBadge(PaymentStatus s) => $"status-badge payment-{s}";
@@ -216,7 +217,7 @@
                                         <li>Open the PayMongo QR page using the button below.</li>
                                         <li>Scan the QR with <strong>GCash, Maya, BPI, BDO, UnionBank</strong> or any QR Ph app.</li>
                                         <li>Pay <strong>@payment.Amount.ToString("0.00") PHP</strong>.</li>
-                                        <li>Complete payment within <strong>3 minutes</strong>. Expired QR Ph bookings are automatically cancelled and cannot be refreshed.</li>
+                                        <li>Complete payment within <strong>@qrExpiryMinutes minutes</strong>. Expired QR Ph bookings are automatically cancelled and cannot be refreshed.</li>
                                     </ol>
                                     <a asp-action="PayMongoStart" asp-route-reference="@Model.BookingReferenceNo"
                                        asp-route-paymentId="@payment.Id"

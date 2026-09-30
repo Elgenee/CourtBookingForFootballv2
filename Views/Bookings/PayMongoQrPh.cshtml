@@ -11,6 +11,7 @@
         .ThenByDescending(p => p.Id)
         .FirstOrDefault();
     var refNo = Model.BookingReferenceNo;
+    var qrExpiryMinutes = (int)CourtBookingSystem.Services.PayMongoQrPhExpiryService.CheckoutLifetime.TotalMinutes;
     var expiresAtText = payment?.CheckoutExpiresAtUtc is DateTime expiresAtUtc
         ? PhilippineTime.FromUtc(expiresAtUtc).ToString("h:mm tt")
         : null;
@@ -43,7 +44,7 @@
                                         Important before you proceed
                                     </h5>
                                     <p class="mb-2">
-                                        This QR Ph checkout expires after <strong>3 minutes</strong>@(expiresAtText != null ? $" at {expiresAtText}" : "").
+                                        This QR Ph checkout expires after <strong>@qrExpiryMinutes minutes</strong>@(expiresAtText != null ? $" at {expiresAtText}" : "").
                                     </p>
                                     <p class="mb-0">
                                         @(payment?.PaymentPurpose == CourtBookingSystem.Models.Enums.PaymentPurpose.Balance

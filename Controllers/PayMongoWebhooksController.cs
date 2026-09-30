@@ -132,9 +132,10 @@ namespace CourtBookingSystem.Controllers
                         payment.Booking.BookingStatus = BookingStatus.Cancelled;
                     }
                     notifyTitle = "Late PayMongo Payment Received";
+                    var expiryMinutes = (int)CourtBookingSystem.Services.PayMongoQrPhExpiryService.CheckoutLifetime.TotalMinutes;
                     notifyMessage = ShouldCancelBookingOnRejectedPayment(payment)
-                        ? $"Payment for booking {payment.Booking.BookingReferenceNo} arrived after the 3-minutes QR Ph expiry and the booking remains cancelled."
-                        : $"Balance payment for booking {payment.Booking.BookingReferenceNo} arrived after the 3-minutes QR Ph expiry and was rejected; the partially paid booking remains active.";
+                        ? $"Payment for booking {payment.Booking.BookingReferenceNo} arrived after the {expiryMinutes}-minute QR Ph expiry and the booking remains cancelled."
+                        : $"Balance payment for booking {payment.Booking.BookingReferenceNo} arrived after the {expiryMinutes}-minute QR Ph expiry and was rejected; the partially paid booking remains active.";
                 }
                 else
                 {
