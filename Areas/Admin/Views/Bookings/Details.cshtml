@@ -13,7 +13,7 @@
         && pay.PaymentStatus is PaymentStatus.Submitted or PaymentStatus.Unpaid
         && Model.BookingStatus is not (BookingStatus.Cancelled or BookingStatus.Completed);
     var canComplete = Model.BookingStatus == BookingStatus.Confirmed;
-    var canCancel = Model.BookingStatus is BookingStatus.Pending or BookingStatus.ForApproval or BookingStatus.Confirmed;
+    var canCancel = Model.BookingStatus is BookingStatus.Pending or BookingStatus.ForApproval or BookingStatus.PartiallyPaid or BookingStatus.Confirmed;
     var canUploadProof = pay != null
         && pay.PaymentMethod == PaymentMethod.GCash
         && pay.PaymentStatus != PaymentStatus.Approved

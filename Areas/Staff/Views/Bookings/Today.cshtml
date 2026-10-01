@@ -44,7 +44,7 @@
                     var payStatus = pay?.PaymentStatus;
                     var canApprove = b.BookingStatus is BookingStatus.Pending or BookingStatus.ForApproval;
                     var canComplete = b.BookingStatus == BookingStatus.Confirmed;
-                    var canCancel = b.BookingStatus is BookingStatus.Pending or BookingStatus.ForApproval or BookingStatus.Confirmed;
+                    var canCancel = b.BookingStatus is BookingStatus.Pending or BookingStatus.ForApproval or BookingStatus.PartiallyPaid or BookingStatus.Confirmed;
                     <tr>
                         <td>
                             <strong>@formatTime(b.StartTime)</strong>

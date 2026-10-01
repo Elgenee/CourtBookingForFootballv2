@@ -51,6 +51,9 @@ namespace CourtBookingSystem.ViewModels
         [Display(Name = "Payment Method")]
         public PaymentMethod? PaymentMethod { get; set; }
 
+        [Display(Name = "Football Payment Amount")]
+        public bool PayReservationFeeOnly { get; set; }
+
         [Display(Name = "Terms and Conditions")]
         public bool AcceptedTerms { get; set; }
 

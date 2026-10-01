@@ -26,6 +26,10 @@ namespace CourtBookingSystem.Models
         [Display(Name = "Payment Status")]
         public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Unpaid;
 
+        [Required]
+        [Display(Name = "Payment Purpose")]
+        public PaymentPurpose PaymentPurpose { get; set; } = PaymentPurpose.FullPayment;
+
         [StringLength(100)]
         [Display(Name = "Reference No.")]
         public string? ReferenceNo { get; set; }

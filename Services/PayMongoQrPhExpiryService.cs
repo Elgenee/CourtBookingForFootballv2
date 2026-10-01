@@ -8,7 +8,7 @@ namespace CourtBookingSystem.Services
 {
     public class PayMongoQrPhExpiryService
     {
-        public static readonly TimeSpan CheckoutLifetime = TimeSpan.FromMinutes(3);
+        public static readonly TimeSpan CheckoutLifetime = TimeSpan.FromMinutes(8);
 
         private readonly ApplicationDbContext _db;
         private readonly IPayMongoClient _payMongo;
@@ -82,13 +82,21 @@ namespace CourtBookingSystem.Services
 
             foreach (var payment in expiredPayments)
             {
-                if (payment.Booking == null || !ShouldCancel(payment, payment.Booking, now))
+                if (payment.Booking == null)
                 {
                     continue;
                 }
 
-                await ExpirePayMongoSessionAsync(payment, cancellationToken);
-                CancelLocally(payment.Booking, payment, now);
+                if (ShouldCancel(payment, payment.Booking, now))
+                {
+                    await ExpirePayMongoSessionAsync(payment, cancellationToken);
+                    CancelLocally(payment.Booking, payment, now);
+                }
+                else if (ShouldRejectWithoutCancelling(payment, payment.Booking, now))
+                {
+                    await ExpirePayMongoSessionAsync(payment, cancellationToken);
+                    RejectLocally(payment.Booking, payment, now);
+                }
             }
 
             if (expiredPayments.Count > 0)
@@ -99,9 +107,39 @@ namespace CourtBookingSystem.Services
             return expiredPayments.Count;
         }
 
+        public async Task<bool> RejectBalanceIfExpiredAsync(
+            Booking booking,
+            Payment payment,
+            CancellationToken cancellationToken = default)
+        {
+            var now = DateTime.UtcNow;
+            if (!ShouldRejectWithoutCancelling(payment, booking, now))
+            {
+                return false;
+            }
+
+            await ExpirePayMongoSessionAsync(payment, cancellationToken);
+            RejectLocally(booking, payment, now);
+            await _db.SaveChangesAsync(cancellationToken);
+
+            _logger.LogInformation("Rejected expired PayMongo QR Ph balance payment {PaymentId} for booking {Ref}",
+                payment.Id, booking.BookingReferenceNo);
+            return true;
+        }
+
         private bool ShouldCancel(Payment payment, Booking booking, DateTime utcNow)
         {
             return payment.PaymentMethod == PaymentMethod.PayMongoQrPh
+                && payment.PaymentPurpose != PaymentPurpose.Balance
+                && payment.PaymentStatus is PaymentStatus.Unpaid or PaymentStatus.Submitted
+                && booking.BookingStatus is not BookingStatus.Cancelled and not BookingStatus.Confirmed
+                && IsExpired(booking, payment, utcNow);
+        }
+
+        private bool ShouldRejectWithoutCancelling(Payment payment, Booking booking, DateTime utcNow)
+        {
+            return payment.PaymentMethod == PaymentMethod.PayMongoQrPh
+                && payment.PaymentPurpose == PaymentPurpose.Balance
                 && payment.PaymentStatus is PaymentStatus.Unpaid or PaymentStatus.Submitted
                 && booking.BookingStatus is not BookingStatus.Cancelled and not BookingStatus.Confirmed
                 && IsExpired(booking, payment, utcNow);
@@ -114,6 +152,14 @@ namespace CourtBookingSystem.Services
             payment.CheckoutUrl = null;
             payment.ConfirmedDate ??= utcNow;
             booking.BookingStatus = BookingStatus.Cancelled;
+        }
+
+        private void RejectLocally(Booking booking, Payment payment, DateTime utcNow)
+        {
+            payment.CheckoutExpiresAtUtc ??= GetEffectiveExpiryUtc(booking, payment) ?? utcNow;
+            payment.PaymentStatus = PaymentStatus.Rejected;
+            payment.CheckoutUrl = null;
+            payment.ConfirmedDate ??= utcNow;
         }
 
         private async Task ExpirePayMongoSessionAsync(Payment payment, CancellationToken cancellationToken)

@@ -3,7 +3,10 @@
 @{
     ViewData["Title"] = "Booking Confirmation";
     var payment = Model.Payments.OrderByDescending(p => p.Id).FirstOrDefault();
+    var summary = CourtBookingSystem.Services.PaymentSummaryHelper.Calculate(Model);
     var isPayMongo = payment?.PaymentMethod == PaymentMethod.PayMongoQrPh;
+    var isReservationOnlyPaid = Model.BookingStatus == BookingStatus.PartiallyPaid && summary.RemainingBalance > 0m;
+    var qrExpiryMinutes = (int)CourtBookingSystem.Services.PayMongoQrPhExpiryService.CheckoutLifetime.TotalMinutes;
     string formatTime(TimeSpan t) => PhilippineTime.FormatTime(t);
     string bookingBadge(BookingStatus s) => $"status-badge status-{s}";
     string paymentBadge(PaymentStatus s) => $"status-badge payment-{s}";
@@ -16,6 +19,11 @@
             Lead: isPayMongo
                 ? "Your PayMongo QR Ph payment was received and your slot is confirmed."
                 : "Your slot is confirmed. Please keep your booking reference handy."
+        ),
+        BookingStatus.PartiallyPaid => (
+            Icon: "fa-check",
+            Title: "Reservation Paid",
+            Lead: "Your reservation payment was received. Your slot is held, but the remaining balance must be settled before play."
         ),
         BookingStatus.ForApproval => (
             Icon: "fa-hourglass-half",
@@ -58,6 +66,12 @@
                 {
                     <div class="alert alert-danger">
                         <i class="fas fa-times-circle mr-1"></i>@TempData["Error"]
+                    </div>
+                }
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle mr-1"></i>@TempData["Success"]
                     </div>
                 }
 
@@ -127,10 +141,37 @@
                             }
 
                             <dt class="col-sm-4">Total Amount</dt>
-                            <dd class="col-sm-8"><strong class="confirmation-amount">@Model.TotalAmount.ToString("0.00") PHP</strong></dd>
+                            <dd class="col-sm-8"><strong class="confirmation-amount">@summary.TotalAmount.ToString("0.00") PHP</strong></dd>
+
+                            <dt class="col-sm-4">Amount Paid</dt>
+                            <dd class="col-sm-8"><strong class="text-success">@summary.AmountPaid.ToString("0.00") PHP</strong></dd>
+
+                            <dt class="col-sm-4">Remaining Balance</dt>
+                            <dd class="col-sm-8"><strong class="text-danger">@summary.RemainingBalance.ToString("0.00") PHP</strong></dd>
                         </dl>
                     </div>
                 </div>
+
+                @if (isReservationOnlyPaid)
+                {
+                    <div class="alert alert-warning mt-3 mb-0" data-testid="reservation-balance-instruction">
+                        <i class="fas fa-exclamation-triangle mr-1"></i>
+                        <strong>Reservation payment only:</strong>
+                        <ol class="mb-0 mt-1 pl-4">
+                            <li>Go to the website and open <strong>Find Booking</strong>.</li>
+                            <li>Enter your booking reference and mobile number.</li>
+                            <li>Pay the remaining balance before your schedule.</li>
+                        </ol>
+                    </div>
+                }
+                else if (Model.Court?.SportType == SportType.Football && Model.BookingStatus != BookingStatus.Cancelled)
+                {
+                    <div class="alert alert-info mt-3 mb-0">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Payment confirmation of Full Payment will need to be presented before entry into play area.
+                        In order to avoid delays, please settle payment before your scheduled booking.
+                    </div>
+                }
 
                 @if (payment != null)
                 {
@@ -166,7 +207,14 @@
                                 {
                                     <div class="alert alert-success mb-0">
                                         <i class="fas fa-check-circle mr-1"></i>
-                                        Payment received via PayMongo QR Ph. Booking auto-confirmed.
+                                        @if (Model.BookingStatus == BookingStatus.PartiallyPaid)
+                                        {
+                                            <span>Reservation payment received via PayMongo QR Ph. Remaining balance: <strong>@summary.RemainingBalance.ToString("0.00") PHP</strong>.</span>
+                                        }
+                                        else
+                                        {
+                                            <span>Payment received via PayMongo QR Ph. Booking auto-confirmed.</span>
+                                        }
                                     </div>
                                 }
                                 else if (payment.PaymentStatus == PaymentStatus.Rejected)
@@ -181,10 +229,11 @@
                                     <ol class="mb-3 pl-3">
                                         <li>Open the PayMongo QR page using the button below.</li>
                                         <li>Scan the QR with <strong>GCash, Maya, BPI, BDO, UnionBank</strong> or any QR Ph app.</li>
-                                        <li>Pay <strong>@Model.TotalAmount.ToString("0.00") PHP</strong>.</li>
-                                        <li>Complete payment within <strong>3 minutes</strong>. Expired QR Ph bookings are automatically cancelled and cannot be refreshed.</li>
+                                        <li>Pay <strong>@payment.Amount.ToString("0.00") PHP</strong>.</li>
+                                        <li>Complete payment within <strong>@qrExpiryMinutes minutes</strong>. Expired QR Ph bookings are automatically cancelled and cannot be refreshed.</li>
                                     </ol>
                                     <a asp-action="PayMongoStart" asp-route-reference="@Model.BookingReferenceNo"
+                                       asp-route-paymentId="@payment.Id"
                                        class="btn btn-primary"
                                        data-testid="paymongo-continue-btn">
                                         <i class="fas fa-qrcode mr-1"></i>Continue to QR Ph
@@ -276,6 +325,36 @@
                             </div>
                         </div>
                     }
+                }
+
+                @if (Model.BookingStatus == BookingStatus.PartiallyPaid && summary.RemainingBalance > 0m)
+                {
+                    <div class="card booking-card mt-3 border-success">
+                        <div class="card-header">
+                            <i class="fas fa-wallet mr-2"></i>Remaining Balance
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-3">
+                                Amount paid: <strong>@summary.AmountPaid.ToString("0.00") PHP</strong><br />
+                                Remaining balance: <strong class="text-danger">@summary.RemainingBalance.ToString("0.00") PHP</strong>
+                            </p>
+                            <form asp-action="StartBalancePayment" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="reference" value="@Model.BookingReferenceNo" />
+                                <button type="submit" class="btn btn-success" data-testid="pay-balance-btn">
+                                    <i class="fas fa-qrcode mr-1"></i>Pay Remaining Balance
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                }
+
+                @if (Model.BookingStatus != BookingStatus.Cancelled)
+                {
+                    <div class="alert alert-warning mt-3 mb-0" data-testid="download-receipt-reminder">
+                        <i class="fas fa-download mr-1"></i>
+                        <strong>Important:</strong> Download or print your receipt and keep it for your booking record.
+                    </div>
                 }
 
                 <div class="text-center mt-4 mb-3" data-testid="confirmation-actions">

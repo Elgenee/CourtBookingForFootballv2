@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using CourtBookingSystem.Models;
+using CourtBookingSystem.Models.Enums;
 using Microsoft.Extensions.Options;
 
 namespace CourtBookingSystem.Services.PayMongo
@@ -16,7 +17,7 @@ namespace CourtBookingSystem.Services.PayMongo
     {
         Task<CheckoutSessionResponse> CreateQrPhCheckoutSessionAsync(
             Booking booking,
-            decimal amount,
+            Payment payment,
             CancellationToken cancellationToken = default);
 
         Task ExpireCheckoutSessionAsync(
@@ -44,7 +45,7 @@ namespace CourtBookingSystem.Services.PayMongo
 
         public async Task<CheckoutSessionResponse> CreateQrPhCheckoutSessionAsync(
             Booking booking,
-            decimal amount,
+            Payment payment,
             CancellationToken cancellationToken = default)
         {
             if (!_options.IsConfigured)
@@ -55,7 +56,10 @@ namespace CourtBookingSystem.Services.PayMongo
             }
 
             // PayMongo expects integer minor units (centavos).
-            var amountMinor = (long)Math.Round(amount * 100m, MidpointRounding.AwayFromZero);
+            var amountMinor = (long)Math.Round(payment.Amount * 100m, MidpointRounding.AwayFromZero);
+            var purposeLabel = payment.PaymentPurpose == PaymentPurpose.Reservation
+                ? "reservation"
+                : payment.PaymentPurpose == PaymentPurpose.Balance ? "balance" : "booking";
 
             var request = new CheckoutSessionRequest
             {
@@ -63,9 +67,9 @@ namespace CourtBookingSystem.Services.PayMongo
                 {
                     Attributes = new CheckoutSessionRequestAttributes
                     {
-                        CancelUrl = BuildReturnUrl(_options.CancelUrl, booking, "cancel"),
-                        SuccessUrl = BuildReturnUrl(_options.SuccessUrl, booking, "success"),
-                        Description = $"Giuseppe Football booking {booking.BookingReferenceNo}",
+                        CancelUrl = BuildReturnUrl(_options.CancelUrl, booking, payment, "cancel"),
+                        SuccessUrl = BuildReturnUrl(_options.SuccessUrl, booking, payment, "success"),
+                        Description = $"Giuseppe Football {purposeLabel} payment for booking {booking.BookingReferenceNo}",
                         ReferenceNumber = booking.BookingReferenceNo,
                         LineItems = new List<CheckoutSessionLineItem>
                         {
@@ -73,7 +77,7 @@ namespace CourtBookingSystem.Services.PayMongo
                             {
                                 Amount = amountMinor,
                                 Currency = "PHP",
-                                Name = $"Booking {booking.BookingReferenceNo}",
+                                Name = $"{payment.PaymentPurpose} - {booking.BookingReferenceNo}",
                                 Quantity = 1
                             }
                         },
@@ -81,7 +85,9 @@ namespace CourtBookingSystem.Services.PayMongo
                         Metadata = new Dictionary<string, string>
                         {
                             ["bookingId"] = booking.Id.ToString(),
+                            ["paymentId"] = payment.Id.ToString(),
                             ["bookingReference"] = booking.BookingReferenceNo,
+                            ["paymentPurpose"] = payment.PaymentPurpose.ToString(),
                             ["channel"] = "giuseppe-football-aspnet-mvc"
                         }
                     }
@@ -137,10 +143,11 @@ namespace CourtBookingSystem.Services.PayMongo
             }
         }
 
-        private static string BuildReturnUrl(string baseUrl, Booking booking, string checkoutResult)
+        private static string BuildReturnUrl(string baseUrl, Booking booking, Payment payment, string checkoutResult)
         {
             var separator = baseUrl.Contains('?') ? '&' : '?';
             return $"{baseUrl}{separator}reference={Uri.EscapeDataString(booking.BookingReferenceNo)}" +
+                   $"&paymentId={payment.Id}" +
                    $"&checkoutResult={Uri.EscapeDataString(checkoutResult)}";
         }
 

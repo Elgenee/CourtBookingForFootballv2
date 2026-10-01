@@ -71,6 +71,8 @@ builder.Services.AddScoped<CourtBookingSystem.Services.BookingPricingService>();
 builder.Services.AddScoped<CourtBookingSystem.Services.SiteContentService>();
 builder.Services.AddScoped<CourtBookingSystem.Services.PayMongoQrPhExpiryService>();
 builder.Services.AddHostedService<CourtBookingSystem.Services.PayMongoQrPhExpiryBackgroundService>();
+builder.Services.Configure<CourtBookingSystem.Services.FootballPaymentOptions>(
+    builder.Configuration.GetSection("FootballPayments"));
 
 // ----- PayMongo QR Ph integration (additive — does not affect existing manual GCash) -----
 builder.Services.Configure<CourtBookingSystem.Services.PayMongo.PayMongoOptions>(

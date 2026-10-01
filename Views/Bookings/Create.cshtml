@@ -1,11 +1,13 @@
 @model CourtBookingSystem.ViewModels.BookingFormViewModel
 @using CourtBookingSystem.Models.Enums
+@inject Microsoft.Extensions.Options.IOptions<CourtBookingSystem.Services.FootballPaymentOptions> FootballPaymentOptions
 @{
     ViewData["Title"] = "Book a Field";
     var minDate = PhilippineTime.Today.ToString("yyyy-MM-dd");
     var maxDate = PhilippineTime.Today.AddYears(5).ToString("yyyy-MM-dd");
     var qrExpiryMinutes = (int)CourtBookingSystem.Services.PayMongoQrPhExpiryService.CheckoutLifetime.TotalMinutes;
     var showPayMongoNote = Model.PaymentMethod == PaymentMethod.PayMongoQrPh;
+    var reservationFeePercent = FootballPaymentOptions.Value.ReservationFeePercent;
 }
 
 <section class="section-default">
@@ -130,13 +132,38 @@
                                     </div>
                                 </label>
                             </div>
-                            <div id="paymongoExpiryNote"
+                     @*        <div id="paymongoExpiryNote"
                                  class="alert alert-warning border-warning small mt-3 mb-0"
                                  style="@(showPayMongoNote ? "" : "display:none;")"
                                  data-testid="paymongo-expiry-note">
                                 <i class="fas fa-exclamation-triangle mr-1"></i>
                                 <strong>Important:</strong> QR Ph checkout expires after <strong>@qrExpiryMinutes minutes</strong>.
                                 Once it expires, this booking is automatically cancelled and cannot be refreshed.
+                            </div> *@
+                            <div id="footballPaymentAmountOptions"
+                                 class="mt-3"
+                                 style="display:none;"
+                                 data-testid="football-payment-amount-options">
+                                <label class="font-weight-bold d-block mb-2">Payment amount</label>
+                                <div class="payment-options">
+                                    <label class="payment-option">
+                                        <input type="radio" asp-for="PayReservationFeeOnly" value="false" data-testid="payment-choice-full" />
+                                        <div class="payment-option-card">
+                                            <i class="fas fa-check-circle"></i>
+                                            <strong>Pay in full</strong>
+                                            <small class="text-muted">Settle the full booking amount now</small>
+                                        </div>
+                                    </label>
+                                    <label class="payment-option">
+                                        <input type="radio" asp-for="PayReservationFeeOnly" value="true" data-testid="payment-choice-reservation" />
+                                        <div class="payment-option-card">
+                                            <i class="fas fa-wallet"></i>
+                                            <strong>Pay reservation fee</strong>
+                                            <small class="text-muted">@reservationFeePercent.ToString("0.##")% now, balance before play</small>
+                                        </div>
+                                    </label>
+                                </div>
+                                <span asp-validation-for="PayReservationFeeOnly" class="text-danger small"></span>
                             </div>
                             <span asp-validation-for="PaymentMethod" class="text-danger small"></span>
                         </div>
@@ -163,10 +190,11 @@
                                 <p>2.4 Player count and field access are subject to the booking package and management approval.</p>
 
                                 <h6>3. Payment Policy</h6>
-                                <p>3.1 Full payment is required to confirm a reservation.</p>
-                                <p>3.2 All confirmed bookings are considered final.</p>
-                                <p>3.3 Bookings are NON-REFUNDABLE, NON-NEGOTIABLE, and NON-TRANSFERABLE.</p>
-                                <p>3.4 No refunds, credits, or rescheduling shall be provided for no-shows, late arrivals, unused field time, personal schedule conflicts, weather-related preferences, or change of plans.</p>
+                                <p>3.1 Customers may pay either the full booking amount or the required reservation fee during online booking.</p>
+                                <p>3.2 Full payment confirmation must be presented before entry into the play area. To avoid delays, customers are encouraged to settle any remaining balance before the scheduled booking.</p>
+                                <p>3.3 All confirmed bookings are considered final.</p>
+                                <p>3.4 Bookings are NON-REFUNDABLE, NON-NEGOTIABLE, and NON-TRANSFERABLE.</p>
+                                <p>3.5 No refunds, credits, or rescheduling shall be provided for no-shows, late arrivals, unused field time, personal schedule conflicts, weather-related preferences, or change of plans.</p>
 
                                 <h6>4. Field Slot Transfers ("Pasalo")</h6>
                                 <p>4.1 Players may privately transfer or sell their booked field slot to another party ("Pasalo") at their own discretion.</p>
@@ -264,6 +292,16 @@
                                 <span class="font-weight-bold">Total</span>
                                 <span class="summary-total" id="summaryTotal">0.00</span>
                             </div>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <span class="font-weight-bold" id="summaryDueLabel">Due Now</span>
+                                <span class="summary-total" id="summaryDueNow">0.00</span>
+                            </div>
+                            <div id="summaryRemainingAfterPayment"
+                                 class="small text-muted mt-1"
+                                 style="display:none;"
+                                 data-testid="summary-remaining-after-payment">
+                                Remaining balance after reservation: <strong id="summaryRemainingBalance">0.00</strong>
+                            </div>
                             <div id="summaryPayMongoExpiryNote"
                                  class="alert alert-warning small mt-3 mb-0"
                                  style="@(showPayMongoNote ? "" : "display:none;")"
@@ -309,8 +347,10 @@
             const $startTime = $("#StartTime");
             const $submit = $("#submitBookingBtn");
             const $paymentMethod = $("input[name='PaymentMethod']");
+            const $reservationChoice = $("input[name='PayReservationFeeOnly']");
             const $acceptedTerms = $("#AcceptedTerms");
             const payMongoValue = "@((int)PaymentMethod.PayMongoQrPh)";
+            const reservationFeePercent = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(reservationFeePercent));
 
             let selectedSlot = null;
 
@@ -332,17 +372,29 @@
                 const hrs = parseInt($duration.val(), 10) || 1;
                 const rate = selectedSlot ? selectedSlot.rate : 0;
                 const total = selectedSlot ? selectedSlot.total : 0;
+                const sport = String(opt.data("sport") || "");
+                const isFootball = sport === "Football";
+                const isPayMongo = $paymentMethod.filter(":checked").val() === payMongoValue;
+                const isReservationOnly = isFootball && isPayMongo && $reservationChoice.filter(":checked").val() === "true";
+                const dueNow = isReservationOnly
+                    ? Math.min(Math.round((total * reservationFeePercent / 100) * 100) / 100, total)
+                    : total;
+                const remainingBalance = Math.max(total - dueNow, 0);
                 const rateLabel = selectedSlot && selectedSlot.isMixed
                     ? "Mixed rates"
                     : formatMoney(rate) + " / hour" + (selectedSlot && selectedSlot.isPromo ? " (promo)" : "");
                 $("#summaryCourt").text(opt.text().split(" — ")[0] || "—");
-                $("#summarySport").text(opt.data("sport") || "—");
+                $("#summarySport").text(sport || "—");
                 $("#summaryDate").text(formatDate($date.val()));
                 $("#summaryDuration").text(hrs + (hrs === 1 ? " hour" : " hours"));
                 $("#summaryRate").text(rateLabel);
                 $("#summaryTotal").text(formatMoney(total));
+                $("#summaryDueLabel").text(isReservationOnly ? "Due Now (Reservation)" : "Due Now");
+                $("#summaryDueNow").text(formatMoney(dueNow));
+                $("#summaryRemainingBalance").text(formatMoney(remainingBalance));
+                $("#footballPaymentAmountOptions").toggle(isFootball && isPayMongo);
+                $("#summaryRemainingAfterPayment").toggle(isReservationOnly && remainingBalance > 0);
                 $("#summaryTime").text(selectedSlot ? selectedSlot.label : "—");
-                const isPayMongo = $paymentMethod.filter(":checked").val() === payMongoValue;
                 $("#paymongoExpiryNote, #summaryPayMongoExpiryNote").toggle(isPayMongo);
                 $submit.prop("disabled", !selectedSlot || !$paymentMethod.filter(":checked").length || !$acceptedTerms.is(":checked"));
             }
@@ -428,6 +480,7 @@
             $date.on("change", loadSlots);
             $duration.on("change", loadSlots);
             $paymentMethod.on("change", updateSummary);
+            $reservationChoice.on("change", updateSummary);
             $acceptedTerms.on("change", function () {
                 if ($acceptedTerms.is(":checked")) {
                     $("span[data-valmsg-for='AcceptedTerms']").empty().removeClass("field-validation-error").addClass("field-validation-valid");

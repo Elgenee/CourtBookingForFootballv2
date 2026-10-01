@@ -3,8 +3,15 @@
     ViewData["Title"] = "PayMongo QR Ph Payment";
     var checkoutUrl = (string?)ViewBag.CheckoutUrl;
     var isSandbox = ViewBag.IsSandbox is true;
-    var payment = Model.Payments.FirstOrDefault(p => p.PaymentMethod == CourtBookingSystem.Models.Enums.PaymentMethod.PayMongoQrPh);
+    var payment = Model.Payments
+        .Where(p => p.PaymentMethod == CourtBookingSystem.Models.Enums.PaymentMethod.PayMongoQrPh)
+        .OrderByDescending(p => p.PaymentStatus == CourtBookingSystem.Models.Enums.PaymentStatus.Unpaid
+            || p.PaymentStatus == CourtBookingSystem.Models.Enums.PaymentStatus.Submitted)
+        .ThenByDescending(p => p.PaymentPurpose == CourtBookingSystem.Models.Enums.PaymentPurpose.Balance)
+        .ThenByDescending(p => p.Id)
+        .FirstOrDefault();
     var refNo = Model.BookingReferenceNo;
+    var qrExpiryMinutes = (int)CourtBookingSystem.Services.PayMongoQrPhExpiryService.CheckoutLifetime.TotalMinutes;
     var expiresAtText = payment?.CheckoutExpiresAtUtc is DateTime expiresAtUtc
         ? PhilippineTime.FromUtc(expiresAtUtc).ToString("h:mm tt")
         : null;
@@ -37,10 +44,12 @@
                                         Important before you proceed
                                     </h5>
                                     <p class="mb-2">
-                                        This QR Ph checkout expires after <strong>3 minutes</strong>@(expiresAtText != null ? $" at {expiresAtText}" : "").
+                                        This QR Ph checkout expires after <strong>@qrExpiryMinutes minutes</strong>@(expiresAtText != null ? $" at {expiresAtText}" : "").
                                     </p>
                                     <p class="mb-0">
-                                        Once it expires, this booking is automatically cancelled and cannot be refreshed.
+                                        @(payment?.PaymentPurpose == CourtBookingSystem.Models.Enums.PaymentPurpose.Balance
+                                            ? "If this balance checkout expires, your partially paid booking remains active and you can start a new balance payment."
+                                            : "Once it expires, this booking is automatically cancelled and cannot be refreshed.")
                                     </p>
                                 </div>
 
@@ -94,15 +103,24 @@
                                     @PhilippineTime.FormatTime(Model.StartTime)
                                     – @PhilippineTime.FormatTime(Model.EndTime)
                                 </dd>
+                                <dt>Payment</dt>
+                                <dd>@(payment?.PaymentPurpose.ToString() ?? "Payment")</dd>
                                 <dt>Amount</dt>
-                                <dd class="font-weight-bold text-success" data-testid="paymongo-amount">@Model.TotalAmount.ToString("0.00") PHP</dd>
+                                <dd class="font-weight-bold text-success" data-testid="paymongo-amount">@((payment?.Amount ?? Model.TotalAmount).ToString("0.00")) PHP</dd>
                                 <dt>Reference</dt>
                                 <dd><code>@(payment?.QrReference ?? "—")</code></dd>
                             </dl>
 
                             <div class="alert alert-info small">
                                 <i class="fas fa-info-circle mr-1"></i>
-                                Once your payment goes through, this booking is <strong>auto-confirmed</strong>.
+                                @if (payment?.PaymentPurpose == CourtBookingSystem.Models.Enums.PaymentPurpose.Reservation)
+                                {
+                                    <span>Once your reservation payment goes through: 1. Go to the website and open Find Booking. 2. Enter your booking reference and mobile number. 3. Pay the remaining balance before your schedule.</span>
+                                }
+                                else
+                                {
+                                    <span>Once your payment goes through, this booking is <strong>auto-confirmed</strong>.</span>
+                                }
                                 No staff approval needed.
                             </div>
 
@@ -128,6 +146,7 @@
     // the booking page once the outcome is known.
     (function () {
         const ref = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(refNo));
+        const paymentPurpose = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(payment?.PaymentPurpose.ToString()));
         const statusUrl = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Url.Action("ConfirmationStatus", "Bookings")));
         const target = "/Bookings/Confirmation?reference=" + encodeURIComponent(ref);
 
@@ -136,7 +155,10 @@
                 const r = await fetch(statusUrl + "?reference=" + encodeURIComponent(ref), { cache: "no-store" });
                 if (r.ok) {
                     const data = await r.json();
-                    if (data.bookingStatus === "Confirmed" || data.bookingStatus === "Cancelled") {
+                    if (data.bookingStatus === "Confirmed"
+                        || data.bookingStatus === "Cancelled"
+                        || data.paymentStatus === "Rejected"
+                        || (paymentPurpose === "Reservation" && data.bookingStatus === "PartiallyPaid")) {
                         window.location.href = target;
                         return;
                     }
@@ -145,7 +167,11 @@
                 try {
                     const r = await fetch(target, { redirect: "follow" });
                     const t = await r.text();
-                    if (t.includes("status-Confirmed") || t.includes(">Confirmed<") || t.includes("status-Cancelled")) {
+                    if (t.includes("status-Confirmed")
+                        || t.includes(">Confirmed<")
+                        || t.includes("payment-Rejected")
+                        || (paymentPurpose === "Reservation" && (t.includes("status-PartiallyPaid") || t.includes(">PartiallyPaid<")))
+                        || t.includes("status-Cancelled")) {
                         window.location.href = target;
                         return;
                     }

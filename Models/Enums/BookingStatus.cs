@@ -9,6 +9,7 @@ namespace CourtBookingSystem.Models.Enums
         ForApproval = 2,  // Customer uploaded GCash proof — waiting for Staff/Admin review
         Confirmed = 3,    // Payment approved — booking confirmed
         Completed = 4,    // Booking schedule finished
-        Cancelled = 5     // Cancelled by customer or Staff/Admin
+        Cancelled = 5,    // Cancelled by customer or Staff/Admin
+        PartiallyPaid = 6  // Reservation payment received — balance remains
     }
 }

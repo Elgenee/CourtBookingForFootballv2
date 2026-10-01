@@ -18,6 +18,9 @@ namespace CourtBookingSystem.Services
         public byte[] Generate(Booking booking, WebsiteSetting settings)
         {
             var payment = booking.Payments?.OrderByDescending(p => p.Id).FirstOrDefault();
+            var summary = PaymentSummaryHelper.Calculate(booking);
+            var isReservationOnlyPaid = booking.BookingStatus == BookingStatus.PartiallyPaid
+                && summary.RemainingBalance > 0m;
 
             var doc = Document.Create(c =>
             {
@@ -71,15 +74,47 @@ namespace CourtBookingSystem.Services
                             Row("Booking Status", booking.BookingStatus.ToString());
                             Row("Payment Status", payment?.PaymentStatus.ToString() ?? "—");
                             Row("Payment Method", payment?.PaymentMethod.ToString() ?? "—");
+                            Row("Amount Paid", summary.AmountPaid.ToString("0.00"));
+                            Row("Remaining Balance", summary.RemainingBalance.ToString("0.00"));
                         });
 
                         col.Item().LineHorizontal(1).LineColor("#e6e8ee");
+
+                        if (isReservationOnlyPaid)
+                        {
+                            col.Item().Border(1).BorderColor("#f59e0b").Background("#fffbeb").Padding(10).Column(note =>
+                            {
+                                note.Spacing(4);
+                                note.Item().Text("Reservation payment only:").Bold().FontSize(10).FontColor("#92400e");
+
+                                void Step(string number, string text)
+                                {
+                                    note.Item().PaddingLeft(10).Row(row =>
+                                    {
+                                        row.ConstantItem(18).Text(number).Bold().FontSize(10).FontColor("#92400e");
+                                        row.RelativeItem().Text(text).FontSize(10).FontColor("#92400e");
+                                    });
+                                }
+
+                                Step("1.", "Go to the website and open Find Booking.");
+                                Step("2.", "Enter your booking reference and mobile number.");
+                                Step("3.", "Pay the remaining balance before your schedule.");
+                            });
+                        }
+                        else if (booking.Court?.SportType == SportType.Football
+                            && booking.BookingStatus != BookingStatus.Cancelled)
+                        {
+                            col.Item().Border(1).BorderColor("#bfdbfe").Background("#eff6ff").Padding(10).Text(
+                                "Payment confirmation of Full Payment will need to be presented before entry into play area. " +
+                                "In order to avoid delays, please settle payment before your scheduled booking.")
+                                .FontSize(10).FontColor("#1d4ed8");
+                        }
 
                         // Total
                         col.Item().Row(r =>
                         {
                             r.RelativeItem().Text("Total Amount").FontSize(12).FontColor("#6b7280");
-                            r.ConstantItem(160).AlignRight().Text(booking.TotalAmount.ToString("0.00"))
+                            r.ConstantItem(160).AlignRight().Text(summary.TotalAmount.ToString("0.00"))
                                 .Bold().FontSize(20).FontColor("#0d3b66");
                         });
                     });

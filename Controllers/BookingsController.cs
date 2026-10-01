@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace CourtBookingSystem.Controllers
 {
@@ -18,6 +19,7 @@ namespace CourtBookingSystem.Controllers
         private readonly IWebHostEnvironment _env;
         private readonly ILogger<BookingsController> _logger;
         private readonly PayMongoQrPhExpiryService _qrPhExpiry;
+        private readonly FootballPaymentOptions _footballPaymentOptions;
 
         public BookingsController(
             ApplicationDbContext db,
@@ -25,6 +27,7 @@ namespace CourtBookingSystem.Controllers
             IWebHostEnvironment env,
             ILogger<BookingsController> logger,
             PayMongoQrPhExpiryService qrPhExpiry,
+            IOptions<FootballPaymentOptions> footballPaymentOptions,
             CourtBookingSystem.Services.CourtGroupAvailabilityService groupAvailability,
             CourtBookingSystem.Services.BookingAvailabilityService availability,
             CourtBookingSystem.Services.BookingPricingService pricing)
@@ -34,6 +37,7 @@ namespace CourtBookingSystem.Controllers
             _env = env;
             _logger = logger;
             _qrPhExpiry = qrPhExpiry;
+            _footballPaymentOptions = footballPaymentOptions.Value;
             _groupAvailability = groupAvailability;
             _availability = availability;
             _pricing = pricing;
@@ -219,11 +223,21 @@ namespace CourtBookingSystem.Controllers
                 CreatedDate = DateTime.UtcNow
             };
 
+            var isFootballPayMongo = court.SportType == SportType.Football
+                && paymentMethod == PaymentMethod.PayMongoQrPh;
+            var paymentPurpose = isFootballPayMongo && vm.PayReservationFeeOnly
+                ? PaymentPurpose.Reservation
+                : PaymentPurpose.FullPayment;
+            var initialPaymentAmount = paymentPurpose == PaymentPurpose.Reservation
+                ? GetInitialReservationAmount(totalAmount)
+                : totalAmount;
+
             var payment = new Payment
             {
                 Booking = booking,
-                Amount = totalAmount,
+                Amount = initialPaymentAmount,
                 PaymentMethod = paymentMethod,
+                PaymentPurpose = paymentPurpose,
                 PaymentStatus = PaymentStatus.Unpaid
             };
 
@@ -248,12 +262,121 @@ namespace CourtBookingSystem.Controllers
             return RedirectToAction(nameof(Confirmation), new { reference = referenceNo });
         }
 
+        // GET /Bookings/Find
+        [HttpGet]
+        public IActionResult Find()
+        {
+            return View(new FindBookingViewModel());
+        }
+
+        // POST /Bookings/Find
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Find(FindBookingViewModel vm)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(vm);
+            }
+
+            var reference = vm.BookingReferenceNo.Trim().ToUpperInvariant();
+            var booking = await _db.Bookings
+                .AsNoTracking()
+                .FirstOrDefaultAsync(b => b.BookingReferenceNo == reference);
+
+            if (booking == null || NormalizeMobile(booking.CustomerMobile) != NormalizeMobile(vm.CustomerMobile))
+            {
+                ModelState.AddModelError(string.Empty, "We couldn't find a booking with that reference and mobile number.");
+                return View(vm);
+            }
+
+            return RedirectToAction(nameof(Confirmation), new { reference = booking.BookingReferenceNo });
+        }
+
+        // POST /Bookings/StartBalancePayment
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> StartBalancePayment(string reference)
+        {
+            if (string.IsNullOrWhiteSpace(reference)) return NotFound();
+
+            var booking = await _db.Bookings
+                .Include(b => b.Court)
+                .Include(b => b.Payments)
+                .FirstOrDefaultAsync(b => b.BookingReferenceNo == reference);
+            if (booking == null) return NotFound();
+
+            if (booking.BookingStatus == BookingStatus.Cancelled)
+            {
+                TempData["Error"] = "This booking has been cancelled and cannot accept another payment.";
+                return RedirectToAction(nameof(Confirmation), new { reference });
+            }
+
+            if (booking.BookingStatus == BookingStatus.Completed)
+            {
+                TempData["Error"] = "This booking has already been completed.";
+                return RedirectToAction(nameof(Confirmation), new { reference });
+            }
+
+            if (booking.Court?.SportType != SportType.Football)
+            {
+                TempData["Error"] = "Remaining-balance PayMongo payments are available for football bookings only.";
+                return RedirectToAction(nameof(Confirmation), new { reference });
+            }
+
+            var summary = PaymentSummaryHelper.Calculate(booking);
+            if (summary.RemainingBalance <= 0m || booking.BookingStatus == BookingStatus.Confirmed)
+            {
+                TempData["Error"] = "This booking is already fully paid.";
+                return RedirectToAction(nameof(Confirmation), new { reference });
+            }
+
+            if (booking.BookingStatus != BookingStatus.PartiallyPaid)
+            {
+                TempData["Error"] = "The reservation payment must be completed before paying the remaining balance.";
+                return RedirectToAction(nameof(Confirmation), new { reference });
+            }
+
+            foreach (var existingBalance in booking.Payments
+                .Where(p => p.PaymentMethod == PaymentMethod.PayMongoQrPh
+                    && p.PaymentPurpose == PaymentPurpose.Balance
+                    && p.PaymentStatus is PaymentStatus.Unpaid or PaymentStatus.Submitted)
+                .ToList())
+            {
+                await _qrPhExpiry.RejectBalanceIfExpiredAsync(booking, existingBalance);
+            }
+
+            var payment = booking.Payments
+                .Where(p => p.PaymentMethod == PaymentMethod.PayMongoQrPh
+                    && p.PaymentPurpose == PaymentPurpose.Balance
+                    && p.PaymentStatus is PaymentStatus.Unpaid or PaymentStatus.Submitted)
+                .OrderByDescending(p => p.Id)
+                .FirstOrDefault();
+
+            if (payment == null)
+            {
+                payment = new Payment
+                {
+                    BookingId = booking.Id,
+                    Amount = summary.RemainingBalance,
+                    PaymentMethod = PaymentMethod.PayMongoQrPh,
+                    PaymentPurpose = PaymentPurpose.Balance,
+                    PaymentStatus = PaymentStatus.Unpaid
+                };
+                _db.Payments.Add(payment);
+                await _db.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(PayMongoStart), new { reference, paymentId = payment.Id });
+        }
+
         // GET /Bookings/PayMongoStart?reference=GFC-...
         // Creates a PayMongo QR Ph Checkout Session for the booking and
         // either redirects to the hosted QR page or shows the embedded view.
         [HttpGet]
         public async Task<IActionResult> PayMongoStart(
             string reference,
+            int? paymentId,
             [FromServices] Services.PayMongo.IPayMongoClient payMongo,
             [FromServices] Microsoft.Extensions.Options.IOptions<Services.PayMongo.PayMongoOptions> payMongoOptions)
         {
@@ -271,17 +394,34 @@ namespace CourtBookingSystem.Controllers
                 return RedirectToAction(nameof(Confirmation), new { reference });
             }
 
-            var payment = booking.Payments
-                .FirstOrDefault(p => p.PaymentMethod == PaymentMethod.PayMongoQrPh);
+            if (booking.BookingStatus == BookingStatus.Completed)
+            {
+                TempData["Error"] = "This booking has already been completed.";
+                return RedirectToAction(nameof(Confirmation), new { reference });
+            }
+
+            var payment = SelectPayMongoPayment(booking, paymentId);
             if (payment == null)
             {
                 TempData["Error"] = "This booking is not a PayMongo QR Ph booking.";
                 return RedirectToAction(nameof(Confirmation), new { reference });
             }
 
+            if (payment.PaymentStatus == PaymentStatus.Approved)
+            {
+                return RedirectToAction(nameof(Confirmation), new { reference });
+            }
+
+            if (payment.PaymentPurpose == PaymentPurpose.Balance
+                && await _qrPhExpiry.RejectBalanceIfExpiredAsync(booking, payment))
+            {
+                TempData["Error"] = "This balance payment link expired. Please start a new remaining-balance payment.";
+                return RedirectToAction(nameof(Confirmation), new { reference });
+            }
+
             if (await _qrPhExpiry.CancelIfExpiredAsync(booking, payment))
             {
-                TempData["Error"] = "This booking was cancelled because the QR Ph payment expired after 3 minutes. Please create a new booking if you still need a slot.";
+                TempData["Error"] = $"This booking was cancelled because the QR Ph payment expired after {QrPhExpiryMinutes} minutes. Please create a new booking if you still need a slot.";
                 return RedirectToAction(nameof(Confirmation), new { reference });
             }
 
@@ -309,7 +449,7 @@ namespace CourtBookingSystem.Controllers
 
             try
             {
-                var session = await payMongo.CreateQrPhCheckoutSessionAsync(booking, payment.Amount);
+                var session = await payMongo.CreateQrPhCheckoutSessionAsync(booking, payment);
 
                 payment.PaymentProvider = "PayMongo";
                 payment.QrReference = session.Data.Id;
@@ -338,7 +478,7 @@ namespace CourtBookingSystem.Controllers
         // closes. Successful payment confirmation still comes from the
         // webhook; this action is informational only.
         [HttpGet]
-        public IActionResult PayMongoReturn(string? reference, string? checkoutResult)
+        public IActionResult PayMongoReturn(string? reference, int? paymentId, string? checkoutResult)
         {
             if (string.IsNullOrWhiteSpace(reference))
             {
@@ -348,7 +488,7 @@ namespace CourtBookingSystem.Controllers
             var isCancelReturn = string.Equals(checkoutResult, "cancel", StringComparison.OrdinalIgnoreCase);
             if (isCancelReturn)
             {
-                return RedirectToAction(nameof(PaymentPending), new { reference });
+                return RedirectToAction(nameof(PaymentPending), new { reference, paymentId });
             }
 
             return RedirectToAction(nameof(Confirmation), new { reference });
@@ -360,7 +500,7 @@ namespace CourtBookingSystem.Controllers
         // verification catches up.
         [HttpGet]
         [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
-        public async Task<IActionResult> PaymentPending(string? reference)
+        public async Task<IActionResult> PaymentPending(string? reference, int? paymentId)
         {
             if (string.IsNullOrWhiteSpace(reference))
             {
@@ -374,10 +514,7 @@ namespace CourtBookingSystem.Controllers
 
             if (booking == null) return NotFound();
 
-            var payment = booking.Payments
-                .Where(p => p.PaymentMethod == PaymentMethod.PayMongoQrPh)
-                .OrderByDescending(p => p.Id)
-                .FirstOrDefault();
+            var payment = SelectPayMongoPayment(booking, paymentId);
 
             if (payment == null)
             {
@@ -386,19 +523,27 @@ namespace CourtBookingSystem.Controllers
             }
 
             if (payment.PaymentStatus == PaymentStatus.Approved
-                || booking.BookingStatus == BookingStatus.Confirmed)
+                || booking.BookingStatus == BookingStatus.Confirmed
+                || (booking.BookingStatus == BookingStatus.PartiallyPaid && payment.PaymentPurpose != PaymentPurpose.Balance))
             {
                 return RedirectToAction(nameof(Receipt), new { reference });
             }
 
-            if (await _qrPhExpiry.CancelIfExpiredAsync(booking, payment))
+            if (payment.PaymentPurpose == PaymentPurpose.Balance
+                && await _qrPhExpiry.RejectBalanceIfExpiredAsync(booking, payment))
             {
-                TempData["Error"] = "This booking was cancelled because the QR Ph payment expired after 3 minutes. Please create a new booking if you still need a slot.";
+                TempData["Error"] = "This balance payment link expired. Please start a new remaining-balance payment.";
                 return RedirectToAction(nameof(Confirmation), new { reference });
             }
 
-            if (booking.BookingStatus == BookingStatus.Pending
-                && payment.PaymentStatus == PaymentStatus.Unpaid)
+            if (await _qrPhExpiry.CancelIfExpiredAsync(booking, payment))
+            {
+                TempData["Error"] = $"This booking was cancelled because the QR Ph payment expired after {QrPhExpiryMinutes} minutes. Please create a new booking if you still need a slot.";
+                return RedirectToAction(nameof(Confirmation), new { reference });
+            }
+
+            if (payment.PaymentStatus == PaymentStatus.Unpaid
+                && (booking.BookingStatus == BookingStatus.Pending || payment.PaymentPurpose == PaymentPurpose.Balance))
             {
                 payment.PaymentStatus = PaymentStatus.Submitted;
                 await _db.SaveChangesAsync();
@@ -423,13 +568,17 @@ namespace CourtBookingSystem.Controllers
 
             if (booking == null) return NotFound();
 
-            var payMongoPayment = booking.Payments
-                .Where(p => p.PaymentMethod == PaymentMethod.PayMongoQrPh)
-                .OrderByDescending(p => p.Id)
-                .FirstOrDefault();
+            var payMongoPayment = SelectActivePayMongoPayment(booking);
             if (payMongoPayment != null)
             {
-                await _qrPhExpiry.CancelIfExpiredAsync(booking, payMongoPayment);
+                if (payMongoPayment.PaymentPurpose == PaymentPurpose.Balance)
+                {
+                    await _qrPhExpiry.RejectBalanceIfExpiredAsync(booking, payMongoPayment);
+                }
+                else
+                {
+                    await _qrPhExpiry.CancelIfExpiredAsync(booking, payMongoPayment);
+                }
             }
 
             return View(booking);
@@ -450,20 +599,31 @@ namespace CourtBookingSystem.Controllers
 
             if (booking == null) return NotFound();
 
-            var payment = booking.Payments
-                .OrderByDescending(p => p.Id)
-                .FirstOrDefault();
+            var payment = SelectActivePayMongoPayment(booking)
+                ?? booking.Payments.OrderByDescending(p => p.Id).FirstOrDefault();
 
             if (payment?.PaymentMethod == PaymentMethod.PayMongoQrPh)
             {
-                await _qrPhExpiry.CancelIfExpiredAsync(booking, payment);
+                if (payment.PaymentPurpose == PaymentPurpose.Balance)
+                {
+                    await _qrPhExpiry.RejectBalanceIfExpiredAsync(booking, payment);
+                }
+                else
+                {
+                    await _qrPhExpiry.CancelIfExpiredAsync(booking, payment);
+                }
             }
+
+            var summary = PaymentSummaryHelper.Calculate(booking);
 
             return Json(new
             {
                 bookingStatus = booking.BookingStatus.ToString(),
                 paymentStatus = payment?.PaymentStatus.ToString(),
                 paymentMethod = payment?.PaymentMethod.ToString(),
+                paymentPurpose = payment?.PaymentPurpose.ToString(),
+                amountPaid = summary.AmountPaid,
+                remainingBalance = summary.RemainingBalance,
                 gatewayTransactionId = payment?.GatewayTransactionId,
                 paidDate = payment?.PaidDate is DateTime paidDate
                     ? PhilippineTime.FromUtc(paidDate).ToString("MMM d, yyyy h:mm tt")
@@ -671,6 +831,50 @@ namespace CourtBookingSystem.Controllers
         {
             var random = Guid.NewGuid().ToString("N").Substring(0, 6).ToUpperInvariant();
             return $"GFC-{PhilippineTime.Today:yyyyMMdd}-{random}";
+        }
+
+        private decimal GetInitialReservationAmount(decimal totalAmount)
+        {
+            var configuredPercent = _footballPaymentOptions.ReservationFeePercent;
+            if (configuredPercent <= 0m)
+            {
+                return totalAmount;
+            }
+
+            var reservationAmount = Math.Round(totalAmount * configuredPercent / 100m, 2, MidpointRounding.AwayFromZero);
+            return Math.Min(reservationAmount, totalAmount);
+        }
+
+        private static int QrPhExpiryMinutes =>
+            (int)PayMongoQrPhExpiryService.CheckoutLifetime.TotalMinutes;
+
+        private static Payment? SelectActivePayMongoPayment(Booking booking)
+        {
+            return booking.Payments
+                .Where(p => p.PaymentMethod == PaymentMethod.PayMongoQrPh)
+                .OrderByDescending(p => p.PaymentStatus is PaymentStatus.Unpaid or PaymentStatus.Submitted)
+                .ThenByDescending(p => p.PaymentPurpose == PaymentPurpose.Balance)
+                .ThenByDescending(p => p.PaymentPurpose == PaymentPurpose.Reservation)
+                .ThenByDescending(p => p.Id)
+                .FirstOrDefault();
+        }
+
+        private static Payment? SelectPayMongoPayment(Booking booking, int? paymentId)
+        {
+            if (paymentId.HasValue)
+            {
+                return booking.Payments.FirstOrDefault(p => p.Id == paymentId.Value
+                    && p.PaymentMethod == PaymentMethod.PayMongoQrPh);
+            }
+
+            return SelectActivePayMongoPayment(booking);
+        }
+
+        private static string NormalizeMobile(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return string.Empty;
+
+            return new string(value.Where(char.IsDigit).ToArray());
         }
 
         private static string FormatTime(TimeSpan t) =>

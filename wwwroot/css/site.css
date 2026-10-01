@@ -1255,7 +1255,8 @@ section.home-hero-content .container {
     background: #fff3cd;
     color: #b7791f;
 }
-.confirmation-check-Confirmed {
+.confirmation-check-Confirmed,
+.confirmation-check-PartiallyPaid {
     background: #d4edda;
     color: #28a745;
 }
@@ -1313,6 +1314,7 @@ section.home-hero-content .container {
     color: #0c5460;
 }
 .status-Confirmed,
+.status-PartiallyPaid,
 .payment-Approved {
     background: #d4edda;
     color: #155724;
@@ -1500,6 +1502,7 @@ section.home-hero-content .container {
     text-transform: uppercase;
 }
 .badge-confirmed   { background: #e6f7ee; color: #1f7a4d; }
+.badge-partial     { background: #e6f7ee; color: #1f7a4d; }
 .badge-pending     { background: #fff5e1; color: #9a6500; }
 .badge-forapproval { background: #e3f2fd; color: #0c5460; }
 .badge-cancelled   { background: #fde9e9; color: #b3261e; }
