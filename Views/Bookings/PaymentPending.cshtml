@@ -29,6 +29,18 @@
                         We are waiting for PayMongo to confirm your QR Ph payment. QR Ph checkout expires after @qrExpiryMinutes minutes.
                         @(isBalancePayment ? "If this balance checkout expires, your partially paid booking remains active." : "Expired reservation checkouts are cancelled automatically.")
                     </p>
+                    @if (payment?.PaymentPurpose == PaymentPurpose.Reservation)
+                    {
+                        <div class="alert alert-warning small mb-3" data-testid="payment-pending-reservation-instruction">
+                            <i class="fas fa-exclamation-triangle mr-1"></i>
+                            <strong>If this reservation payment is confirmed:</strong>
+                            <ol class="mb-0 pl-3">
+                                <li>Go to the website and open <strong>Find Booking</strong>.</li>
+                                <li>Enter your booking reference and mobile number.</li>
+                                <li>Pay the remaining balance before your schedule.</li>
+                            </ol>
+                        </div>
+                    }
                     <div class="confirmation-ref">
                         <span class="label">Booking Reference</span>
                         <span class="value">@Model.BookingReferenceNo</span>

@@ -19,6 +19,8 @@ namespace CourtBookingSystem.Services
         {
             var payment = booking.Payments?.OrderByDescending(p => p.Id).FirstOrDefault();
             var summary = PaymentSummaryHelper.Calculate(booking);
+            var isReservationOnlyPaid = booking.BookingStatus == BookingStatus.PartiallyPaid
+                && summary.RemainingBalance > 0m;
 
             var doc = Document.Create(c =>
             {
@@ -78,7 +80,28 @@ namespace CourtBookingSystem.Services
 
                         col.Item().LineHorizontal(1).LineColor("#e6e8ee");
 
-                        if (booking.Court?.SportType == SportType.Football
+                        if (isReservationOnlyPaid)
+                        {
+                            col.Item().Border(1).BorderColor("#f59e0b").Background("#fffbeb").Padding(10).Column(note =>
+                            {
+                                note.Spacing(4);
+                                note.Item().Text("Reservation payment only:").Bold().FontSize(10).FontColor("#92400e");
+
+                                void Step(string number, string text)
+                                {
+                                    note.Item().PaddingLeft(10).Row(row =>
+                                    {
+                                        row.ConstantItem(18).Text(number).Bold().FontSize(10).FontColor("#92400e");
+                                        row.RelativeItem().Text(text).FontSize(10).FontColor("#92400e");
+                                    });
+                                }
+
+                                Step("1.", "Go to the website and open Find Booking.");
+                                Step("2.", "Enter your booking reference and mobile number.");
+                                Step("3.", "Pay the remaining balance before your schedule.");
+                            });
+                        }
+                        else if (booking.Court?.SportType == SportType.Football
                             && booking.BookingStatus != BookingStatus.Cancelled)
                         {
                             col.Item().Border(1).BorderColor("#bfdbfe").Background("#eff6ff").Padding(10).Text(

@@ -6,6 +6,7 @@
     var ws = await SiteContent.GetSettingsAsync();
     var payment = Model.Payments?.OrderByDescending(p => p.Id).FirstOrDefault();
     var summary = CourtBookingSystem.Services.PaymentSummaryHelper.Calculate(Model);
+    var isReservationOnlyPaid = Model.BookingStatus == BookingStatus.PartiallyPaid && summary.RemainingBalance > 0m;
     string formatTime(TimeSpan t) => PhilippineTime.FormatTime(t);
 
     string statusBadge(BookingStatus s) => s switch
@@ -111,7 +112,19 @@
                 </div>
             </div>
 
-            @if (Model.Court?.SportType == SportType.Football && Model.BookingStatus != BookingStatus.Cancelled)
+            @if (isReservationOnlyPaid)
+            {
+                <div class="alert alert-warning small mt-3 mb-0" data-testid="receipt-reservation-instruction">
+                    <i class="fas fa-exclamation-triangle mr-1"></i>
+                    <strong>Reservation payment only:</strong>
+                    <ol class="mb-0 mt-1 pl-4">
+                        <li>Go to the website and open <strong>Find Booking</strong>.</li>
+                        <li>Enter your booking reference and mobile number.</li>
+                        <li>Pay the remaining balance before your schedule.</li>
+                    </ol>
+                </div>
+            }
+            else if (Model.Court?.SportType == SportType.Football && Model.BookingStatus != BookingStatus.Cancelled)
             {
                 <div class="alert alert-info small mt-3 mb-0">
                     <i class="fas fa-info-circle mr-1"></i>

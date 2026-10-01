@@ -5,6 +5,7 @@
     var payment = Model.Payments.OrderByDescending(p => p.Id).FirstOrDefault();
     var summary = CourtBookingSystem.Services.PaymentSummaryHelper.Calculate(Model);
     var isPayMongo = payment?.PaymentMethod == PaymentMethod.PayMongoQrPh;
+    var isReservationOnlyPaid = Model.BookingStatus == BookingStatus.PartiallyPaid && summary.RemainingBalance > 0m;
     var qrExpiryMinutes = (int)CourtBookingSystem.Services.PayMongoQrPhExpiryService.CheckoutLifetime.TotalMinutes;
     string formatTime(TimeSpan t) => PhilippineTime.FormatTime(t);
     string bookingBadge(BookingStatus s) => $"status-badge status-{s}";
@@ -22,7 +23,7 @@
         BookingStatus.PartiallyPaid => (
             Icon: "fa-check",
             Title: "Reservation Paid",
-            Lead: "Your reservation payment was received. Your slot is held and the remaining balance is shown below."
+            Lead: "Your reservation payment was received. Your slot is held, but the remaining balance must be settled before play."
         ),
         BookingStatus.ForApproval => (
             Icon: "fa-hourglass-half",
@@ -151,7 +152,19 @@
                     </div>
                 </div>
 
-                @if (Model.Court?.SportType == SportType.Football && Model.BookingStatus != BookingStatus.Cancelled)
+                @if (isReservationOnlyPaid)
+                {
+                    <div class="alert alert-warning mt-3 mb-0" data-testid="reservation-balance-instruction">
+                        <i class="fas fa-exclamation-triangle mr-1"></i>
+                        <strong>Reservation payment only:</strong>
+                        <ol class="mb-0 mt-1 pl-4">
+                            <li>Go to the website and open <strong>Find Booking</strong>.</li>
+                            <li>Enter your booking reference and mobile number.</li>
+                            <li>Pay the remaining balance before your schedule.</li>
+                        </ol>
+                    </div>
+                }
+                else if (Model.Court?.SportType == SportType.Football && Model.BookingStatus != BookingStatus.Cancelled)
                 {
                     <div class="alert alert-info mt-3 mb-0">
                         <i class="fas fa-info-circle mr-1"></i>
@@ -333,6 +346,14 @@
                                 </button>
                             </form>
                         </div>
+                    </div>
+                }
+
+                @if (Model.BookingStatus != BookingStatus.Cancelled)
+                {
+                    <div class="alert alert-warning mt-3 mb-0" data-testid="download-receipt-reminder">
+                        <i class="fas fa-download mr-1"></i>
+                        <strong>Important:</strong> Download or print your receipt and keep it for your booking record.
                     </div>
                 }
 
