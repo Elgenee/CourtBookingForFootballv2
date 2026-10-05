@@ -3584,6 +3584,164 @@ body {
     line-height: 1.48;
 }
 
+/* Simple, elegant homepage section polish */
+.public-home-page .campo-rates-section,
+.public-home-page .campo-gallery-section,
+.public-home-page .campo-contact-section {
+    position: relative;
+    padding-top: 5.25rem;
+    padding-bottom: 5.25rem;
+    background:
+        linear-gradient(180deg, rgba(252, 250, 246, .52), rgba(247, 242, 232, 0) 12rem),
+        var(--campo-cream);
+}
+
+.public-home-page .section-header {
+    max-width: 680px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.public-home-page .section-header h2 {
+    margin-bottom: .45rem;
+    color: var(--campo-ink);
+    font-size: clamp(2rem, 3.2vw, 2.7rem);
+    font-weight: 900;
+    line-height: 1.08;
+}
+
+.public-home-page .section-header p {
+    color: var(--campo-muted) !important;
+    font-size: 1.02rem;
+    line-height: 1.55;
+}
+
+.public-home-page .section-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 24px;
+    margin-bottom: .75rem;
+    padding: .16rem .58rem;
+    border-radius: 999px;
+    background: rgba(252, 233, 222, .72);
+    color: var(--campo-orange);
+    font-size: .68rem;
+    font-weight: 900;
+    letter-spacing: .14em;
+}
+
+.public-home-page .campo-rate-simple,
+.public-home-page .gallery-card,
+.public-home-page .campo-contact-item {
+    border: 1px solid var(--campo-line);
+    border-radius: 8px;
+    background: var(--campo-card);
+    box-shadow: 0 18px 44px rgba(24, 59, 42, .08);
+}
+
+.public-home-page .gallery-card,
+.public-home-page .campo-contact-item {
+    width: 100%;
+}
+
+.public-home-page .campo-rate-simple,
+.public-home-page .gallery-card,
+.public-home-page .campo-contact-item,
+.public-home-page .campo-rate-rule {
+    transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease;
+}
+
+.public-home-page .campo-rate-simple {
+    overflow: hidden;
+    padding: .6rem .85rem 1.25rem;
+}
+
+.public-home-page .campo-rate-row {
+    gap: 1.5rem;
+    padding: 1.35rem 1.25rem;
+}
+
+.public-home-page .campo-rate-row + .campo-rate-row {
+    border-top: 1px solid var(--campo-line);
+}
+
+.public-home-page .campo-rate-row h3,
+.public-home-page .gallery-title,
+.public-home-page .campo-contact-item strong {
+    color: var(--campo-ink);
+}
+
+.public-home-page .campo-rate-row p,
+.public-home-page .gallery-caption,
+.public-home-page .campo-contact-item p {
+    color: var(--campo-muted);
+}
+
+.public-home-page .campo-rate-rule {
+    box-shadow: none;
+}
+
+.public-home-page .campo-rate-rule:hover {
+    border-color: #E3D7CA;
+    transform: translateY(-1px);
+    box-shadow: 0 12px 28px rgba(24, 59, 42, .07);
+}
+
+.public-home-page .campo-gallery-section .row {
+    justify-content: center;
+    row-gap: .35rem;
+}
+
+.public-home-page .campo-gallery-section .row > [class*="col-"],
+.public-home-page .campo-contact-section .row > [class*="col-"] {
+    display: flex;
+}
+
+.public-home-page .campo-gallery-section .gallery-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.public-home-page .campo-gallery-section .gallery-card:hover {
+    border-color: #E3D7CA;
+    transform: translateY(-3px);
+    box-shadow: 0 24px 54px rgba(24, 59, 42, .12);
+}
+
+.public-home-page .campo-gallery-section .gallery-image-wrap {
+    aspect-ratio: 4 / 3;
+    background: var(--campo-cream-light);
+}
+
+.public-home-page .campo-gallery-section .gallery-body {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 96px;
+    padding: 1rem 1.1rem 1.15rem;
+}
+
+.public-home-page .campo-contact-section {
+    border-top: 0;
+    padding-top: 4.75rem;
+}
+
+.public-home-page .campo-contact-section .row {
+    row-gap: 1rem;
+}
+
+.public-home-page .campo-contact-item {
+    min-height: 154px;
+}
+
+.public-home-page .campo-contact-item::after {
+    content: none;
+    display: none;
+}
+
 @media (max-width: 991.98px) {
     .public-home-page .site-navbar .navbar-collapse {
         background: var(--campo-cream);
@@ -3597,6 +3755,17 @@ body {
 }
 
 @media (max-width: 767.98px) {
+    .public-home-page .campo-rates-section,
+    .public-home-page .campo-gallery-section,
+    .public-home-page .campo-contact-section {
+        padding-top: 3.4rem;
+        padding-bottom: 3.4rem;
+    }
+
+    .public-home-page .section-header h2 {
+        font-size: 2rem;
+    }
+
     .public-home-page .campo-rate-row {
         display: block;
     }
