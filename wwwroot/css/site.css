@@ -4724,41 +4724,6 @@ body {
     isolation: isolate;
 }
 
-.public-home-page .campo-rates-section::before {
-    content: "";
-    position: absolute;
-    z-index: 0;
-    pointer-events: none;
-}
-
-.public-home-page .campo-rates-section::before {
-    top: -2.5rem;
-    right: -3.5rem;
-    width: min(28vw, 18rem);
-    height: min(34vw, 21rem);
-    opacity: .26;
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 260'%3E%3Cg fill='none' stroke='%232F6B46' stroke-width='4' stroke-linecap='round'%3E%3Cpath d='M35 250 C62 192 74 137 61 80'/%3E%3Cpath d='M65 240 C96 182 114 118 105 42'/%3E%3Cpath d='M102 252 C137 206 154 153 151 88'/%3E%3C/g%3E%3Cg fill='%232F6B46' opacity='.23'%3E%3Cellipse cx='42' cy='201' rx='28' ry='12' transform='rotate(-38 42 201)'/%3E%3Cellipse cx='64' cy='160' rx='30' ry='13' transform='rotate(32 64 160)'/%3E%3Cellipse cx='58' cy='108' rx='26' ry='12' transform='rotate(-42 58 108)'/%3E%3Cellipse cx='96' cy='197' rx='31' ry='13' transform='rotate(36 96 197)'/%3E%3Cellipse cx='119' cy='143' rx='29' ry='12' transform='rotate(-35 119 143)'/%3E%3Cellipse cx='112' cy='78' rx='25' ry='11' transform='rotate(31 112 78)'/%3E%3Cellipse cx='147' cy='210' rx='29' ry='12' transform='rotate(-30 147 210)'/%3E%3Cellipse cx='160' cy='137' rx='27' ry='12' transform='rotate(34 160 137)'/%3E%3C/g%3E%3C/svg%3E");
-    transform: rotate(18deg);
-}
-
-.public-home-page .campo-rates-section::after {
-    content: "";
-    position: absolute;
-    right: -4.5rem;
-    bottom: -3.8rem;
-    z-index: 0;
-    width: min(26vw, 17rem);
-    height: min(32vw, 20rem);
-    opacity: .18;
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 260'%3E%3Cg fill='none' stroke='%232F6B46' stroke-width='4' stroke-linecap='round'%3E%3Cpath d='M35 250 C62 192 74 137 61 80'/%3E%3Cpath d='M65 240 C96 182 114 118 105 42'/%3E%3Cpath d='M102 252 C137 206 154 153 151 88'/%3E%3C/g%3E%3Cg fill='%232F6B46' opacity='.23'%3E%3Cellipse cx='42' cy='201' rx='28' ry='12' transform='rotate(-38 42 201)'/%3E%3Cellipse cx='64' cy='160' rx='30' ry='13' transform='rotate(32 64 160)'/%3E%3Cellipse cx='58' cy='108' rx='26' ry='12' transform='rotate(-42 58 108)'/%3E%3Cellipse cx='96' cy='197' rx='31' ry='13' transform='rotate(36 96 197)'/%3E%3Cellipse cx='119' cy='143' rx='29' ry='12' transform='rotate(-35 119 143)'/%3E%3Cellipse cx='112' cy='78' rx='25' ry='11' transform='rotate(31 112 78)'/%3E%3Cellipse cx='147' cy='210' rx='29' ry='12' transform='rotate(-30 147 210)'/%3E%3Cellipse cx='160' cy='137' rx='27' ry='12' transform='rotate(34 160 137)'/%3E%3C/g%3E%3C/svg%3E");
-    transform: scaleX(-1) rotate(-10deg);
-    pointer-events: none;
-}
-
 .public-home-page .campo-rate-simple {
     position: relative;
 }
@@ -4821,13 +4786,6 @@ body {
     min-width: 0;
 }
 
-@media (max-width: 767.98px) {
-    .public-home-page .campo-rates-section::before {
-        width: 18rem;
-        height: 18rem;
-    }
-}
-
 /* Continuous subtle turf-line background */
 .public-home-page .campo-rates-section::before,
 .public-home-page .campo-rates-section::after,
@@ -4846,39 +4804,43 @@ body {
     isolation: isolate;
     overflow: hidden;
     background:
-        radial-gradient(circle at 12% 8%, rgba(47, 107, 70, .08), transparent 22rem),
-        radial-gradient(circle at 96% 42%, rgba(244, 121, 58, .055), transparent 24rem),
+        radial-gradient(circle at 9% 10%, rgba(47, 107, 70, .055), transparent 22rem),
+        radial-gradient(circle at 94% 64%, rgba(47, 107, 70, .045), transparent 24rem),
         linear-gradient(180deg, var(--campo-cream-light) 0%, var(--campo-cream) 55%, var(--campo-cream-light) 100%);
 }
 
 .public-home-page .campo-home-main-sections::before {
     content: "";
     position: absolute;
-    right: max(-4rem, -6vw);
-    bottom: 5%;
+    top: clamp(1.5rem, 3vw, 3rem);
+    bottom: clamp(1.5rem, 3vw, 3rem);
+    left: clamp(.75rem, 2vw, 2rem);
     z-index: 0;
-    width: clamp(15rem, 28vw, 28rem);
-    height: clamp(20rem, 40vw, 38rem);
+    width: clamp(7rem, 10vw, 11rem);
     pointer-events: none;
-    opacity: .11;
+    opacity: .105;
     background-repeat: no-repeat;
-    background-position: center bottom;
-    background-size: contain;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 330 460'%3E%3Cg fill='none' stroke='%232F6B46' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M164 438c10-58 11-117 2-176-9-62-5-116 13-164' stroke-width='18'/%3E%3Cpath d='M168 258c-34-38-72-66-123-78' stroke-width='10'/%3E%3Cpath d='M177 222c42-36 81-57 134-62' stroke-width='10'/%3E%3Cpath d='M172 166c-28-33-60-55-100-68' stroke-width='9'/%3E%3Cpath d='M184 132c30-29 62-47 103-55' stroke-width='9'/%3E%3C/g%3E%3Cg fill='%232F6B46'%3E%3Cellipse cx='56' cy='164' rx='50' ry='23' transform='rotate(24 56 164)'/%3E%3Cellipse cx='100' cy='113' rx='52' ry='23' transform='rotate(35 100 113)'/%3E%3Cellipse cx='247' cy='83' rx='56' ry='25' transform='rotate(-24 247 83)'/%3E%3Cellipse cx='285' cy='154' rx='50' ry='22' transform='rotate(-34 285 154)'/%3E%3Cellipse cx='72' cy='216' rx='48' ry='22' transform='rotate(18 72 216)'/%3E%3Cellipse cx='236' cy='207' rx='52' ry='23' transform='rotate(-18 236 207)'/%3E%3Cellipse cx='150' cy='64' rx='60' ry='27' transform='rotate(4 150 64)'/%3E%3C/g%3E%3C/svg%3E");
+    background-position: left center;
+    background-size: 100% 100%;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 960'%3E%3Cg fill='none' stroke='%232F6B46' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M88 938C46 812 134 733 80 604C35 496 128 392 90 284C62 204 88 122 122 28' stroke-width='12'/%3E%3Cpath d='M86 792C58 760 36 734 18 700' stroke-width='7'/%3E%3Cpath d='M92 650c32-35 58-64 78-103' stroke-width='7'/%3E%3Cpath d='M80 508C50 476 28 446 14 410' stroke-width='6'/%3E%3Cpath d='M92 362c30-31 54-60 72-94' stroke-width='6'/%3E%3Cpath d='M104 210C76 178 54 146 42 110' stroke-width='6'/%3E%3C/g%3E%3Cg fill='%232F6B46'%3E%3Cellipse cx='30' cy='696' rx='35' ry='14' transform='rotate(38 30 696)'/%3E%3Cellipse cx='146' cy='548' rx='38' ry='15' transform='rotate(-42 146 548)'/%3E%3Cellipse cx='32' cy='408' rx='34' ry='14' transform='rotate(34 32 408)'/%3E%3Cellipse cx='142' cy='268' rx='36' ry='14' transform='rotate(-38 142 268)'/%3E%3Cellipse cx='58' cy='112' rx='34' ry='14' transform='rotate(48 58 112)'/%3E%3C/g%3E%3C/svg%3E");
 }
 
 .public-home-page .campo-home-main-sections::after {
     content: "";
     position: absolute;
-    left: -8rem;
-    top: 18%;
+    top: clamp(5rem, 8vw, 8rem);
+    right: clamp(.75rem, 2vw, 2rem);
+    bottom: clamp(1.5rem, 3vw, 3rem);
     z-index: 0;
-    width: clamp(18rem, 34vw, 36rem);
-    height: clamp(18rem, 34vw, 36rem);
+    width: clamp(7rem, 10vw, 11rem);
     pointer-events: none;
-    border-radius: 999px;
-    background: rgba(47, 107, 70, .045);
-    filter: blur(1px);
+    opacity: .085;
+    background-repeat: no-repeat;
+    background-position: right center;
+    background-size: 100% 100%;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 960'%3E%3Cg fill='none' stroke='%232F6B46' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M88 938C46 812 134 733 80 604C35 496 128 392 90 284C62 204 88 122 122 28' stroke-width='12'/%3E%3Cpath d='M86 792C58 760 36 734 18 700' stroke-width='7'/%3E%3Cpath d='M92 650c32-35 58-64 78-103' stroke-width='7'/%3E%3Cpath d='M80 508C50 476 28 446 14 410' stroke-width='6'/%3E%3Cpath d='M92 362c30-31 54-60 72-94' stroke-width='6'/%3E%3Cpath d='M104 210C76 178 54 146 42 110' stroke-width='6'/%3E%3C/g%3E%3Cg fill='%232F6B46'%3E%3Cellipse cx='30' cy='696' rx='35' ry='14' transform='rotate(38 30 696)'/%3E%3Cellipse cx='146' cy='548' rx='38' ry='15' transform='rotate(-42 146 548)'/%3E%3Cellipse cx='32' cy='408' rx='34' ry='14' transform='rotate(34 32 408)'/%3E%3Cellipse cx='142' cy='268' rx='36' ry='14' transform='rotate(-38 142 268)'/%3E%3Cellipse cx='58' cy='112' rx='34' ry='14' transform='rotate(48 58 112)'/%3E%3C/g%3E%3C/svg%3E");
+    transform: scaleX(-1);
+    transform-origin: center;
 }
 
 .public-home-page .campo-home-main-sections > section {
@@ -4898,69 +4860,19 @@ body {
 
 @media (max-width: 767.98px) {
     .public-home-page .campo-home-main-sections::before {
-        right: -7rem;
-        bottom: 1.5rem;
-        width: 18rem;
-        height: 25rem;
-        opacity: .08;
+        top: 1.25rem;
+        bottom: 1.25rem;
+        left: .35rem;
+        width: 5.25rem;
+        opacity: .07;
     }
 
     .public-home-page .campo-home-main-sections::after {
-        left: -12rem;
-        top: 12rem;
-        width: 22rem;
-        height: 22rem;
-    }
-}
-
-.public-home-page .campo-rates-section,
-.public-home-page .campo-gallery-section,
-.public-home-page .campo-contact-section {
-    --campo-turf-edge-y: 0rem;
-    background-color: var(--campo-cream-light);
-    background-image:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='900' viewBox='0 0 260 900'%3E%3Cg fill='none' stroke='%232F6B46' stroke-linecap='round' stroke-width='3' stroke-opacity='.095'%3E%3Cpath d='M-42 52 C92 156 114 274 48 404 C-12 522 20 654 154 840'/%3E%3Cpath d='M-76 184 C58 272 78 370 30 492 C-24 632 36 746 214 896'/%3E%3Cpath d='M18 -22 C144 116 168 238 94 376 C34 490 64 604 198 734'/%3E%3Cpath d='M-18 718 C42 684 94 684 146 720 C188 750 218 776 254 790'/%3E%3Cpath d='M-18 360 C48 326 112 328 176 366 C214 388 238 402 268 408'/%3E%3C/g%3E%3C/svg%3E"),
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='900' viewBox='0 0 260 900'%3E%3Cg fill='none' stroke='%232F6B46' stroke-linecap='round' stroke-width='3' stroke-opacity='.085'%3E%3Cpath d='M302 52 C168 156 146 274 212 404 C272 522 240 654 106 840'/%3E%3Cpath d='M336 184 C202 272 182 370 230 492 C284 632 224 746 46 896'/%3E%3Cpath d='M242 -22 C116 116 92 238 166 376 C226 490 196 604 62 734'/%3E%3Cpath d='M278 718 C218 684 166 684 114 720 C72 750 42 776 6 790'/%3E%3Cpath d='M278 360 C212 326 148 328 84 366 C46 388 22 402 -8 408'/%3E%3C/g%3E%3C/svg%3E"),
-        radial-gradient(circle at -8% 12%, rgba(47, 107, 70, .07), transparent 28rem),
-        radial-gradient(circle at 106% 6%, rgba(244, 121, 58, .045), transparent 24rem);
-    background-position:
-        left var(--campo-turf-edge-y),
-        right var(--campo-turf-edge-y),
-        left top,
-        right top;
-    background-repeat: repeat-y, repeat-y, no-repeat, no-repeat;
-    background-size:
-        clamp(11rem, 18vw, 18rem) 62rem,
-        clamp(11rem, 18vw, 18rem) 62rem,
-        auto,
-        auto;
-}
-
-.public-home-page .campo-gallery-section {
-    --campo-turf-edge-y: -21rem;
-}
-
-.public-home-page .campo-contact-section {
-    --campo-turf-edge-y: -42rem;
-}
-
-@media (max-width: 767.98px) {
-    .public-home-page .campo-rates-section,
-    .public-home-page .campo-gallery-section,
-    .public-home-page .campo-contact-section {
-        background-size:
-            7.5rem 42rem,
-            7.5rem 42rem,
-            auto,
-            auto;
-    }
-
-    .public-home-page .campo-gallery-section {
-        --campo-turf-edge-y: -14rem;
-    }
-
-    .public-home-page .campo-contact-section {
-        --campo-turf-edge-y: -28rem;
+        top: 7rem;
+        right: .35rem;
+        bottom: 1.25rem;
+        width: 5.25rem;
+        opacity: .06;
     }
 }
 
@@ -4990,15 +4902,9 @@ body {
     background: transparent !important;
 }
 
-/* Shared Gallery and Contact decorative canvas */
+/* Shared Gallery and Contact spacing within the lower decorative canvas */
 .public-home-page .campo-home-main-sections {
-    overflow: visible !important;
-}
-
-.public-home-page .campo-home-main-sections::before,
-.public-home-page .campo-home-main-sections::after {
-    content: none;
-    display: none;
+    overflow: hidden;
 }
 
 .public-home-page .campo-gallery-contact-wrap {
@@ -5009,36 +4915,8 @@ body {
 
 .public-home-page .campo-gallery-contact-wrap::before,
 .public-home-page .campo-gallery-contact-wrap::after {
-    content: "";
-    position: absolute;
-    z-index: 0;
-    pointer-events: none;
-}
-
-.public-home-page .campo-gallery-contact-wrap::before {
-    top: clamp(1.5rem, 3vw, 3rem);
-    left: clamp(1rem, 4vw, 4rem);
-    width: clamp(14rem, 24vw, 24rem);
-    height: clamp(11rem, 20vw, 20rem);
-    border-radius: 44% 56% 62% 38% / 46% 42% 58% 54%;
-    background:
-        radial-gradient(circle at 36% 38%, rgba(47, 107, 70, .075), transparent 55%),
-        radial-gradient(circle at 72% 68%, rgba(47, 107, 70, .045), transparent 48%);
-    opacity: .46;
-    transform: rotate(-7deg);
-}
-
-.public-home-page .campo-gallery-contact-wrap::after {
-    right: clamp(1rem, 4vw, 4rem);
-    bottom: clamp(1rem, 3vw, 3rem);
-    width: clamp(9rem, 15vw, 15rem);
-    height: clamp(11rem, 18vw, 18rem);
-    opacity: .10;
-    transform: rotate(8deg);
-    background-repeat: no-repeat;
-    background-position: right bottom;
-    background-size: contain;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 280 360'%3E%3Cg fill='none' stroke='%232F6B46' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M142 344c4-58-4-103-23-145-19-41-23-82-12-121' stroke-width='12'/%3E%3Cpath d='M122 207C80 179 51 145 36 104' stroke-width='7'/%3E%3Cpath d='M135 176c40-35 75-58 120-70' stroke-width='7'/%3E%3Cpath d='M113 136C78 111 54 84 43 51' stroke-width='6'/%3E%3Cpath d='M126 108c34-30 67-48 108-57' stroke-width='6'/%3E%3C/g%3E%3Cg fill='%232F6B46'%3E%3Cellipse cx='40' cy='102' rx='39' ry='16' transform='rotate(33 40 102)'/%3E%3Cellipse cx='70' cy='58' rx='41' ry='17' transform='rotate(43 70 58)'/%3E%3Cellipse cx='218' cy='50' rx='44' ry='18' transform='rotate(-24 218 50)'/%3E%3Cellipse cx='242' cy='105' rx='41' ry='16' transform='rotate(-35 242 105)'/%3E%3Cellipse cx='69' cy='151' rx='39' ry='16' transform='rotate(24 69 151)'/%3E%3Cellipse cx='199' cy='157' rx='42' ry='17' transform='rotate(-20 199 157)'/%3E%3C/g%3E%3C/svg%3E");
+    content: none;
+    display: none;
 }
 
 .public-home-page .campo-gallery-contact-wrap > section {
@@ -5050,24 +4928,4 @@ body {
 .public-home-page .campo-gallery-contact-wrap .container {
     position: relative;
     z-index: 2;
-}
-
-@media (max-width: 767.98px) {
-    .public-home-page .campo-gallery-contact-wrap::before {
-        top: 1.25rem;
-        left: .75rem;
-        width: 12rem;
-        height: 10rem;
-        opacity: .34;
-        transform: rotate(-6deg);
-    }
-
-    .public-home-page .campo-gallery-contact-wrap::after {
-        right: .75rem;
-        bottom: 1.25rem;
-        width: 7.5rem;
-        height: 9rem;
-        opacity: .075;
-        transform: rotate(7deg);
-    }
 }
