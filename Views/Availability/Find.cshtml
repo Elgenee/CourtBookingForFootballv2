@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "Find Available Field Time";
+    ViewData["Title"] = "Find Available Turf Time";
     var sport = (SportType)ViewBag.Sport;
     var date = (string)ViewBag.Date;
     var duration = (int)ViewBag.Duration;
@@ -11,28 +11,20 @@
     <div class="container">
         <div class="row mb-3">
             <div class="col">
-                <h2 class="mb-1"><i class="fas fa-search-location mr-2 text-primary"></i>Find Available Field Time</h2>
-                <p class="text-muted">Pick a sport, date, and duration — we'll show every open slot across our fields.</p>
+                <h2 class="mb-1"><i class="fas fa-search-location mr-2 text-primary"></i>Find Available Turf Time</h2>
+                <p class="text-muted">Pick a date and duration. We'll show open slots across our turf fields.</p>
             </div>
         </div>
 
         <div class="card booking-card mb-3">
             <div class="card-body">
                 <form id="availabilityForm" class="form-row align-items-end">
-                    <div class="form-group col-md-3">
-                        <label for="sport" class="quick-label">Sport</label>
-                        <select name="sport" id="sport" class="form-control">
-                            @foreach (var s in Enum.GetValues<SportType>())
-                            {
-                                <option value="@s" selected="@(s == sport)">@s</option>
-                            }
-                        </select>
-                    </div>
-                    <div class="form-group col-md-3">
+                    <input type="hidden" name="sport" id="sport" value="@sport" />
+                    <div class="form-group col-md-4">
                         <label for="date" class="quick-label">Date</label>
                         <input type="date" name="date" id="date" class="form-control" value="@date" min="@minDate" max="@maxDate" />
                     </div>
-                    <div class="form-group col-md-3">
+                    <div class="form-group col-md-4">
                         <label for="durationHours" class="quick-label">Duration</label>
                         <select name="durationHours" id="durationHours" class="form-control">
                             @for (var hours = 1; hours <= 8; hours++)
@@ -41,7 +33,7 @@
                             }
                         </select>
                     </div>
-                    <div class="form-group col-md-3">
+                    <div class="form-group col-md-4">
                         <button type="submit" class="btn btn-primary btn-block btn-lg quick-search-btn">
                             <i class="fas fa-search mr-1"></i>Find Times
                         </button>
@@ -63,6 +55,21 @@
             var $results = $("#results");
             var $header = $("#resultsHeader");
 
+            function turfText(text) {
+                return String(text || "")
+                    .replace(/Giuseppe Football Club/gi, "CAMPO TURF")
+                    .replace(/Giuseppe Football Field/gi, "CAMPO TURF Field")
+                    .replace(/Football Field/gi, "Turf Field")
+                    .replace(/football field/gi, "turf field");
+            }
+
+            function formatMoney(value) {
+                return Number(value || 0).toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            }
+
             function load() {
                 var sport = $("#sport").val();
                 var date = $("#date").val();
@@ -81,7 +88,7 @@
 
             function render(payload) {
                 if (!payload || !payload.slots || payload.slots.length === 0) {
-                    $results.html('<div class="alert alert-warning"><i class="fas fa-circle-info mr-2"></i>No available slots for this sport/date/duration. Try a different day or shorter duration.</div>');
+                    $results.html('<div class="alert alert-warning"><i class="fas fa-circle-info mr-2"></i>No available turf slots for this date and duration. Try a different day or shorter duration.</div>');
                     $header.hide();
                     return;
                 }
@@ -100,8 +107,8 @@
                     var slots = byCourt[court];
                     html += '<div class="card availability-card mb-3">';
                     html += '<div class="card-header d-flex justify-content-between align-items-center">';
-                    html += '<h6 class="mb-0"><i class="fas fa-futbol mr-2 text-primary"></i>' + court + '</h6>';
-                    html += '<span class="text-muted small">' + slots.length + ' open · ' + slots[0].sportType + '</span>';
+                    html += '<h6 class="mb-0"><i class="fas fa-layer-group mr-2 text-primary"></i>' + turfText(court) + '</h6>';
+                    html += '<span class="text-muted small">' + slots.length + ' open · Turf Field</span>';
                     html += '</div>';
                     html += '<div class="card-body p-2"><div class="availability-slots">';
                     slots.forEach(function (s) {
@@ -113,7 +120,7 @@
                         html += '<a href="' + url + '" class="availability-slot-btn' + rateClass + '">';
                         html += '<span class="time">' + s.startLabel + ' – ' + s.endLabel + '</span>';
                         var priceNote = s.isMixedRate ? ' mixed' : (s.isPromoRate ? ' promo' : '');
-                        html += '<span class="price">' + Number(s.totalAmount).toFixed(2) + priceNote + '</span>';
+                        html += '<span class="price">' + formatMoney(s.totalAmount) + priceNote + '</span>';
                         html += '</a>';
                     });
                     html += '</div></div></div>';
@@ -122,7 +129,7 @@
             }
 
             $form.on("submit", function (e) { e.preventDefault(); load(); });
-            $("#sport, #date, #durationHours").on("change", load);
+            $("#date, #durationHours").on("change", load);
             load(); // initial
         })(jQuery);
     </script>

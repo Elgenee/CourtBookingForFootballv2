@@ -10,6 +10,15 @@
     string formatTime(TimeSpan t) => PhilippineTime.FormatTime(t);
     string bookingBadge(BookingStatus s) => $"status-badge status-{s}";
     string paymentBadge(PaymentStatus s) => $"status-badge payment-{s}";
+    string TurfText(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return "";
+        return text
+            .Replace("Giuseppe Football Club", "CAMPO TURF", StringComparison.OrdinalIgnoreCase)
+            .Replace("Giuseppe Football Field", "CAMPO TURF Field", StringComparison.OrdinalIgnoreCase)
+            .Replace("Football Field", "Turf Field", StringComparison.OrdinalIgnoreCase)
+            .Replace("football field", "turf field", StringComparison.OrdinalIgnoreCase);
+    }
 
     var hero = Model.BookingStatus switch
     {
@@ -92,7 +101,7 @@
                     <div class="card-body">
                         <dl class="row mb-0">
                             <dt class="col-sm-4">Field</dt>
-                            <dd class="col-sm-8">@Model.Court?.CourtName <span class="badge badge-info ml-1">@Model.Court?.SportType</span></dd>
+                            <dd class="col-sm-8">@TurfText(Model.Court?.CourtName) <span class="badge badge-info ml-1">Turf Field</span></dd>
 
                             <dt class="col-sm-4">Date</dt>
                             <dd class="col-sm-8">@Model.BookingDate.ToString("dddd, MMMM d, yyyy")</dd>
@@ -198,7 +207,7 @@
                                     <li>Arrive at the venue at least <strong>15 minutes before your slot</strong>.</li>
                                     <li>Show your booking reference <code>@Model.BookingReferenceNo</code> at the front desk.</li>
                                     <li>Pay <strong>@Model.TotalAmount.ToString("0.00") PHP</strong> in cash to confirm your booking.</li>
-                                    <li>Our staff will check you in and assign your court.</li>
+                                    <li>Our staff will check you in and assign your turf field.</li>
                                 </ol>
                             }
                             else if (payment.PaymentMethod == PaymentMethod.PayMongoQrPh)
@@ -246,7 +255,7 @@
                             else
                             {
                                 <ol class="mb-3 pl-3">
-                                    <li>Send <strong>@Model.TotalAmount.ToString("0.00") PHP</strong> via GCash to <strong>0917 622 0308</strong> (Giuseppe Football).</li>
+                                    <li>Send <strong>@Model.TotalAmount.ToString("0.00") PHP</strong> via GCash to <strong>0917 622 0308</strong> (CAMPO TURF).</li>
                                     <li>Use reference <code>@Model.BookingReferenceNo</code> in the message.</li>
                                     <li><strong>Upload your GCash receipt below</strong> so our team can verify within 1 hour.</li>
                                 </ol>

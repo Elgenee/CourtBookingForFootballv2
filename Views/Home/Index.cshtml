@@ -10,9 +10,36 @@
     var activeCourts = (Model ?? Enumerable.Empty<CourtBookingSystem.Models.Court>())
         .Where(c => c.IsActive)
         .ToList();
+    var pricingRulesByCourt = ViewBag.PricingRulesByCourt as IDictionary<int, List<BookingPricingRule>>
+        ?? new Dictionary<int, List<BookingPricingRule>>();
     string ImageUrl(string path) => path.StartsWith("http", StringComparison.OrdinalIgnoreCase) || path.StartsWith("/")
         ? path
         : "/" + path;
+    string TurfText(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return "";
+        return text
+            .Replace("Giuseppe Football Club", "CAMPO TURF", StringComparison.OrdinalIgnoreCase)
+            .Replace("Giuseppe Football Field", "CAMPO TURF Field", StringComparison.OrdinalIgnoreCase)
+            .Replace("Football Field", "Turf Field", StringComparison.OrdinalIgnoreCase)
+            .Replace("football field", "turf field", StringComparison.OrdinalIgnoreCase)
+            .Replace("(Football + Caf\u00e9)", "", StringComparison.OrdinalIgnoreCase);
+    }
+    string RuleWindow(BookingPricingRule rule) =>
+        $"{PhilippineTime.FormatTime(rule.StartTime)} - {PhilippineTime.FormatTime(rule.EndTime)}";
+    string RuleDates(BookingPricingRule rule)
+    {
+        if (!rule.IsPromotional) return "All dates";
+        if (rule.EffectiveStartDate.HasValue && rule.EffectiveEndDate.HasValue)
+        {
+            return rule.EffectiveStartDate.Value.Date == rule.EffectiveEndDate.Value.Date
+                ? rule.EffectiveStartDate.Value.ToString("MMM d, yyyy")
+                : $"{rule.EffectiveStartDate.Value:MMM d, yyyy} - {rule.EffectiveEndDate.Value:MMM d, yyyy}";
+        }
+        if (rule.EffectiveStartDate.HasValue) return $"From {rule.EffectiveStartDate.Value:MMM d, yyyy}";
+        if (rule.EffectiveEndDate.HasValue) return $"Until {rule.EffectiveEndDate.Value:MMM d, yyyy}";
+        return "Promo dates";
+    }
 }
 
 <!-- ============ HERO ============ -->
@@ -24,13 +51,13 @@
             <div class="col-lg-7 col-xl-6">
                 <div class="hero-eyebrow campo-hero-eyebrow">CAMPO TURF</div>
                 <h1 class="hero-title mb-3" data-testid="hero-title">Play Your Game.</h1>
-                <p class="hero-subtitle mb-4" data-testid="hero-subtitle">Your neighborhood turf.</p>
+                <p class="hero-subtitle mb-4" data-testid="hero-subtitle">A multi-purpose sports turf for teams, schools, and community play.</p>
                 <a asp-controller="Availability" asp-action="Find" class="btn btn-primary btn-lg hero-book-btn">
                     Book a Turf <i class="fas fa-arrow-right ml-2"></i>
                 </a>
                 <div class="campo-hero-notes" aria-label="Venue highlights">
                     <span>Hourly reservations</span>
-                    <span>Team-ready turf</span>
+                    <span>Multi-purpose turf field</span>
                     <span>Easy online booking</span>
                 </div>
             </div>
@@ -46,7 +73,7 @@
                 <div class="section-header text-center mb-4">
                     <span class="section-eyebrow">Rates</span>
                     <h2>Hourly Rates</h2>
-                    <p class="text-muted mb-0">Straightforward pricing for your next game.</p>
+                    <p class="text-muted mb-0">Pricing rules are shown from the backend configuration.</p>
                 </div>
 
                 <div class="campo-rate-card campo-rate-simple">
@@ -54,17 +81,52 @@
                     {
                         @foreach (var court in activeCourts)
                         {
+                            var pricingRules = pricingRulesByCourt.TryGetValue(court.Id, out var configuredRules)
+                                ? configuredRules
+                                : new List<BookingPricingRule>();
                             <div class="campo-rate-row">
-                                <div>
-                                    <span class="court-sport-tag">@court.SportType</span>
-                                    <h3>@court.CourtName</h3>
+                                <div class="campo-rate-copy">
+                                    <span class="court-sport-tag">Turf Field</span>
+                                    <h3>@TurfText(court.CourtName)</h3>
                                     @if (!string.IsNullOrWhiteSpace(court.Description))
                                     {
-                                        <p>@court.Description</p>
+                                        <p>@TurfText(court.Description)</p>
                                     }
                                 </div>
-                                <div class="campo-rate-price">
-                                    @court.HourlyRate.ToString("0.00") <span>/ hour</span>
+                                <div class="campo-rate-rules" aria-label="Pricing rules for @TurfText(court.CourtName)">
+                                    @if (pricingRules.Any())
+                                    {
+                                        @foreach (var rule in pricingRules)
+                                        {
+                                            <div class="campo-rate-rule">
+                                                <div class="campo-rate-rule-main">
+                                                    <span class="campo-rate-rule-type @(rule.IsPromotional ? "is-promo" : "")">
+                                                        @(rule.IsPromotional ? "Promo" : "Regular")
+                                                    </span>
+                                                    <strong>@rule.Name</strong>
+                                                    <span>@RuleWindow(rule)</span>
+                                                    <span>@RuleDates(rule)</span>
+                                                </div>
+                                                <div class="campo-rate-rule-price">
+                                                    <span>PHP</span> @rule.HourlyRate.ToString("N2") <small>/ hour</small>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="campo-rate-rule">
+                                            <div class="campo-rate-rule-main">
+                                                <span class="campo-rate-rule-type">Base</span>
+                                                <strong>Standard rate</strong>
+                                                <span>All operating hours</span>
+                                                <span>Fallback court rate</span>
+                                            </div>
+                                            <div class="campo-rate-rule-price">
+                                                <span>PHP</span> @court.HourlyRate.ToString("N2") <small>/ hour</small>
+                                            </div>
+                                        </div>
+                                    }
                                 </div>
                             </div>
                         }
@@ -80,13 +142,34 @@
     </div>
 </section>
 
+<!-- ============ ACTIVITIES ============ -->
+@* <section id="activities" class="section-default campo-activities-section" data-testid="section-activities">
+    <div class="container">
+        <div class="section-header text-center mb-4">
+            <span class="section-eyebrow">Activities</span>
+            <h2>Built for More Than One Game</h2>
+            <p class="text-muted mb-0">CAMPO TURF is a multi-purpose sports turf for organized play, school sessions, and community events.</p>
+        </div>
+
+        <div class="campo-activities-grid" aria-label="Supported activities">
+            <div class="campo-activity-item"><i class="fas fa-futbol"></i><span>Football</span></div>
+            <div class="campo-activity-item"><i class="fas fa-compact-disc"></i><span>Ultimate Frisbee</span></div>
+            <div class="campo-activity-item"><i class="fas fa-flag"></i><span>Flag Football</span></div>
+            <div class="campo-activity-item"><i class="fas fa-football"></i><span>Rugby</span></div>
+            <div class="campo-activity-item"><i class="fas fa-school"></i><span>School PE Activities</span></div>
+            <div class="campo-activity-item"><i class="fas fa-people-group"></i><span>Community Games &amp; Sports Days</span></div>
+            <div class="campo-activity-item"><i class="fas fa-plus"></i><span>Others</span></div>
+        </div>
+    </div>
+</section> *@
+
 <!-- ============ GALLERY ============ -->
 <section id="facilities" class="section-default campo-gallery-section" data-testid="section-gallery">
     <div class="container">
         <div class="section-header text-center mb-4">
             <span class="section-eyebrow">Take a look</span>
             <h2>Gallery</h2>
-            <p class="text-muted">A peek inside the courts, the lounge, and the action.</p>
+            <p class="text-muted">A peek inside the turf field, the lounge, and the action.</p>
         </div>
 
         <div class="row">
@@ -95,16 +178,16 @@
                 <div class="col-12 col-sm-6 col-lg-3 mb-4">
                     <div class="gallery-card" data-testid="gallery-card-@item.Id">
                         <div class="gallery-image-wrap">
-                            <img src="@ImageUrl(item.ImagePath)" alt="@item.Title" loading="lazy" />
+                            <img src="@ImageUrl(item.ImagePath)" alt="@TurfText(item.Title)" loading="lazy" />
                             <div class="gallery-overlay">
                                 <i class="fas fa-search-plus"></i>
                             </div>
                         </div>
                         <div class="gallery-body">
-                            <h6 class="gallery-title">@item.Title</h6>
+                            <h6 class="gallery-title">@TurfText(item.Title)</h6>
                             @if (!string.IsNullOrWhiteSpace(item.Caption))
                             {
-                                <p class="gallery-caption">@item.Caption</p>
+                                <p class="gallery-caption">@TurfText(item.Caption)</p>
                             }
                         </div>
                     </div>
@@ -152,7 +235,7 @@
                     <div>
                         <h3>Location</h3>
                         <p class="mb-0">
-                            <strong data-testid="about-location">@(about.Location ?? "")</strong>
+                            <strong data-testid="about-location">@TurfText(about.Location)</strong>
                         </p>
                     </div>
                 </div>

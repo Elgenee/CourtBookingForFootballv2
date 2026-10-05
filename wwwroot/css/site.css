@@ -1,17 +1,17 @@
 /* ============================================================
-   Football Field Booking System — site.css
+   CAMPO TURF booking system — site.css
    Bootstrap 4 + AdminLTE 3 customisation
    ============================================================ */
 
 :root {
-    --brand-primary: #0f4c81;       /* deep court blue */
-    --brand-primary-dark: #0a3a64;
-    --brand-accent: #ffb627;        /* warm net-yellow accent */
-    --brand-bg-soft: #f4f6f9;
-    --brand-text-dark: #1c2434;
-    --brand-primary-rgb: 15, 76, 129;
-    --brand-primary-dark-rgb: 10, 58, 100;
-    --brand-accent-rgb: 255, 182, 39;
+    --brand-primary: #2F6B46;
+    --brand-primary-dark: #174F32;
+    --brand-accent: #F4793A;
+    --brand-bg-soft: #F7F2E8;
+    --brand-text-dark: #183B2A;
+    --brand-primary-rgb: 47, 107, 70;
+    --brand-primary-dark-rgb: 23, 79, 50;
+    --brand-accent-rgb: 244, 121, 58;
 }
 
 html, body {
@@ -1526,24 +1526,27 @@ section.home-hero-content .container {
    ============================================================ */
 
 :root {
-    --campo-green: #204B31;
-    --campo-green-dark: #204B31;
-    --campo-green-deep: #204B31;
-    --campo-green-soft: #F5F0E7;
-    --campo-orange: #EE7136;
-    --campo-cream: #F5F0E7;
-    --campo-ink: #204B31;
-    --campo-muted: #64746c;
-    --campo-line: #ded8cc;
-    --campo-shadow: 0 18px 45px rgba(5, 45, 29, .10);
-    --brand-primary: #204B31;
-    --brand-primary-dark: #204B31;
-    --brand-accent: #EE7136;
-    --brand-bg-soft: #F5F0E7;
-    --brand-text-dark: #204B31;
-    --brand-primary-rgb: 27, 79, 49;
-    --brand-primary-dark-rgb: 23, 63, 41;
-    --brand-accent-rgb: 243, 111, 50;
+    --campo-green: #2F6B46;
+    --campo-green-dark: #174F32;
+    --campo-green-deep: #174F32;
+    --campo-green-soft: #F7F2E8;
+    --campo-orange: #F4793A;
+    --campo-orange-soft: #FCE9DE;
+    --campo-cream: #F7F2E8;
+    --campo-cream-light: #FCFAF6;
+    --campo-card: #FFFFFF;
+    --campo-ink: #183B2A;
+    --campo-muted: #718078;
+    --campo-line: #E9E2D8;
+    --campo-shadow: 0 18px 42px rgba(24, 59, 42, .09);
+    --brand-primary: #2F6B46;
+    --brand-primary-dark: #174F32;
+    --brand-accent: #F4793A;
+    --brand-bg-soft: #F7F2E8;
+    --brand-text-dark: #183B2A;
+    --brand-primary-rgb: 47, 107, 70;
+    --brand-primary-dark-rgb: 23, 79, 50;
+    --brand-accent-rgb: 244, 121, 58;
 }
 
 html,
@@ -1923,7 +1926,7 @@ body {
 }
 
 #contact {
-    border-top: 1px solid rgba(0, 63, 40, .08);
+/*    border-top: 1px solid rgba(0, 63, 40, .08);*/
 }
 
 .info-icon,
@@ -2270,6 +2273,10 @@ body {
     .footer-links {
         gap: 1rem;
     }
+
+    .campo-activities-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Simplified CAMPO TURF homepage */
@@ -2406,6 +2413,48 @@ body {
     justify-content: center;
 }
 
+.campo-activities-section {
+    padding: 4.75rem 0;
+    background: #fff;
+}
+
+.campo-activities-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.campo-activity-item {
+    min-height: 118px;
+    display: flex;
+    align-items: center;
+    gap: .95rem;
+    padding: 1.1rem;
+    border: 1px solid var(--campo-line);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--campo-green-dark);
+    box-shadow: 0 14px 32px rgba(4, 32, 22, .05);
+}
+
+.campo-activity-item i {
+    width: 42px;
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 42px;
+    border-radius: 50%;
+    background: var(--campo-orange-soft);
+    color: var(--campo-orange);
+    font-size: 1.05rem;
+}
+
+.campo-activity-item span {
+    font-weight: 900;
+    line-height: 1.2;
+}
+
 .campo-facilities-section {
     padding: 4.75rem 0;
     background: #f7faf8;
@@ -2487,6 +2536,18 @@ body {
 
     .campo-facilities-section {
         padding: 3rem 0;
+    }
+
+    .campo-activities-section {
+        padding: 3rem 0;
+    }
+
+    .campo-activities-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .campo-activity-item {
+        min-height: 104px;
     }
 }
 
@@ -3039,23 +3100,27 @@ body {
 
 /* Client-approved CAMPO TURF palette */
 :root {
-    --campo-green: #204B31;
-    --campo-green-dark: #204B31;
-    --campo-green-deep: #204B31;
-    --campo-green-soft: #F5F0E7;
-    --campo-orange: #EE7136;
-    --campo-cream: #F5F0E7;
-    --campo-ink: #204B31;
-    --campo-muted: #66736b;
-    --campo-line: rgba(32, 75, 49, .16);
-    --brand-primary: #204B31;
-    --brand-primary-dark: #204B31;
-    --brand-accent: #EE7136;
-    --brand-bg-soft: #F5F0E7;
-    --brand-text-dark: #204B31;
-    --brand-primary-rgb: 32, 75, 49;
-    --brand-primary-dark-rgb: 32, 75, 49;
-    --brand-accent-rgb: 238, 113, 54;
+    --campo-green: #2F6B46;
+    --campo-green-dark: #174F32;
+    --campo-green-deep: #174F32;
+    --campo-green-soft: #F7F2E8;
+    --campo-orange: #F4793A;
+    --campo-orange-soft: #FCE9DE;
+    --campo-cream: #F7F2E8;
+    --campo-cream-light: #FCFAF6;
+    --campo-card: #FFFFFF;
+    --campo-ink: #183B2A;
+    --campo-muted: #718078;
+    --campo-line: #E9E2D8;
+    --campo-shadow: 0 18px 42px rgba(24, 59, 42, .09);
+    --brand-primary: #2F6B46;
+    --brand-primary-dark: #174F32;
+    --brand-accent: #F4793A;
+    --brand-bg-soft: #F7F2E8;
+    --brand-text-dark: #183B2A;
+    --brand-primary-rgb: 47, 107, 70;
+    --brand-primary-dark-rgb: 23, 79, 50;
+    --brand-accent-rgb: 244, 121, 58;
 }
 
 .btn-primary,
@@ -3064,7 +3129,7 @@ body {
     background: var(--campo-green);
     border-color: var(--campo-green);
     color: #fff;
-    box-shadow: 0 14px 26px rgba(32, 75, 49, .20);
+    box-shadow: 0 14px 26px rgba(47, 107, 70, .20);
 }
 
 .btn-primary:hover,
@@ -3072,15 +3137,16 @@ body {
 .btn-primary:not(:disabled):not(.disabled):active,
 .quick-search-btn:hover,
 .quick-search-btn:focus {
-    background: var(--campo-green);
-    border-color: var(--campo-green);
+    background: var(--campo-green-dark);
+    border-color: var(--campo-green-dark);
     color: #fff;
 }
 
 .site-navbar,
 .public-home-page .site-navbar {
     background: var(--campo-cream) !important;
-    border-bottom-color: rgba(32, 75, 49, .14);
+    border-bottom-color: var(--campo-line);
+    box-shadow: 0 10px 28px rgba(24, 59, 42, .08);
 }
 
 .site-navbar .nav-link,
@@ -3091,7 +3157,16 @@ body {
 .public-home-page .site-navbar .nav-link.active,
 .public-home-page .site-navbar .nav-link:hover,
 .public-home-page .site-navbar .nav-link:focus {
-    color: var(--campo-green) !important;
+    color: var(--campo-ink) !important;
+}
+
+.site-navbar .nav-link:hover,
+.site-navbar .nav-link:focus,
+.site-navbar .nav-link.active,
+.public-home-page .site-navbar .nav-link:hover,
+.public-home-page .site-navbar .nav-link:focus,
+.public-home-page .site-navbar .nav-link.active {
+    background: rgba(252, 233, 222, .78);
 }
 
 .site-navbar .nav-link.active::after,
@@ -3099,10 +3174,25 @@ body {
     background: var(--campo-orange);
 }
 
+.public-home-page .site-navbar-cta .btn-book-turf {
+    background: var(--campo-green-dark);
+    border-color: var(--campo-green-dark);
+    color: #fff;
+    box-shadow: 0 12px 24px rgba(23, 79, 50, .20);
+}
+
+.public-home-page .site-navbar-cta .btn-book-turf:hover,
+.public-home-page .site-navbar-cta .btn-book-turf:focus {
+    background: var(--campo-green);
+    border-color: var(--campo-green);
+    color: #fff;
+}
+
 .public-home-page .campo-home-hero .hero-overlay {
     background:
-        linear-gradient(90deg, rgba(32, 75, 49, .90) 0%, rgba(32, 75, 49, .70) 45%, rgba(32, 75, 49, .30) 100%),
-        linear-gradient(180deg, rgba(32, 75, 49, .12), rgba(32, 75, 49, .42));
+        radial-gradient(circle at 78% 18%, rgba(244, 121, 58, .16), transparent 32%),
+        linear-gradient(90deg, rgba(23, 79, 50, .92) 0%, rgba(23, 79, 50, .72) 45%, rgba(23, 79, 50, .34) 100%),
+        linear-gradient(180deg, rgba(23, 79, 50, .12), rgba(23, 79, 50, .42));
 }
 
 .section-eyebrow,
@@ -3111,8 +3201,8 @@ body {
 }
 
 .campo-hero-eyebrow {
-    border-color: rgba(245, 240, 231, .28);
-    background: rgba(245, 240, 231, .12);
+    border-color: rgba(247, 242, 232, .30);
+    background: rgba(247, 242, 232, .13);
 }
 
 .public-home-page .campo-rates-section,
@@ -3120,16 +3210,23 @@ body {
     background: var(--campo-cream);
 }
 
+.public-home-page .campo-rates-section,
+.public-home-page .campo-gallery-section,
+.public-home-page .campo-contact-section {
+    background: var(--campo-cream);
+}
+
 .public-home-page .campo-rate-simple,
 .campo-rate-simple,
 .public-home-page .campo-gallery-section .gallery-card,
 .public-home-page .campo-contact-item {
-    background: #fff;
-    border-color: rgba(32, 75, 49, .15);
+    background: var(--campo-card);
+    border-color: var(--campo-line);
+    box-shadow: var(--campo-shadow);
 }
 
 .court-sport-tag {
-    background: rgba(238, 113, 54, .12);
+    background: var(--campo-orange-soft);
     color: var(--campo-orange);
 }
 
@@ -3142,8 +3239,104 @@ body {
     color: var(--campo-orange);
 }
 
+.public-home-page .campo-rate-copy {
+    flex: 1 1 260px;
+}
+
+.public-home-page .campo-rate-rules {
+    flex: 1.35 1 380px;
+    display: grid;
+    gap: .75rem;
+}
+
+.public-home-page .campo-rate-rule {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .8rem .9rem;
+    border: 1px solid var(--campo-line);
+    border-left: 4px solid var(--campo-orange);
+    border-radius: 8px;
+    background: var(--campo-card);
+    box-shadow: 0 16px 34px rgba(24, 59, 42, .07);
+}
+
+.public-home-page .campo-rate-rule-main {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .4rem .65rem;
+    min-width: 0;
+    color: var(--campo-muted);
+    font-size: .86rem;
+    line-height: 1.3;
+}
+
+.public-home-page .campo-rate-rule-main strong {
+    color: var(--campo-green-dark);
+    font-size: .95rem;
+}
+
+.public-home-page .campo-rate-rule-type {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: .2rem .55rem;
+    border-radius: 999px;
+    background: var(--campo-orange-soft);
+    color: var(--campo-orange);
+    font-size: .7rem;
+    font-weight: 900;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.public-home-page .campo-rate-rule-type.is-promo {
+    background: var(--campo-orange);
+    color: #fff;
+}
+
+.public-home-page .campo-rate-rule-price {
+    flex: 0 0 auto;
+    color: var(--campo-green);
+    font-size: 1.35rem;
+    font-weight: 900;
+    line-height: 1;
+    text-align: right;
+}
+
+.public-home-page .campo-rate-rule-price span {
+    color: var(--campo-orange);
+    font-size: .72rem;
+    font-weight: 900;
+}
+
+.public-home-page .campo-rate-rule-price small {
+    color: var(--campo-muted);
+    font-size: .78rem;
+    font-weight: 700;
+}
+
 .public-home-page .campo-gallery-section {
-    background: #fff;
+    background: var(--campo-cream);
+}
+
+.public-home-page .campo-gallery-section .row {
+    justify-content: center;
+}
+
+.public-home-page .campo-gallery-section .gallery-image-wrap img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    transition: transform .35s ease;
+}
+
+.public-home-page .campo-gallery-section .gallery-card:hover .gallery-image-wrap img {
+    transform: scale(1.06);
 }
 
 .public-home-page .campo-contact-section {
@@ -3160,7 +3353,7 @@ body {
 }
 
 .campo-footer {
-    background: var(--campo-green);
+    background: var(--campo-green-dark);
     border-top: 0;
     color: #fff;
 }
@@ -3183,9 +3376,251 @@ body {
     filter: brightness(0) invert(1);
 }
 
+.btn-primary,
+.quick-search-btn,
+.public-home-page .campo-rate-simple > .btn-primary,
+#submitBookingBtn {
+    background: var(--campo-green);
+    border-color: var(--campo-green);
+    color: #fff;
+    box-shadow: 0 14px 26px rgba(47, 107, 70, .20);
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:not(:disabled):not(.disabled):active,
+.quick-search-btn:hover,
+.quick-search-btn:focus,
+.public-home-page .campo-rate-simple > .btn-primary:hover,
+.public-home-page .campo-rate-simple > .btn-primary:focus,
+#submitBookingBtn:hover,
+#submitBookingBtn:focus {
+    background: var(--campo-green-dark);
+    border-color: var(--campo-green-dark);
+    color: #fff;
+}
+
+.public-home-page .hero-book-btn {
+    background: var(--campo-orange);
+    border-color: var(--campo-orange);
+    color: #fff;
+    box-shadow: 0 18px 34px rgba(244, 121, 58, .30);
+}
+
+.public-home-page .hero-book-btn:hover,
+.public-home-page .hero-book-btn:focus {
+    background: #DC632B;
+    border-color: #DC632B;
+    color: #fff;
+}
+
+.public-home-page .campo-rate-simple > .btn-primary {
+    background: var(--campo-green-dark);
+    border-color: var(--campo-green-dark);
+    color: #fff;
+    box-shadow: 0 16px 30px rgba(23, 79, 50, .22);
+}
+
+.public-home-page .campo-rate-simple > .btn-primary:hover,
+.public-home-page .campo-rate-simple > .btn-primary:focus {
+    background: var(--campo-green);
+    border-color: var(--campo-green);
+    color: #fff;
+}
+
+.public-home-page .section-header h2,
+.public-home-page .campo-rate-row h3 {
+    color: var(--campo-ink);
+}
+
+.public-home-page .text-muted,
+.public-home-page .section-header p,
+.public-home-page .campo-rate-row p {
+    color: var(--campo-muted) !important;
+}
+
+.public-home-page .campo-rate-row + .campo-rate-row {
+    border-top-color: var(--campo-line);
+}
+
+.public-home-page .campo-gallery-section .gallery-overlay {
+    background: linear-gradient(180deg, transparent 35%, rgba(23, 79, 50, .48));
+}
+
+.public-home-page .campo-contact-item::after {
+    background: var(--campo-orange-soft);
+}
+
+.badge-info,
+.badge-primary,
+.court-sport-tag,
+.slot-rate-badge {
+    background: var(--campo-orange-soft);
+    color: var(--campo-orange);
+}
+
+.section-eyebrow,
+.campo-hero-eyebrow,
+.payment-option-card i,
+.booking-card .card-header i,
+.campo-contact-icon,
+.campo-activity-item i {
+    color: var(--campo-orange);
+}
+
+.slot-btn.active {
+    border-color: var(--campo-green);
+    background: var(--campo-green);
+    color: #fff;
+    box-shadow: 0 12px 24px rgba(47, 107, 70, .18);
+}
+
+.slot-btn.active .slot-rate-badge {
+    background: rgba(255, 255, 255, .20);
+    color: #fff;
+}
+
+.public-home-page .campo-contact-icon {
+    background: var(--campo-orange);
+    color: #fff;
+}
+
+.public-home-page section.campo-contact-section.section-light {
+    background: var(--campo-cream) !important;
+}
+
+.public-home-page .campo-contact-section {
+    border-top: 0;
+}
+
+.public-home-page .campo-contact-item {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    min-height: 148px;
+    padding: 1.35rem 1.4rem;
+    border: 1px solid var(--campo-line);
+    border-left: 4px solid var(--campo-orange);
+    border-radius: 8px;
+    background:
+        linear-gradient(135deg, #fff 0%, rgba(252, 250, 246, .96) 100%),
+        var(--campo-card);
+    box-shadow: 0 16px 34px rgba(24, 59, 42, .07);
+    transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+}
+
+.public-home-page .campo-contact-item:hover {
+    border-color: #E3D7CA;
+    border-left-color: var(--campo-orange);
+    transform: translateY(-2px);
+    box-shadow: 0 22px 48px rgba(24, 59, 42, .11);
+}
+
+.public-home-page .campo-contact-item::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 3px;
+    z-index: 0;
+    border-radius: 8px 8px 0 0;
+    background: linear-gradient(90deg, rgba(244, 121, 58, .58), rgba(244, 121, 58, .08) 58%, transparent);
+    pointer-events: none;
+}
+
+.public-home-page .campo-contact-item::after {
+    z-index: 0;
+    right: -34px;
+    bottom: -42px;
+    width: 112px;
+    height: 112px;
+    background: var(--campo-orange-soft);
+    opacity: .72;
+}
+
+.public-home-page .campo-contact-item > * {
+    position: relative;
+    z-index: 1;
+}
+
+.public-home-page .campo-contact-icon {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    margin-top: .08rem;
+    background: var(--campo-orange-soft);
+    color: var(--campo-orange);
+    font-size: 1rem;
+    box-shadow: inset 0 0 0 1px rgba(244, 121, 58, .16);
+}
+
+.public-home-page .campo-contact-item h3 {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    margin-bottom: .55rem;
+    padding: .2rem .55rem;
+    border-radius: 999px;
+    background: var(--campo-orange-soft);
+    color: var(--campo-orange);
+    font-size: .7rem;
+    font-weight: 900;
+    letter-spacing: .04em;
+    line-height: 1;
+}
+
+.public-home-page .campo-contact-item p {
+    color: var(--campo-muted);
+    line-height: 1.55;
+}
+
+.public-home-page .campo-contact-item strong {
+    color: var(--campo-ink);
+    font-size: 1.02rem;
+    font-weight: 900;
+    line-height: 1.48;
+}
+
 @media (max-width: 991.98px) {
     .public-home-page .site-navbar .navbar-collapse {
         background: var(--campo-cream);
-        border-color: rgba(32, 75, 49, .14);
+        border-color: var(--campo-line);
+    }
+
+    .public-home-page .campo-rate-row,
+    .campo-rate-row {
+        align-items: stretch;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .public-home-page .campo-rate-row {
+        display: block;
+    }
+
+    .public-home-page .campo-rate-rules {
+        margin-top: 1rem;
+    }
+
+    .public-home-page .campo-rate-rule {
+        align-items: flex-start;
+    }
+
+    .public-home-page .campo-contact-item {
+        min-height: 0;
+        padding: 1.25rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .public-home-page .campo-rate-rule {
+        display: grid;
+    }
+
+    .public-home-page .campo-rate-rule-price {
+        text-align: left;
     }
 }

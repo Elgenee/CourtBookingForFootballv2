@@ -8,6 +8,15 @@
     var qrExpiryMinutes = (int)CourtBookingSystem.Services.PayMongoQrPhExpiryService.CheckoutLifetime.TotalMinutes;
     var showPayMongoNote = Model.PaymentMethod == PaymentMethod.PayMongoQrPh;
     var reservationFeePercent = FootballPaymentOptions.Value.ReservationFeePercent;
+    string TurfText(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return "";
+        return text
+            .Replace("Giuseppe Football Club", "CAMPO TURF", StringComparison.OrdinalIgnoreCase)
+            .Replace("Giuseppe Football Field", "CAMPO TURF Field", StringComparison.OrdinalIgnoreCase)
+            .Replace("Football Field", "Turf Field", StringComparison.OrdinalIgnoreCase)
+            .Replace("football field", "turf field", StringComparison.OrdinalIgnoreCase);
+    }
 }
 
 <section class="section-default campo-booking-page">
@@ -40,7 +49,7 @@
                                         @foreach (var court in Model.Courts)
                                         {
                                             <option value="@court.Id" data-sport="@court.SportType">
-                                                @court.CourtName — @court.SportType
+                                                @TurfText(court.CourtName)
                                             </option>
                                         }
                                     </select>
@@ -205,7 +214,7 @@
                                 <p>4.3 CAMPO TURF shall not participate in, mediate, verify, guarantee, or assume responsibility for any payment, dispute, fraud, misunderstanding, or agreement arising from such transfers.</p>
 
                                 <h6>5. Safety and Assumption of Risk</h6>
-                                <p>5.1 Participation in football and related activities involves inherent risks, including but not limited to slips, falls, collisions, equipment-related injuries, medical emergencies, and other unforeseen incidents.</p>
+                                <p>5.1 Participation in turf field sports and related activities involves inherent risks, including but not limited to slips, falls, collisions, equipment-related injuries, medical emergencies, and other unforeseen incidents.</p>
                                 <p>5.2 All players voluntarily participate at their own risk.</p>
                                 <p>5.3 Players are responsible for ensuring that they are physically fit and medically capable of participating in sports activities.</p>
                                 <p>5.4 CAMPO TURF, its owners, officers, employees, coaches, staff, affiliates, and representatives shall not be liable for any injury, illness, disability, death, accident, or loss resulting from participation in activities conducted on the premises.</p>
@@ -274,9 +283,6 @@
                             <dl class="summary-list">
                                 <dt>Field</dt>
                                 <dd id="summaryCourt">—</dd>
-
-                                <dt>Sport</dt>
-                                <dd id="summarySport">—</dd>
 
                                 <dt>Date</dt>
                                 <dd id="summaryDate">—</dd>
@@ -361,7 +367,10 @@
             let preselectedStart = @Html.Raw(System.Text.Json.JsonSerializer.Serialize((string)(ViewBag.PreselectedStart ?? "")));
 
             function formatMoney(n) {
-                return Number(n).toFixed(2);
+                return Number(n || 0).toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
             }
 
             function formatDate(d) {
@@ -386,8 +395,7 @@
                 const rateLabel = selectedSlot && selectedSlot.isMixed
                     ? "Mixed rates"
                     : formatMoney(rate) + " / hour" + (selectedSlot && selectedSlot.isPromo ? " (promo)" : "");
-                $("#summaryCourt").text(opt.text().split(" — ")[0] || "—");
-                $("#summarySport").text(sport || "—");
+                $("#summaryCourt").text($.trim(opt.text()) || "—");
                 $("#summaryDate").text(formatDate($date.val()));
                 $("#summaryDuration").text(hrs + (hrs === 1 ? " hour" : " hours"));
                 $("#summaryRate").text(rateLabel);

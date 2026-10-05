@@ -57,7 +57,7 @@
         <nav class="main-header navbar navbar-expand-md navbar-light bg-white site-navbar">
             <div class="container">
                 <a asp-controller="Home" asp-action="Index" class="navbar-brand" data-testid="navbar-brand">
-                    <img src="/img/branding/campo-logo.png" alt="CAMPO Cebu - Your neighborhood turf." class="campo-logo-img" />
+                    <img src="/img/branding/Campo-Cebu-Tree-Turf-Logo.png" alt="CAMPO Cebu - Your neighborhood turf." class="campo-logo-img" />
                 </a>
 
                 <button class="navbar-toggler order-1" type="button" data-toggle="collapse" data-target="#navbarCollapse"
@@ -72,10 +72,9 @@
                                 <span>Home</span>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="/#rates" class="nav-link">
-                                <span>Rates</span>
-                            </a>
+                        <a asp-controller="Bookings" asp-action="Find" class="nav-link @(string.Equals(currentController, "Bookings", StringComparison.OrdinalIgnoreCase) && string.Equals(currentAction, "Find", StringComparison.OrdinalIgnoreCase) ? "active" : "")">
+                            <span>Find Booking</span>
+                        </a>
                         </li>
                         <li class="nav-item">
                             <a href="/#contact" class="nav-link">
@@ -105,8 +104,6 @@
                 </a>
                 <div class="footer-links my-3 my-md-0">
                     <a asp-controller="Home" asp-action="Index">Home</a>
-                    <a asp-controller="Availability" asp-action="Find">Book</a>
-                    <a href="/#rates">Rates</a>
                     <a href="/#contact">Contact</a>
                 </div>
                 <div class="footer-social">

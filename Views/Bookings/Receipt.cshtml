@@ -8,6 +8,15 @@
     var summary = CourtBookingSystem.Services.PaymentSummaryHelper.Calculate(Model);
     var isReservationOnlyPaid = Model.BookingStatus == BookingStatus.PartiallyPaid && summary.RemainingBalance > 0m;
     string formatTime(TimeSpan t) => PhilippineTime.FormatTime(t);
+    string TurfText(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return "";
+        return text
+            .Replace("Giuseppe Football Club", "CAMPO TURF", StringComparison.OrdinalIgnoreCase)
+            .Replace("Giuseppe Football Field", "CAMPO TURF Field", StringComparison.OrdinalIgnoreCase)
+            .Replace("Football Field", "Turf Field", StringComparison.OrdinalIgnoreCase)
+            .Replace("football field", "turf field", StringComparison.OrdinalIgnoreCase);
+    }
 
     string statusBadge(BookingStatus s) => s switch
     {
@@ -65,11 +74,11 @@
                 </div>
                 <div class="receipt-row">
                     <span class="label">Field</span>
-                    <span class="value" data-testid="receipt-court">@Model.Court?.CourtName</span>
+                    <span class="value" data-testid="receipt-court">@TurfText(Model.Court?.CourtName)</span>
                 </div>
                 <div class="receipt-row">
-                    <span class="label">Sport</span>
-                    <span class="value" data-testid="receipt-sport">@Model.Court?.SportType</span>
+                    <span class="label">Facility Type</span>
+                    <span class="value" data-testid="receipt-sport">Turf Field</span>
                 </div>
                 <div class="receipt-row">
                     <span class="label">Date</span>
