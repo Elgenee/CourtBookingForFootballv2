@@ -1519,3 +1519,1673 @@ section.home-hero-content .container {
     .receipt-page { background: #fff !important; padding: 0 !important; }
     .receipt-card { box-shadow: none !important; border: 1px solid #e6e8ee; max-width: 100% !important; }
 }
+
+/* ============================================================
+   CAMPO TURF public redesign
+   Visual-only layer for the public home and booking surfaces.
+   ============================================================ */
+
+:root {
+    --campo-green: #204B31;
+    --campo-green-dark: #204B31;
+    --campo-green-deep: #204B31;
+    --campo-green-soft: #F5F0E7;
+    --campo-orange: #EE7136;
+    --campo-cream: #F5F0E7;
+    --campo-ink: #204B31;
+    --campo-muted: #64746c;
+    --campo-line: #ded8cc;
+    --campo-shadow: 0 18px 45px rgba(5, 45, 29, .10);
+    --brand-primary: #204B31;
+    --brand-primary-dark: #204B31;
+    --brand-accent: #EE7136;
+    --brand-bg-soft: #F5F0E7;
+    --brand-text-dark: #204B31;
+    --brand-primary-rgb: 27, 79, 49;
+    --brand-primary-dark-rgb: 23, 63, 41;
+    --brand-accent-rgb: 243, 111, 50;
+}
+
+html,
+body {
+    color: var(--campo-ink);
+    background: #fff;
+}
+
+.btn {
+    border-radius: 999px;
+    font-weight: 700;
+}
+
+.btn-primary,
+.quick-search-btn {
+    background: var(--campo-green);
+    border-color: var(--campo-green);
+    color: #fff;
+    box-shadow: 0 12px 22px rgba(0, 107, 63, .18);
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:not(:disabled):not(.disabled):active,
+.quick-search-btn:hover,
+.quick-search-btn:focus {
+    background: var(--campo-green-dark);
+    border-color: var(--campo-green-dark);
+    color: #fff;
+}
+
+.btn-outline-primary {
+    color: var(--campo-green);
+    border-color: var(--campo-green);
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+    background: var(--campo-green);
+    border-color: var(--campo-green);
+    color: #fff;
+}
+
+.site-navbar {
+    min-height: 78px;
+    background: #fff !important;
+    border-bottom: 1px solid rgba(0, 63, 40, .10);
+    box-shadow: 0 8px 30px rgba(4, 32, 22, .06);
+}
+
+.site-navbar .container {
+    min-height: 78px;
+}
+
+.site-navbar .navbar-brand,
+.footer-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: .6rem;
+    min-width: 0;
+    margin-right: 2rem;
+    color: var(--campo-green-dark) !important;
+    text-decoration: none;
+}
+
+.campo-brand-mark {
+    position: relative;
+    width: 54px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--campo-green-dark);
+    flex: 0 0 54px;
+}
+
+.campo-brand-mark i {
+    font-size: 1.95rem;
+    line-height: 1;
+}
+
+.campo-brand-mark::after {
+    content: "";
+    position: absolute;
+    left: 7px;
+    right: 7px;
+    bottom: 4px;
+    height: 8px;
+    border-top: 3px solid var(--campo-green-dark);
+    border-bottom: 3px solid var(--campo-green-dark);
+}
+
+.campo-brand-copy {
+    display: inline-flex;
+    flex-direction: column;
+    line-height: .86;
+}
+
+.campo-brand-name {
+    font-size: 1.65rem;
+    font-weight: 900;
+    letter-spacing: 0;
+    color: var(--campo-green-dark);
+}
+
+.campo-brand-sub {
+    align-self: flex-end;
+    margin-top: .12rem;
+    padding-top: .08rem;
+    border-top: 3px solid var(--campo-orange);
+    font-size: .72rem;
+    font-weight: 900;
+    color: var(--campo-orange);
+    letter-spacing: 0;
+}
+
+.campo-brand-tagline {
+    margin-left: .25rem;
+    color: var(--campo-green-dark);
+    font-size: .9rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.site-navbar .navbar-collapse {
+    justify-content: center;
+}
+
+.site-navbar-nav {
+    gap: .9rem;
+}
+
+.site-navbar .nav-link {
+    min-height: 42px;
+    padding: .55rem .35rem !important;
+    border-radius: 0;
+    color: #33463d !important;
+    font-weight: 600;
+    box-shadow: none;
+}
+
+.site-navbar .nav-link:hover,
+.site-navbar .nav-link:focus,
+.site-navbar .nav-link.active {
+    background: transparent;
+    color: var(--campo-green) !important;
+    box-shadow: none;
+}
+
+.site-navbar .nav-link.active::after {
+    left: .35rem;
+    right: .35rem;
+    bottom: .3rem;
+    height: 3px;
+    background: var(--campo-green);
+}
+
+.btn-book-turf {
+    min-width: 142px;
+    padding: .78rem 1.35rem;
+}
+
+.layout-top-nav .content-wrapper {
+    background: #fff;
+}
+
+.campo-home-hero {
+    min-height: 560px;
+    display: flex;
+    align-items: center;
+    padding: 6.25rem 0;
+    background-position: center;
+}
+
+.campo-home-hero .hero-overlay {
+    background:
+        linear-gradient(90deg, rgba(0, 0, 0, .62) 0%, rgba(0, 0, 0, .38) 44%, rgba(0, 0, 0, .18) 100%),
+        linear-gradient(180deg, rgba(0, 63, 40, .10), rgba(0, 63, 40, .18));
+}
+
+.campo-home-hero .hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+.campo-home-hero .hero-title {
+    max-width: 650px;
+    color: #fff;
+    font-size: clamp(3.4rem, 7vw, 5.7rem);
+    font-weight: 900;
+    line-height: .96;
+    letter-spacing: 0;
+    text-shadow: 0 12px 26px rgba(0, 0, 0, .26);
+}
+
+.campo-home-hero .hero-subtitle {
+    max-width: 520px;
+    color: #fff;
+    font-size: 1.55rem;
+    font-weight: 500;
+    opacity: .98;
+}
+
+.hero-book-btn {
+    min-width: 248px;
+    padding: 1.05rem 1.8rem;
+}
+
+.campo-feature-strip {
+    background: #fff;
+    padding: 2.8rem 0 2.55rem;
+}
+
+.campo-feature {
+    max-width: 270px;
+    margin: 0 auto;
+}
+
+.campo-feature-icon {
+    width: 54px;
+    height: 54px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: .85rem;
+    color: var(--campo-green-dark);
+    font-size: 2rem;
+}
+
+.campo-feature h3 {
+    margin-bottom: .45rem;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #0c1914;
+}
+
+.campo-feature p {
+    margin: 0;
+    color: #4c5d55;
+    line-height: 1.35;
+}
+
+.campo-quick-section {
+    padding: 2.5rem 0;
+    background: #f7faf8;
+    border-top: 1px solid rgba(0, 63, 40, .08);
+}
+
+.campo-quick-section .quick-widget-section {
+    margin-top: 0;
+}
+
+.quick-widget {
+    border-radius: 8px;
+    border: 1px solid var(--campo-line);
+    box-shadow: var(--campo-shadow);
+}
+
+.quick-widget-title {
+    color: var(--campo-green-dark);
+}
+
+.quick-widget-form .form-control,
+.campo-booking-page .form-control {
+    height: 46px;
+    border-color: #d6e1dc;
+    border-radius: 8px;
+    color: var(--campo-ink);
+}
+
+.quick-widget-form .form-control:focus,
+.campo-booking-page .form-control:focus {
+    border-color: var(--campo-green);
+    box-shadow: 0 0 0 .16rem rgba(0, 107, 63, .14);
+}
+
+.campo-story-band {
+    position: relative;
+    min-height: 320px;
+    display: flex;
+    align-items: center;
+    padding: 4rem 0;
+    color: #fff;
+    background-size: cover;
+    background-position: center 62%;
+}
+
+.campo-story-band::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(0, 34, 22, .72), rgba(0, 34, 22, .30));
+}
+
+.campo-story-copy {
+    position: relative;
+    z-index: 1;
+    max-width: 520px;
+}
+
+.campo-story-copy h2 {
+    margin-bottom: .75rem;
+    color: #fff;
+    font-size: clamp(2.1rem, 4vw, 3.25rem);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0;
+}
+
+.campo-story-copy p {
+    max-width: 440px;
+    font-size: 1.1rem;
+    line-height: 1.45;
+}
+
+.campo-story-copy .btn-light {
+    min-width: 170px;
+    color: var(--campo-green-dark);
+}
+
+.campo-rates-section {
+    background: #fff;
+}
+
+.campo-rate-card {
+    padding: 1.25rem;
+    border: 1px solid var(--campo-line);
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 12px 28px rgba(4, 32, 22, .06);
+}
+
+.campo-rate-card h3 {
+    margin: .8rem 0 .45rem;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--campo-green-dark);
+}
+
+.campo-rate-card p {
+    min-height: 44px;
+    color: var(--campo-muted);
+}
+
+.campo-rate-price {
+    margin: 1rem 0;
+    color: var(--campo-green);
+    font-size: 1.65rem;
+    font-weight: 900;
+}
+
+.campo-rate-price span {
+    color: var(--campo-muted);
+    font-size: .9rem;
+    font-weight: 600;
+}
+
+.court-sport-tag {
+    background: var(--campo-green-soft);
+    color: var(--campo-green-dark);
+}
+
+.section-eyebrow {
+    color: var(--campo-orange);
+}
+
+.section-header h2,
+.booking-page-heading h2 {
+    color: var(--campo-green-dark);
+    font-weight: 900;
+}
+
+.promos-section,
+#contact,
+#gallery {
+    background: #fff;
+}
+
+#contact {
+    border-top: 1px solid rgba(0, 63, 40, .08);
+}
+
+.info-icon,
+.about-icon {
+    background: var(--campo-green);
+}
+
+.about-icon-accent {
+    background: rgba(242, 106, 27, .15);
+    color: var(--campo-orange);
+}
+
+.campo-booking-page {
+    min-height: calc(100vh - 78px);
+    padding: 3.5rem 0 4rem;
+    background:
+        radial-gradient(circle at 12% 18%, rgba(0, 107, 63, .08), transparent 30%),
+        linear-gradient(180deg, #f8fbf9 0%, #fff 100%);
+}
+
+.booking-page-heading {
+    padding-left: 2.25rem;
+}
+
+.booking-layout {
+    justify-content: center;
+}
+
+.booking-card,
+.booking-summary,
+.about-card,
+.info-card,
+.promo-card,
+.gallery-card {
+    border-color: var(--campo-line);
+    border-radius: 8px;
+    box-shadow: 0 14px 32px rgba(4, 32, 22, .06);
+}
+
+.booking-selection-card {
+    box-shadow: var(--campo-shadow);
+}
+
+.booking-card .card-header,
+.booking-summary .card-header {
+    background: #fff;
+    border-bottom: 1px solid var(--campo-line);
+    color: var(--campo-green-dark);
+    font-weight: 800;
+}
+
+.booking-card .card-body,
+.booking-summary .card-body {
+    padding: 1.35rem;
+}
+
+.booking-card label {
+    color: #34483e;
+    font-size: .83rem;
+    font-weight: 800;
+}
+
+.slot-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .7rem;
+}
+
+.slot-btn {
+    min-height: 54px;
+    border-color: #d7e1dc;
+    border-radius: 8px;
+    background: #fff;
+    color: #34483e;
+    font-weight: 700;
+    box-shadow: 0 8px 18px rgba(4, 32, 22, .04);
+}
+
+.slot-btn:hover:not(:disabled) {
+    border-color: var(--campo-green);
+    color: var(--campo-green-dark);
+    background: #f4fbf7;
+}
+
+.slot-btn.active {
+    border-color: var(--campo-green);
+    background: var(--campo-green);
+    color: #fff;
+    box-shadow: 0 12px 24px rgba(0, 107, 63, .18);
+}
+
+.slot-btn.slot-promo {
+    border-color: rgba(0, 107, 63, .45);
+    background: #f2fff8;
+}
+
+.slot-btn.slot-mixed {
+    border-color: rgba(242, 106, 27, .50);
+    background: #fff7f0;
+}
+
+.payment-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.payment-option-card {
+    border-color: var(--campo-line);
+    border-radius: 8px;
+}
+
+.payment-option-card i {
+    color: var(--campo-green);
+}
+
+.payment-option input:checked + .payment-option-card {
+    border-color: var(--campo-green);
+    background: #f0faf5;
+}
+
+.booking-summary {
+    overflow: hidden;
+}
+
+.booking-summary.sticky-top {
+    top: 1.25rem !important;
+}
+
+.booking-summary .card-header {
+    background: var(--campo-green-dark);
+    color: #fff;
+}
+
+.summary-total {
+    color: var(--campo-green);
+}
+
+.summary-list dt {
+    color: var(--campo-muted);
+}
+
+#submitBookingBtn {
+    min-height: 50px;
+}
+
+.campo-footer {
+    padding: 1.1rem 0;
+    background: #fff;
+    border-top: 1px solid rgba(0, 63, 40, .10);
+}
+
+.footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.65rem;
+}
+
+.footer-links a,
+.footer-social a {
+    color: #34483e;
+    font-weight: 600;
+}
+
+.footer-links a:hover,
+.footer-social a:hover {
+    color: var(--campo-green);
+    text-decoration: none;
+}
+
+.footer-social {
+    display: inline-flex;
+    align-items: center;
+    gap: .85rem;
+}
+
+.footer-social a {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: #f4f8f5;
+}
+
+@media (max-width: 991.98px) {
+    .site-navbar .navbar-collapse {
+        justify-content: flex-start;
+        flex-basis: 100%;
+        order: 4;
+    }
+
+    .site-navbar-nav {
+        align-items: stretch;
+        gap: .2rem;
+        padding: .75rem 0 .35rem;
+    }
+
+    .site-navbar .navbar-collapse .nav-link {
+        width: 100%;
+        padding: .7rem 0 !important;
+    }
+
+    .site-navbar .nav-link.active::after {
+        left: 0;
+        right: auto;
+        width: 36px;
+    }
+
+    .site-navbar-cta {
+        margin-left: auto;
+        margin-right: .75rem;
+    }
+
+    .btn-book-turf {
+        min-width: 118px;
+        padding: .65rem .95rem;
+    }
+
+    .booking-page-heading {
+        padding-left: 0;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .site-navbar,
+    .site-navbar .container {
+        min-height: 68px;
+    }
+
+    .site-navbar .navbar-brand {
+        max-width: calc(100% - 152px);
+        margin-right: 0;
+    }
+
+    .campo-brand-mark {
+        width: 42px;
+        height: 36px;
+        flex-basis: 42px;
+    }
+
+    .campo-brand-mark i {
+        font-size: 1.55rem;
+    }
+
+    .campo-brand-name {
+        font-size: 1.25rem;
+    }
+
+    .campo-brand-sub {
+        font-size: .58rem;
+        border-top-width: 2px;
+    }
+
+    .campo-home-hero {
+        min-height: 490px;
+        padding: 4.5rem 0 3.5rem;
+        background-position: center;
+    }
+
+    .campo-home-hero .hero-title {
+        font-size: 3.75rem;
+    }
+
+    .campo-home-hero .hero-subtitle {
+        font-size: 1.18rem;
+    }
+
+    .hero-book-btn {
+        min-width: 210px;
+        padding: .9rem 1.45rem;
+    }
+
+    .campo-feature-strip {
+        padding: 2.25rem 0;
+    }
+
+    .campo-story-band {
+        min-height: 280px;
+        padding: 3rem 0;
+    }
+
+    .slot-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .payment-options {
+        grid-template-columns: 1fr;
+    }
+
+    .booking-summary.sticky-top {
+        position: static;
+    }
+
+    .footer-brand {
+        margin-right: 0;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .site-navbar .navbar-brand {
+        max-width: calc(100% - 122px);
+    }
+
+    .btn-book-turf {
+        min-width: 0;
+        padding: .58rem .78rem;
+        font-size: .86rem;
+    }
+
+    .campo-home-hero {
+        min-height: 430px;
+    }
+
+    .campo-home-hero .hero-title {
+        font-size: 3.05rem;
+    }
+
+    .campo-quick-section {
+        padding: 1.75rem 0;
+    }
+
+    .quick-widget {
+        padding: 1rem;
+    }
+
+    .campo-booking-page {
+        padding: 2rem 0 2.5rem;
+    }
+
+    .booking-card .card-body,
+    .booking-summary .card-body {
+        padding: 1rem;
+    }
+
+    .slot-grid {
+        gap: .55rem;
+    }
+
+    .slot-btn {
+        min-height: 50px;
+        font-size: .84rem;
+    }
+
+    .footer-links {
+        gap: 1rem;
+    }
+}
+
+/* Simplified CAMPO TURF homepage */
+.campo-quick-section {
+    padding: 4.5rem 0;
+}
+
+.campo-booking-widget {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2.2rem;
+    background: #fff;
+}
+
+.campo-booking-widget .quick-widget-title {
+    font-size: clamp(1.8rem, 3vw, 2.45rem);
+    font-weight: 900;
+}
+
+.campo-rates-section,
+.campo-contact-section {
+    padding: 4.75rem 0;
+}
+
+.campo-rate-simple {
+    padding: 0;
+    overflow: hidden;
+}
+
+.campo-rate-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1.35rem 1.5rem;
+    border-bottom: 1px solid var(--campo-line);
+}
+
+.campo-rate-row:last-of-type {
+    border-bottom: 0;
+}
+
+.campo-rate-row h3 {
+    margin: .55rem 0 .2rem;
+}
+
+.campo-rate-row p {
+    min-height: 0;
+    margin-bottom: 0;
+}
+
+.campo-rate-row .campo-rate-price {
+    flex: 0 0 auto;
+    margin: 0;
+    text-align: right;
+}
+
+.campo-rate-simple > .btn {
+    width: calc(100% - 3rem);
+    margin-left: 1.5rem;
+    margin-right: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.campo-contact-item {
+    height: 100%;
+    padding: 1.2rem 0;
+    border-top: 2px solid var(--campo-orange);
+}
+
+.campo-contact-item h3 {
+    margin-bottom: .5rem;
+    color: var(--campo-green-dark);
+    font-size: 1rem;
+    font-weight: 900;
+}
+
+.campo-contact-item p {
+    color: var(--campo-muted);
+    line-height: 1.45;
+}
+
+.campo-contact-item strong {
+    color: var(--campo-ink);
+}
+
+.campo-rates-section {
+    background:
+        linear-gradient(180deg, #fff 0%, #fbfdfc 100%);
+}
+
+.campo-rate-simple {
+    border: 1px solid rgba(0, 63, 40, .12);
+    box-shadow: 0 24px 60px rgba(4, 32, 22, .08);
+}
+
+.campo-rate-row {
+    background: #fff;
+}
+
+.campo-rate-row h3 {
+    color: var(--campo-green-dark);
+    font-size: 1.25rem;
+    letter-spacing: 0;
+}
+
+.campo-rate-row .court-sport-tag {
+    display: inline-flex;
+    align-items: center;
+    min-height: 26px;
+    border-radius: 999px;
+    font-size: .72rem;
+    font-weight: 900;
+    letter-spacing: .04em;
+}
+
+.campo-rate-row .campo-rate-price {
+    color: var(--campo-green-dark);
+    font-size: clamp(1.8rem, 3vw, 2.35rem);
+}
+
+.campo-rate-row .campo-rate-price::before {
+    content: "PHP ";
+    color: var(--campo-orange);
+    font-size: .85rem;
+    font-weight: 900;
+    vertical-align: middle;
+}
+
+.campo-rate-simple > .btn-primary {
+    min-height: 52px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.campo-facilities-section {
+    padding: 4.75rem 0;
+    background: #f7faf8;
+}
+
+.campo-facility-card {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid var(--campo-line);
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 18px 42px rgba(4, 32, 22, .07);
+}
+
+.campo-facility-card img {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    display: block;
+    object-fit: cover;
+}
+
+.campo-facility-card figcaption {
+    padding: 1.1rem 1.2rem 1.25rem;
+}
+
+.campo-facility-card h3 {
+    margin-bottom: .35rem;
+    color: var(--campo-green-dark);
+    font-size: 1.1rem;
+    font-weight: 900;
+}
+
+.campo-facility-card p {
+    margin-bottom: 0;
+    color: var(--campo-muted);
+    line-height: 1.45;
+}
+
+.campo-contact-section {
+    background: #fff;
+}
+
+.campo-contact-item {
+    padding: 1.35rem;
+    border: 1px solid var(--campo-line);
+    border-top: 3px solid var(--campo-orange);
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 14px 32px rgba(4, 32, 22, .05);
+}
+
+@media (max-width: 767.98px) {
+    .campo-quick-section,
+    .campo-rates-section,
+    .campo-contact-section {
+        padding: 3rem 0;
+    }
+
+    .campo-booking-widget {
+        padding: 1.35rem;
+    }
+
+    .campo-rate-row {
+        display: block;
+        padding: 1.2rem;
+    }
+
+    .campo-rate-row .campo-rate-price {
+        margin-top: .85rem;
+        text-align: left;
+    }
+
+    .campo-rate-simple > .btn {
+        width: calc(100% - 2.4rem);
+        margin-left: 1.2rem;
+        margin-right: 1.2rem;
+    }
+
+    .campo-facilities-section {
+        padding: 3rem 0;
+    }
+}
+
+/* Royal Pitch-inspired homepage polish */
+.public-home-page .site-navbar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 1030;
+    background: linear-gradient(180deg, rgba(0, 28, 18, .72), rgba(0, 28, 18, .18)) !important;
+    border-bottom-color: rgba(255, 255, 255, .12);
+    box-shadow: none;
+}
+
+.public-home-page .site-navbar .campo-brand-name,
+.public-home-page .site-navbar .campo-brand-mark,
+.public-home-page .site-navbar .campo-brand-tagline,
+.public-home-page .site-navbar .nav-link {
+    color: #fff !important;
+}
+
+.public-home-page .site-navbar .campo-brand-sub {
+    color: var(--campo-orange);
+}
+
+.public-home-page .site-navbar .nav-link.active,
+.public-home-page .site-navbar .nav-link:hover,
+.public-home-page .site-navbar .nav-link:focus {
+    color: #fff !important;
+}
+
+.public-home-page .site-navbar .nav-link.active::after {
+    background: var(--campo-orange);
+}
+
+.public-home-page .site-navbar .navbar-toggler {
+    border-color: rgba(255, 255, 255, .38);
+}
+
+.public-home-page .site-navbar .navbar-toggler-icon {
+    filter: invert(1) grayscale(1);
+}
+
+.public-home-page .campo-home-hero {
+    min-height: 720px;
+    padding-top: 8.5rem;
+    padding-bottom: 5.5rem;
+    background-position: center;
+}
+
+.public-home-page .campo-home-hero .hero-overlay {
+    background:
+        radial-gradient(circle at 78% 18%, rgba(242, 106, 27, .22), transparent 30%),
+        linear-gradient(90deg, rgba(0, 20, 13, .88) 0%, rgba(0, 45, 29, .70) 42%, rgba(0, 0, 0, .22) 100%),
+        linear-gradient(180deg, rgba(0, 20, 13, .10), rgba(0, 20, 13, .42));
+}
+
+.campo-hero-eyebrow {
+    background: rgba(255, 255, 255, .12);
+    border: 1px solid rgba(255, 255, 255, .22);
+    color: #fff;
+    font-size: .75rem;
+    font-weight: 900;
+    letter-spacing: .18em;
+}
+
+.public-home-page .campo-home-hero .hero-title {
+    max-width: 720px;
+    font-size: clamp(4rem, 8vw, 6.6rem);
+}
+
+.public-home-page .campo-home-hero .hero-subtitle {
+    color: rgba(255, 255, 255, .92);
+    font-size: 1.45rem;
+}
+
+.public-home-page .hero-book-btn {
+    min-width: 230px;
+    border: 1px solid rgba(255, 255, 255, .14);
+    box-shadow: 0 18px 34px rgba(0, 0, 0, .28);
+}
+
+.campo-hero-notes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+    margin-top: 1.4rem;
+}
+
+.campo-hero-notes span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    padding: .42rem .8rem;
+    border: 1px solid rgba(255, 255, 255, .20);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .10);
+    color: rgba(255, 255, 255, .90);
+    font-size: .84rem;
+    font-weight: 700;
+    backdrop-filter: blur(6px);
+}
+
+.public-home-page .campo-rates-section {
+    padding-top: 5.5rem;
+    padding-bottom: 5.5rem;
+    background:
+        linear-gradient(180deg, #fff 0%, #f6faf7 100%);
+}
+
+.public-home-page .campo-rate-simple {
+    position: relative;
+    padding-top: .25rem;
+    border: 0;
+    border-radius: 8px;
+    background:
+        linear-gradient(#fff, #fff) padding-box,
+        linear-gradient(135deg, rgba(0, 107, 63, .38), rgba(242, 106, 27, .32)) border-box;
+    border: 1px solid transparent;
+    box-shadow: 0 28px 70px rgba(0, 38, 24, .12);
+}
+
+.public-home-page .campo-rate-row {
+    padding: 1.65rem 1.75rem;
+}
+
+.public-home-page .campo-rate-row + .campo-rate-row {
+    border-top: 1px solid rgba(0, 63, 40, .10);
+}
+
+.public-home-page .campo-rate-row h3 {
+    font-size: 1.35rem;
+}
+
+.public-home-page .campo-rate-row p {
+    max-width: 430px;
+}
+
+.public-home-page .campo-rate-row .campo-rate-price {
+    min-width: 168px;
+    padding: .65rem .9rem;
+    border-radius: 8px;
+    background: #f2fbf6;
+    text-align: center;
+}
+
+.public-home-page .campo-rate-simple > .btn-primary {
+    margin-top: 1rem !important;
+    margin-bottom: 1.65rem;
+}
+
+.public-home-page .campo-facilities-section {
+    padding-top: 5.25rem;
+    padding-bottom: 4.5rem;
+    background: var(--campo-green-dark);
+    color: #fff;
+}
+
+.public-home-page .campo-facilities-section .section-header h2,
+.public-home-page .campo-facilities-section .section-header p {
+    color: #fff;
+}
+
+.public-home-page .campo-facility-card {
+    position: relative;
+    min-height: 390px;
+    border: 1px solid rgba(255, 255, 255, .14);
+    border-radius: 8px;
+    background: #001f15;
+    box-shadow: 0 24px 58px rgba(0, 0, 0, .22);
+}
+
+.public-home-page .campo-facility-card img {
+    height: 100%;
+    min-height: 390px;
+    aspect-ratio: auto;
+    opacity: .86;
+}
+
+.public-home-page .campo-facility-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 30%, rgba(0, 20, 13, .88) 100%);
+    pointer-events: none;
+}
+
+.public-home-page .campo-facility-card figcaption {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    padding: 1.4rem;
+}
+
+.public-home-page .campo-facility-card h3 {
+    color: #fff;
+    font-size: 1.35rem;
+}
+
+.public-home-page .campo-facility-card p {
+    max-width: 430px;
+    color: rgba(255, 255, 255, .80);
+}
+
+.public-home-page .campo-contact-section {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+    background: #fff;
+}
+
+.public-home-page .campo-contact-item {
+    padding: 1.6rem;
+    border: 1px solid rgba(0, 63, 40, .10);
+    border-top: 4px solid var(--campo-orange);
+    box-shadow: 0 18px 48px rgba(0, 38, 24, .07);
+}
+
+.public-home-page .campo-contact-item h3 {
+    font-size: 1.05rem;
+}
+
+@media (max-width: 991.98px) {
+    .public-home-page .site-navbar .navbar-collapse {
+        margin-top: .7rem;
+        padding: .75rem 1rem;
+        border: 1px solid rgba(255, 255, 255, .14);
+        border-radius: 8px;
+        background: rgba(0, 38, 24, .92);
+    }
+}
+
+@media (max-width: 767.98px) {
+    .public-home-page .campo-home-hero {
+        min-height: 620px;
+        padding-top: 7.25rem;
+    }
+
+    .public-home-page .campo-home-hero .hero-title {
+        font-size: 3.55rem;
+    }
+
+    .campo-hero-notes {
+        gap: .5rem;
+    }
+
+    .public-home-page .campo-rate-row .campo-rate-price {
+        display: inline-block;
+        min-width: 0;
+        text-align: left;
+    }
+
+    .public-home-page .campo-facility-card,
+    .public-home-page .campo-facility-card img {
+        min-height: 320px;
+    }
+}
+
+/* Official CAMPO logo and palette refinements */
+.site-navbar,
+.public-home-page .site-navbar {
+    position: relative;
+    top: auto;
+    right: auto;
+    left: auto;
+    z-index: 1030;
+    min-height: 88px;
+    background: rgba(240, 235, 225, .98) !important;
+    border-bottom: 1px solid rgba(27, 79, 49, .16);
+    box-shadow: 0 10px 28px rgba(16, 47, 32, .08);
+}
+
+.site-navbar .container,
+.public-home-page .site-navbar .container {
+    min-height: 88px;
+}
+
+.site-navbar .navbar-brand,
+.footer-brand {
+    margin-right: 1.75rem;
+}
+
+.campo-logo-img {
+    display: block;
+    width: min(230px, 52vw);
+    height: auto;
+    max-height: 68px;
+    object-fit: contain;
+}
+
+.footer-logo-img {
+    width: 190px;
+    max-height: 58px;
+}
+
+.public-home-page .site-navbar .nav-link,
+.public-home-page .site-navbar .nav-link.active,
+.public-home-page .site-navbar .nav-link:hover,
+.public-home-page .site-navbar .nav-link:focus {
+    color: var(--campo-green-dark) !important;
+}
+
+.site-navbar .nav-link.active::after,
+.public-home-page .site-navbar .nav-link.active::after {
+    background: var(--campo-orange);
+}
+
+.public-home-page .site-navbar .navbar-collapse {
+    background: transparent;
+}
+
+.public-home-page .site-navbar .navbar-toggler {
+    border-color: rgba(27, 79, 49, .34);
+}
+
+.public-home-page .site-navbar .navbar-toggler-icon {
+    filter: none;
+}
+
+.public-home-page .campo-home-hero {
+    min-height: 640px;
+    padding-top: 5.75rem;
+    padding-bottom: 5rem;
+}
+
+.public-home-page .campo-home-hero .hero-overlay {
+    background:
+        radial-gradient(circle at 78% 18%, rgba(243, 111, 50, .18), transparent 30%),
+        linear-gradient(90deg, rgba(16, 47, 32, .86) 0%, rgba(27, 79, 49, .68) 44%, rgba(0, 0, 0, .24) 100%),
+        linear-gradient(180deg, rgba(16, 47, 32, .08), rgba(16, 47, 32, .36));
+}
+
+.public-home-page .campo-rates-section,
+.campo-rates-section {
+    background: linear-gradient(180deg, #fff 0%, var(--campo-cream) 100%);
+}
+
+.public-home-page .campo-facilities-section {
+    background: var(--campo-green-dark);
+}
+
+.public-home-page .campo-facility-card {
+    min-height: 280px;
+    max-width: 520px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.public-home-page .campo-facility-card img {
+    min-height: 280px;
+}
+
+.public-home-page .campo-facility-card figcaption {
+    padding: 1rem 1.1rem;
+}
+
+.public-home-page .campo-facility-card h3 {
+    font-size: 1.15rem;
+}
+
+.public-home-page .campo-facility-card p {
+    font-size: .92rem;
+}
+
+@media (max-width: 991.98px) {
+    .public-home-page .site-navbar .navbar-collapse {
+        margin-top: .7rem;
+        padding: .75rem 1rem;
+        border: 1px solid rgba(27, 79, 49, .14);
+        border-radius: 8px;
+        background: rgba(240, 235, 225, .98);
+    }
+}
+
+@media (max-width: 767.98px) {
+    .site-navbar,
+    .public-home-page .site-navbar,
+    .site-navbar .container,
+    .public-home-page .site-navbar .container {
+        min-height: 76px;
+    }
+
+    .campo-logo-img {
+        width: min(178px, 48vw);
+        max-height: 56px;
+    }
+
+    .public-home-page .campo-home-hero {
+        min-height: 560px;
+        padding-top: 4.5rem;
+    }
+
+    .public-home-page .campo-facility-card,
+    .public-home-page .campo-facility-card img {
+        min-height: 240px;
+    }
+}
+
+/* Facilities/contact requested refinements */
+.public-home-page .campo-facilities-section {
+    padding-top: 4rem;
+    padding-bottom: 3.4rem;
+}
+
+.public-home-page .campo-facility-card {
+    min-height: 0;
+    max-width: 460px;
+    aspect-ratio: 16 / 9;
+    border-radius: 8px;
+}
+
+.public-home-page .campo-facility-card img {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    aspect-ratio: auto;
+    object-fit: cover;
+    opacity: 1;
+}
+
+.public-home-page .campo-facility-card::after,
+.public-home-page .campo-facility-card figcaption {
+    display: none;
+}
+
+.public-home-page .campo-contact-section {
+    padding-top: 4.4rem;
+    padding-bottom: 4.8rem;
+    background:
+        linear-gradient(180deg, #fff 0%, rgba(240, 235, 225, .52) 100%);
+}
+
+.public-home-page .campo-contact-section .section-header {
+    margin-bottom: 2rem !important;
+}
+
+.public-home-page .campo-contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    min-height: 142px;
+    padding: 1.35rem;
+    border: 1px solid rgba(27, 79, 49, .12);
+    border-top: 0;
+    border-left: 4px solid var(--campo-orange);
+    border-radius: 8px;
+    background:
+        linear-gradient(135deg, rgba(240, 235, 225, .74), #fff 52%);
+    box-shadow: 0 18px 42px rgba(16, 47, 32, .08);
+}
+
+.campo-contact-icon {
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 44px;
+    border-radius: 50%;
+    background: var(--campo-green-dark);
+    color: var(--campo-cream);
+    font-size: 1.05rem;
+    box-shadow: 0 10px 18px rgba(16, 47, 32, .18);
+}
+
+.public-home-page .campo-contact-item h3 {
+    margin-bottom: .38rem;
+    color: var(--campo-green-dark);
+    font-size: .92rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+.public-home-page .campo-contact-item p {
+    color: var(--campo-muted);
+    line-height: 1.55;
+}
+
+.public-home-page .campo-contact-item strong {
+    color: var(--campo-ink);
+    font-size: 1.02rem;
+}
+
+@media (max-width: 767.98px) {
+    .public-home-page .campo-facility-card {
+        max-width: 100%;
+    }
+
+    .public-home-page .campo-contact-item {
+        min-height: 0;
+    }
+}
+
+/* Original gallery restored for homepage facilities */
+.public-home-page .campo-gallery-section {
+    padding-top: 4.75rem;
+    padding-bottom: 4.25rem;
+    background: #fff;
+}
+
+.public-home-page .campo-gallery-section .gallery-card {
+    overflow: hidden;
+    border: 1px solid rgba(27, 79, 49, .14);
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 16px 36px rgba(16, 47, 32, .07);
+}
+
+.public-home-page .campo-gallery-section .gallery-image-wrap {
+    aspect-ratio: 4 / 3;
+}
+
+.public-home-page .campo-gallery-section .gallery-overlay {
+    background: linear-gradient(180deg, transparent 35%, rgba(16, 47, 32, .40));
+}
+
+.public-home-page .campo-gallery-section .gallery-title {
+    color: var(--campo-ink);
+    font-weight: 900;
+}
+
+.public-home-page .campo-gallery-section .gallery-caption {
+    color: var(--campo-muted);
+}
+
+.public-home-page .campo-contact-item {
+    position: relative;
+    overflow: hidden;
+}
+
+.public-home-page .campo-contact-item::after {
+    content: "";
+    position: absolute;
+    right: -34px;
+    bottom: -42px;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(243, 111, 50, .10);
+    pointer-events: none;
+}
+
+.public-home-page .campo-contact-icon {
+    background: var(--campo-orange);
+    color: #fff;
+}
+
+/* Client-approved CAMPO TURF palette */
+:root {
+    --campo-green: #204B31;
+    --campo-green-dark: #204B31;
+    --campo-green-deep: #204B31;
+    --campo-green-soft: #F5F0E7;
+    --campo-orange: #EE7136;
+    --campo-cream: #F5F0E7;
+    --campo-ink: #204B31;
+    --campo-muted: #66736b;
+    --campo-line: rgba(32, 75, 49, .16);
+    --brand-primary: #204B31;
+    --brand-primary-dark: #204B31;
+    --brand-accent: #EE7136;
+    --brand-bg-soft: #F5F0E7;
+    --brand-text-dark: #204B31;
+    --brand-primary-rgb: 32, 75, 49;
+    --brand-primary-dark-rgb: 32, 75, 49;
+    --brand-accent-rgb: 238, 113, 54;
+}
+
+.btn-primary,
+.quick-search-btn,
+.public-home-page .hero-book-btn {
+    background: var(--campo-green);
+    border-color: var(--campo-green);
+    color: #fff;
+    box-shadow: 0 14px 26px rgba(32, 75, 49, .20);
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:not(:disabled):not(.disabled):active,
+.quick-search-btn:hover,
+.quick-search-btn:focus {
+    background: var(--campo-green);
+    border-color: var(--campo-green);
+    color: #fff;
+}
+
+.site-navbar,
+.public-home-page .site-navbar {
+    background: var(--campo-cream) !important;
+    border-bottom-color: rgba(32, 75, 49, .14);
+}
+
+.site-navbar .nav-link,
+.site-navbar .nav-link.active,
+.site-navbar .nav-link:hover,
+.site-navbar .nav-link:focus,
+.public-home-page .site-navbar .nav-link,
+.public-home-page .site-navbar .nav-link.active,
+.public-home-page .site-navbar .nav-link:hover,
+.public-home-page .site-navbar .nav-link:focus {
+    color: var(--campo-green) !important;
+}
+
+.site-navbar .nav-link.active::after,
+.public-home-page .site-navbar .nav-link.active::after {
+    background: var(--campo-orange);
+}
+
+.public-home-page .campo-home-hero .hero-overlay {
+    background:
+        linear-gradient(90deg, rgba(32, 75, 49, .90) 0%, rgba(32, 75, 49, .70) 45%, rgba(32, 75, 49, .30) 100%),
+        linear-gradient(180deg, rgba(32, 75, 49, .12), rgba(32, 75, 49, .42));
+}
+
+.section-eyebrow,
+.campo-hero-eyebrow {
+    color: var(--campo-orange);
+}
+
+.campo-hero-eyebrow {
+    border-color: rgba(245, 240, 231, .28);
+    background: rgba(245, 240, 231, .12);
+}
+
+.public-home-page .campo-rates-section,
+.campo-rates-section {
+    background: var(--campo-cream);
+}
+
+.public-home-page .campo-rate-simple,
+.campo-rate-simple,
+.public-home-page .campo-gallery-section .gallery-card,
+.public-home-page .campo-contact-item {
+    background: #fff;
+    border-color: rgba(32, 75, 49, .15);
+}
+
+.court-sport-tag {
+    background: rgba(238, 113, 54, .12);
+    color: var(--campo-orange);
+}
+
+.public-home-page .campo-rate-row .campo-rate-price {
+    background: var(--campo-cream);
+    color: var(--campo-green);
+}
+
+.public-home-page .campo-rate-row .campo-rate-price::before {
+    color: var(--campo-orange);
+}
+
+.public-home-page .campo-gallery-section {
+    background: #fff;
+}
+
+.public-home-page .campo-contact-section {
+    background: var(--campo-cream);
+}
+
+.public-home-page .campo-contact-icon {
+    background: var(--campo-orange);
+    color: #fff;
+}
+
+.public-home-page .campo-contact-item {
+    border-left-color: var(--campo-orange);
+}
+
+.campo-footer {
+    background: var(--campo-green);
+    border-top: 0;
+    color: #fff;
+}
+
+.campo-footer .footer-links a,
+.campo-footer .footer-social a {
+    color: #fff;
+}
+
+.campo-footer .footer-links a:hover,
+.campo-footer .footer-social a:hover {
+    color: var(--campo-orange);
+}
+
+.campo-footer .footer-social a {
+    background: rgba(255, 255, 255, .12);
+}
+
+.campo-footer .campo-logo-img {
+    filter: brightness(0) invert(1);
+}
+
+@media (max-width: 991.98px) {
+    .public-home-page .site-navbar .navbar-collapse {
+        background: var(--campo-cream);
+        border-color: rgba(32, 75, 49, .14);
+    }
+}
