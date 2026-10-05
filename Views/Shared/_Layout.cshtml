@@ -72,9 +72,10 @@
                                 <span>Home</span>
                             </a>
                         </li>
-                        <a asp-controller="Bookings" asp-action="Find" class="nav-link @(string.Equals(currentController, "Bookings", StringComparison.OrdinalIgnoreCase) && string.Equals(currentAction, "Find", StringComparison.OrdinalIgnoreCase) ? "active" : "")">
-                            <span>Find Booking</span>
-                        </a>
+                        <li class="nav-item">
+                            <a asp-controller="Bookings" asp-action="Find" class="nav-link @(string.Equals(currentController, "Bookings", StringComparison.OrdinalIgnoreCase) && string.Equals(currentAction, "Find", StringComparison.OrdinalIgnoreCase) ? "active" : "")">
+                                <span>Find Booking</span>
+                            </a>
                         </li>
                         <li class="nav-item">
                             <a href="/#contact" class="nav-link">
@@ -82,10 +83,13 @@
                             </a>
                         </li>
                     </ul>
+                    <div class="site-navbar-mobile-cta d-md-none">
+                        <a asp-controller="Availability" asp-action="Find" class="btn btn-primary btn-book-turf">Book a Turf</a>
+                    </div>
                 </div>
 
                 <!-- Right navbar -->
-                <div class="order-1 order-md-3 ml-md-auto site-navbar-cta">
+                <div class="order-1 order-md-3 ml-md-auto site-navbar-cta d-none d-md-flex">
                     <a asp-controller="Availability" asp-action="Find" class="btn btn-primary btn-book-turf">Book a Turf</a>
                 </div>
             </div>

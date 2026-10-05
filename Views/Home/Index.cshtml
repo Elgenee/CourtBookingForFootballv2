@@ -40,6 +40,23 @@
         if (rule.EffectiveEndDate.HasValue) return $"Until {rule.EffectiveEndDate.Value:MMM d, yyyy}";
         return "Promo dates";
     }
+    string GalleryIcon(string? title)
+    {
+        var text = (title ?? "").ToLowerInvariant();
+        if (text.Contains("eat") || text.Contains("food") || text.Contains("cafe") || text.Contains("lounge"))
+        {
+            return "fas fa-utensils";
+        }
+        if (text.Contains("training") || text.Contains("session"))
+        {
+            return "fas fa-dumbbell";
+        }
+        if (text.Contains("match") || text.Contains("game"))
+        {
+            return "fas fa-futbol";
+        }
+        return "fas fa-border-all";
+    }
 }
 
 <!-- ============ HERO ============ -->
@@ -50,26 +67,27 @@
         <div class="row">
             <div class="col-lg-7 col-xl-6">
                 <div class="hero-eyebrow campo-hero-eyebrow">CAMPO TURF</div>
-                <h1 class="hero-title mb-3" data-testid="hero-title">Play Your Game.</h1>
+                <h1 class="hero-title mb-3" data-testid="hero-title">Play Your <span>Game.</span></h1>
                 <p class="hero-subtitle mb-4" data-testid="hero-subtitle">A multi-purpose sports turf for teams, schools, and community play.</p>
                 <a asp-controller="Availability" asp-action="Find" class="btn btn-primary btn-lg hero-book-btn">
                     Book a Turf <i class="fas fa-arrow-right ml-2"></i>
                 </a>
-                <div class="campo-hero-notes" aria-label="Venue highlights">
+        @*         <div class="campo-hero-notes" aria-label="Venue highlights">
                     <span>Hourly reservations</span>
                     <span>Multi-purpose turf field</span>
                     <span>Easy online booking</span>
-                </div>
+                </div> *@
             </div>
         </div>
     </div>
 </section>
 
+<div class="campo-home-main-sections">
 <!-- ============ RATES ============ -->
 <section id="rates" class="section-default campo-rates-section">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-lg-9 col-xl-8">
+            <div class="col-lg-10 col-xl-10">
                 <div class="section-header text-center mb-4">
                     <span class="section-eyebrow">Rates</span>
                     <h2>Hourly Rates</h2>
@@ -163,6 +181,7 @@
     </div>
 </section> *@
 
+<div class="campo-gallery-contact-wrap">
 <!-- ============ GALLERY ============ -->
 <section id="facilities" class="section-default campo-gallery-section" data-testid="section-gallery">
     <div class="container">
@@ -175,7 +194,7 @@
         <div class="row">
             @foreach (var item in galleryItems)
             {
-                <div class="col-12 col-sm-6 col-lg-3 mb-4">
+                <div class="col-12 col-md-6 mb-4">
                     <div class="gallery-card" data-testid="gallery-card-@item.Id">
                         <div class="gallery-image-wrap">
                             <img src="@ImageUrl(item.ImagePath)" alt="@TurfText(item.Title)" loading="lazy" />
@@ -184,11 +203,14 @@
                             </div>
                         </div>
                         <div class="gallery-body">
-                            <h6 class="gallery-title">@TurfText(item.Title)</h6>
-                            @if (!string.IsNullOrWhiteSpace(item.Caption))
-                            {
-                                <p class="gallery-caption">@TurfText(item.Caption)</p>
-                            }
+                            <span class="gallery-card-icon" aria-hidden="true"><i class="@GalleryIcon(item.Title)"></i></span>
+                            <div class="gallery-copy">
+                                <h6 class="gallery-title">@TurfText(item.Title)</h6>
+                                @if (!string.IsNullOrWhiteSpace(item.Caption))
+                                {
+                                    <p class="gallery-caption">@TurfText(item.Caption)</p>
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -243,3 +265,5 @@
         </div>
     </div>
 </section>
+</div>
+</div>
