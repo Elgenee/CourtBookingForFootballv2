@@ -4946,3 +4946,20 @@ body {
     background-repeat: no-repeat;
     background-size: min(78rem, 94vw) 20rem;
 }
+
+/* Tighter lower homepage section rhythm */
+.public-home-page .campo-rates-section,
+.public-home-page .campo-gallery-contact-wrap > .campo-gallery-section,
+.public-home-page .campo-gallery-contact-wrap > .campo-contact-section {
+    padding-top: clamp(3.6rem, 4.2vw, 4.1rem);
+    padding-bottom: clamp(3.6rem, 4.2vw, 4.1rem);
+}
+
+@media (max-width: 767.98px) {
+    .public-home-page .campo-rates-section,
+    .public-home-page .campo-gallery-contact-wrap > .campo-gallery-section,
+    .public-home-page .campo-gallery-contact-wrap > .campo-contact-section {
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+    }
+}
