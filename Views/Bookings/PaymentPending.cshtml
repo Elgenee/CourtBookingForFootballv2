@@ -14,6 +14,15 @@
     string formatTime(TimeSpan t) => PhilippineTime.FormatTime(t);
     string bookingBadge(BookingStatus s) => $"status-badge status-{s}";
     string paymentBadge(PaymentStatus? s) => $"status-badge payment-{s}";
+    string TurfText(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return "";
+        return text
+            .Replace("Giuseppe Football Club", "CAMPO TURF", StringComparison.OrdinalIgnoreCase)
+            .Replace("Giuseppe Football Field", "CAMPO TURF Field", StringComparison.OrdinalIgnoreCase)
+            .Replace("Football Field", "Turf Field", StringComparison.OrdinalIgnoreCase)
+            .Replace("football field", "turf field", StringComparison.OrdinalIgnoreCase);
+    }
 }
 
 <section class="section-default">
@@ -54,7 +63,7 @@
                     <div class="card-body">
                         <dl class="row mb-0">
                             <dt class="col-sm-4">Field</dt>
-                            <dd class="col-sm-8">@Model.Court?.CourtName <span class="badge badge-info ml-1">@Model.Court?.SportType</span></dd>
+                            <dd class="col-sm-8">@TurfText(Model.Court?.CourtName) <span class="badge badge-info ml-1">Turf Field</span></dd>
 
                             <dt class="col-sm-4">Date</dt>
                             <dd class="col-sm-8">@Model.BookingDate.ToString("dddd, MMMM d, yyyy")</dd>

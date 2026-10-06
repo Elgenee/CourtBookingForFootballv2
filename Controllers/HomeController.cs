@@ -44,6 +44,18 @@ namespace CourtBookingSystem.Controllers
             ViewBag.About = await _content.GetAboutAsync();
             ViewBag.Gallery = await _content.GetGalleryAsync();
             ViewBag.Promotions = await _content.GetActivePromotionsAsync(PhilippineTime.Today);
+            var pricingRules = await _db.BookingPricingRules
+                .AsNoTracking()
+                .Where(r => r.IsEnabled)
+                .OrderBy(r => r.CourtId)
+                .ThenBy(r => r.IsPromotional)
+                .ThenBy(r => r.DisplayOrder)
+                .ThenBy(r => r.StartTime)
+                .ThenBy(r => r.Id)
+                .ToListAsync();
+            ViewBag.PricingRulesByCourt = pricingRules
+                .GroupBy(r => r.CourtId)
+                .ToDictionary(g => g.Key, g => g.ToList());
 
             return View(courts);
         }

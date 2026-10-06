@@ -59,7 +59,7 @@ namespace CourtBookingSystem.Data
             await SeedHeroImagesAsync(db);
             await SeedGalleryImagesAsync(db);
             await SeedPromotionsAsync(db);
-            await ApplyGiuseppeFootballDefaultsAsync(db);
+            await ApplyCampoTurfDefaultsAsync(db);
         }
 
         private static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
@@ -199,9 +199,9 @@ namespace CourtBookingSystem.Data
             {
                 new()
                 {
-                    CourtName = "Giuseppe Football Field",
+                    CourtName = "CAMPO TURF Field",
                     SportType = SportType.Football,
-                    Description = "Football field available for regular matches, training, and private bookings.",
+                    Description = "Multi-purpose turf field available for matches, training, school activities, and private bookings.",
                     HourlyRate = 0m,
                     Status = CourtStatus.Available,
                     IsActive = true,
@@ -272,29 +272,28 @@ namespace CourtBookingSystem.Data
             await db.SaveChangesAsync();
         }
 
-        // Keeps one simple field group for the football setup. The internal
-        // model still uses Court/CourtGroup names to avoid a database rename.
+        // Keeps one simple field group for the main turf setup.
         private static async Task SeedCourtGroupsAsync(ApplicationDbContext db)
         {
-            var footballGroup = await db.CourtGroups.FirstOrDefaultAsync(g => g.GroupCode == "FOOTBALL_FIELD");
-            if (footballGroup == null)
+            var turfGroup = await db.CourtGroups.FirstOrDefaultAsync(g => g.GroupCode == "TURF_FIELD");
+            if (turfGroup == null)
             {
-                footballGroup = new CourtGroup
+                turfGroup = new CourtGroup
                 {
-                    GroupCode = "FOOTBALL_FIELD",
-                    GroupName = "Giuseppe Football Field",
-                    Description = "Primary football field booking area.",
+                    GroupCode = "TURF_FIELD",
+                    GroupName = "CAMPO TURF Field",
+                    Description = "Primary multi-purpose turf booking area.",
                     IsActive = true
                 };
-                db.CourtGroups.Add(footballGroup);
+                db.CourtGroups.Add(turfGroup);
             }
 
             await db.SaveChangesAsync();
 
-            var field = await db.Courts.FirstOrDefaultAsync(c => c.CourtName == "Giuseppe Football Field");
+            var field = await db.Courts.FirstOrDefaultAsync(c => c.CourtName == "CAMPO TURF Field");
             if (field != null && field.CourtGroupId == null)
             {
-                field.CourtGroupId = footballGroup.Id;
+                field.CourtGroupId = turfGroup.Id;
                 field.IsFullCourt = true;
             }
 
@@ -417,13 +416,13 @@ namespace CourtBookingSystem.Data
 
             db.WebsiteSettings.Add(new WebsiteSetting
             {
-                WebsiteName = "Giuseppe Football",
-                WebsiteTagline = "Football Field",
+                WebsiteName = "CAMPO TURF",
+                WebsiteTagline = "Multi-purpose Sports Turf",
                 NavbarLogoPath = null,
                 LandingColorScheme = LandingColorSchemeCatalog.DefaultKey,
-                HeroTitle = "Book Your Next Football Game",
-                HeroSubtitle = "Reserve the Giuseppe Football field online in seconds for matches, training sessions, and friendly games.",
-                HeroButtonText = "Find Available Field Times",
+                HeroTitle = "Book Your Turf Time",
+                HeroSubtitle = "Reserve CAMPO TURF online for football, frisbee, rugby, school activities, and community games.",
+                HeroButtonText = "Find Available Turf Times",
                 UpdatedDate = DateTime.UtcNow
             });
             await db.SaveChangesAsync();
@@ -435,12 +434,12 @@ namespace CourtBookingSystem.Data
 
             db.AboutContents.Add(new AboutContent
             {
-                Title = "About Giuseppe Football",
-                Description = "Giuseppe Football is a dedicated football field built for casual games, training sessions, friendly matches, and competitive play. " +
-                              "Players can reserve field time online, review available schedules, and arrive ready to play.",
+                Title = "About CAMPO TURF",
+                Description = "CAMPO TURF is a multi-purpose sports turf built for casual games, training sessions, school activities, and community events. " +
+                              "Players and organizers can reserve turf time online, review available schedules, and arrive ready to play.",
                 FacilitiesList = string.Join('\n', new[]
                 {
-                    "Well-kept football field",
+                    "Multi-purpose turf field",
                     "Clean changing rooms",
                     "Comfortable waiting area",
                     "Parking area",
@@ -449,10 +448,10 @@ namespace CourtBookingSystem.Data
                     "Online & walk-in booking"
                 }),
                 ContactPhone = "0917 622 0308",
-                ContactEmail = "hello@giuseppefootball.ph",
-                Location = "Giuseppe Football Club Sanchez Compound Banilad 6000 Cebu (PH)",
+                ContactEmail = "hello@campoturf.ph",
+                Location = "CAMPO TURF Sanchez Compound Banilad 6000 Cebu (PH)",
                 OpeningHoursDays = "Mon – Sun",
-                OpeningHoursTimes = "8:00 AM – 10:00 PM",
+                OpeningHoursTimes = "5:00 AM – 12:00 AM",
                 UpdatedDate = DateTime.UtcNow
             });
             await db.SaveChangesAsync();
@@ -468,24 +467,24 @@ namespace CourtBookingSystem.Data
             {
                 new HeroImage
                 {
-                    Title = "Giuseppe Football Field",
+                    Title = "CAMPO TURF Field",
                     ImagePath = "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?auto=format&fit=crop&w=1920&q=80",
                     IsDefault = true,
                     IsActive = true
                 },
                 new HeroImage
                 {
-                    Title = "Football Training Sessions",
+                    Title = "Turf Training Sessions",
                     ImagePath = "https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&w=1920&q=80",
                     IsDefault = false,
-                    IsActive = true
+                    IsActive = false
                 },
                 new HeroImage
                 {
-                    Title = "Match Day Football",
+                    Title = "Community Match Day",
                     ImagePath = "https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=1920&q=80",
                     IsDefault = false,
-                    IsActive = true
+                    IsActive = false
                 }
             };
 
@@ -499,10 +498,10 @@ namespace CourtBookingSystem.Data
 
             var items = new[]
             {
-                ("Football Field", "A well-kept field for casual games, league matches, and private bookings.", "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?auto=format&fit=crop&w=640&q=80"),
+                ("Turf Field", "A well-kept turf field for casual games, training, school activities, and private bookings.", "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?auto=format&fit=crop&w=640&q=80"),
                 ("Training Session", "Open space for drills, team practice, and skill development.", "https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&w=640&q=80"),
-                ("Match Day", "Reserve your schedule and arrive ready for kickoff.", "https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=640&q=80"),
-                ("Team Play", "Flexible booking for friendly matches and competitive games.", "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=640&q=80")
+                ("Match Day", "Reserve your schedule and arrive ready for play.", "https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=640&q=80"),
+                ("Community Play", "Flexible booking for friendly matches, school events, and sports days.", "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=640&q=80")
             };
 
             var order = 0;
@@ -541,7 +540,7 @@ namespace CourtBookingSystem.Data
                     Title = title,
                     Description = $"Edit this {monthNames[i]} promotion with your field rates, event details, or facility announcement.",
                     ImagePath = $"/img/promos/months/{monthNames[i].ToLowerInvariant()}.svg",
-                    ImageAlt = $"{title} artwork for Giuseppe Football",
+                    ImageAlt = $"{title} artwork for CAMPO TURF",
                     ButtonLabel = "Book Now",
                     ButtonUrl = "#booking-search",
                     IconHtml = "&#x1F389;",
@@ -556,23 +555,28 @@ namespace CourtBookingSystem.Data
             await db.SaveChangesAsync();
         }
 
-        private static async Task ApplyGiuseppeFootballDefaultsAsync(ApplicationDbContext db)
+        private static async Task ApplyCampoTurfDefaultsAsync(ApplicationDbContext db)
         {
             var now = DateTime.UtcNow;
 
             foreach (var settings in await db.WebsiteSettings.ToListAsync())
             {
                 if (ContainsOldBrand(settings.WebsiteName)
+                    || ContainsGiuseppeFootball(settings.WebsiteName)
+                    || ContainsGiuseppeFootball(settings.WebsiteTagline)
+                    || ContainsGiuseppeFootball(settings.HeroTitle)
                     || ContainsOldBrand(settings.HeroSubtitle)
                     || ContainsMisspelledBrand(settings.WebsiteName)
                     || ContainsMisspelledBrand(settings.HeroSubtitle)
+                    || ContainsFootballOnlyCopy(settings.WebsiteTagline)
+                    || ContainsFootballOnlyCopy(settings.HeroTitle)
                     || ContainsOldSport(settings.HeroSubtitle))
                 {
-                    settings.WebsiteName = "Giuseppe Football";
-                    settings.WebsiteTagline = "Football Field";
-                    settings.HeroTitle = "Book Your Next Football Game";
-                    settings.HeroSubtitle = "Reserve the Giuseppe Football field online in seconds for matches, training sessions, and friendly games.";
-                    settings.HeroButtonText = "Find Available Field Times";
+                    settings.WebsiteName = "CAMPO TURF";
+                    settings.WebsiteTagline = "Multi-purpose Sports Turf";
+                    settings.HeroTitle = "Book Your Turf Time";
+                    settings.HeroSubtitle = "Reserve CAMPO TURF online for football, frisbee, rugby, school activities, and community games.";
+                    settings.HeroButtonText = "Find Available Turf Times";
                     settings.UpdatedDate = now;
                 }
             }
@@ -581,19 +585,25 @@ namespace CourtBookingSystem.Data
             {
                 if (ContainsOldBrand(about.Title)
                     || ContainsOldBrand(about.Description)
+                    || ContainsGiuseppeFootball(about.Title)
+                    || ContainsGiuseppeFootball(about.Description)
+                    || ContainsGiuseppeFootball(about.FacilitiesList)
+                    || ContainsGiuseppeFootball(about.ContactEmail)
+                    || ContainsGiuseppeFootball(about.Location)
                     || ContainsMisspelledBrand(about.Title)
                     || ContainsMisspelledBrand(about.Description)
                     || ContainsPlaceholderContact(about.ContactPhone)
                     || ContainsPlaceholderLocation(about.Location)
+                    || ContainsFootballOnlyCopy(about.Title)
                     || ContainsOldSport(about.Description)
                     || ContainsOldSport(about.FacilitiesList))
                 {
-                    about.Title = "About Giuseppe Football";
-                    about.Description = "Giuseppe Football is a dedicated football field built for casual games, training sessions, friendly matches, and competitive play. " +
-                                        "Players can reserve field time online, review available schedules, and arrive ready to play.";
+                    about.Title = "About CAMPO TURF";
+                    about.Description = "CAMPO TURF is a multi-purpose sports turf built for casual games, training sessions, school activities, and community events. " +
+                                        "Players and organizers can reserve turf time online, review available schedules, and arrive ready to play.";
                     about.FacilitiesList = string.Join('\n', new[]
                     {
-                        "Well-kept football field",
+                        "Multi-purpose turf field",
                         "Clean changing rooms",
                         "Comfortable waiting area",
                         "Parking area",
@@ -602,14 +612,17 @@ namespace CourtBookingSystem.Data
                         "Online & walk-in booking"
                     });
                     about.ContactPhone = "0917 622 0308";
-                    about.ContactEmail = "hello@giuseppefootball.ph";
-                    about.Location = "Giuseppe Football Club Sanchez Compound Banilad 6000 Cebu (PH)";
+                    about.ContactEmail = "hello@campoturf.ph";
+                    about.Location = "CAMPO TURF Sanchez Compound Banilad 6000 Cebu (PH)";
+                    about.OpeningHoursDays = string.IsNullOrWhiteSpace(about.OpeningHoursDays) ? "Mon – Sun" : about.OpeningHoursDays;
+                    about.OpeningHoursTimes = "5:00 AM – 12:00 AM";
                     about.UpdatedDate = now;
                 }
             }
 
             var oldSeedNames = new[]
             {
+                "Giuseppe Football Field",
                 "Basketball Court",
                 "Pickleball Court 1",
                 "Pickleball Court 2",
@@ -617,71 +630,114 @@ namespace CourtBookingSystem.Data
                 "Pickleball Court 4"
             };
             var existingCourts = await db.Courts.OrderBy(c => c.Id).ToListAsync();
-            var footballField = existingCourts.FirstOrDefault(c => c.CourtName == "Giuseppe Football Field")
+            var turfField = existingCourts.FirstOrDefault(c => c.CourtName == "CAMPO TURF Field")
+                ?? existingCourts.FirstOrDefault(c => c.CourtName == "Giuseppe Football Field")
                 ?? existingCourts.FirstOrDefault(c => ContainsMisspelledBrand(c.CourtName))
                 ?? existingCourts.FirstOrDefault(c => oldSeedNames.Contains(c.CourtName));
 
-            if (footballField == null)
+            if (turfField == null)
             {
-                footballField = new Court
+                turfField = new Court
                 {
-                    CourtName = "Giuseppe Football Field",
+                    CourtName = "CAMPO TURF Field",
                     HourlyRate = 0m,
                     Status = CourtStatus.Available,
                     IsActive = true,
                     IsFullCourt = true
                 };
-                db.Courts.Add(footballField);
+                db.Courts.Add(turfField);
             }
 
-            footballField.CourtName = "Giuseppe Football Field";
-            footballField.SportType = SportType.Football;
-            footballField.Description = "Football field available for regular matches, training, and private bookings.";
-            footballField.Status = CourtStatus.Available;
-            footballField.IsActive = true;
-            footballField.IsFullCourt = true;
+            turfField.CourtName = "CAMPO TURF Field";
+            turfField.SportType = SportType.Football;
+            turfField.Description = "Multi-purpose turf field available for matches, training, school activities, and private bookings.";
+            turfField.Status = CourtStatus.Available;
+            turfField.IsActive = true;
+            turfField.IsFullCourt = true;
 
-            foreach (var court in existingCourts.Where(c => c.Id != footballField.Id))
+            foreach (var court in existingCourts.Where(c => c.Id != turfField.Id))
             {
                 court.SportType = SportType.Football;
                 if (ContainsMisspelledBrand(court.CourtName))
                 {
-                    court.CourtName = court.CourtName.Replace(MisspelledGiuseppe, "Giuseppe", StringComparison.OrdinalIgnoreCase);
+                    court.CourtName = court.CourtName.Replace(MisspelledGiuseppe, "CAMPO TURF", StringComparison.OrdinalIgnoreCase);
                 }
 
-                if (oldSeedNames.Contains(court.CourtName))
+                if (oldSeedNames.Contains(court.CourtName) || ContainsFootballOnlyCopy(court.Description))
                 {
-                    court.IsActive = false;
+                    var hasBookings = await db.Bookings.AnyAsync(b => b.CourtId == court.Id);
+                    if (hasBookings)
+                    {
+                        court.IsActive = false;
+                    }
+                    else
+                    {
+                        db.Courts.Remove(court);
+                    }
                 }
             }
 
-            var footballGroup = await db.CourtGroups.FirstOrDefaultAsync(g => g.GroupCode == "FOOTBALL_FIELD");
-            if (footballGroup == null)
+            var turfGroup = await db.CourtGroups.FirstOrDefaultAsync(g => g.GroupCode == "TURF_FIELD")
+                ?? await db.CourtGroups.FirstOrDefaultAsync(g => g.GroupCode == "FOOTBALL_FIELD")
+                ?? await db.CourtGroups.FirstOrDefaultAsync(g => g.GroupCode == "MAIN_COURT");
+            if (turfGroup == null)
             {
-                footballGroup = await db.CourtGroups.FirstOrDefaultAsync(g => g.GroupCode == "MAIN_COURT")
-                    ?? new CourtGroup { GroupCode = "FOOTBALL_FIELD" };
-                if (footballGroup.Id == 0)
-                {
-                    db.CourtGroups.Add(footballGroup);
-                }
+                turfGroup = new CourtGroup { GroupCode = "TURF_FIELD" };
+                db.CourtGroups.Add(turfGroup);
             }
-            footballGroup.GroupCode = "FOOTBALL_FIELD";
-            footballGroup.GroupName = "Giuseppe Football Field";
-            footballGroup.Description = "Primary football field booking area.";
-            footballGroup.IsActive = true;
-            footballField.CourtGroup = footballGroup;
+            turfGroup.GroupCode = "TURF_FIELD";
+            turfGroup.GroupName = "CAMPO TURF Field";
+            turfGroup.Description = "Primary multi-purpose turf booking area.";
+            turfGroup.IsActive = true;
+            turfField.CourtGroup = turfGroup;
 
-            foreach (var group in await db.CourtGroups.Where(g => g.GroupCode == "PB4").ToListAsync())
+            foreach (var group in await db.CourtGroups
+                .Where(g => g.Id != turfGroup.Id && (g.GroupCode == "PB4" || g.GroupCode == "FOOTBALL_FIELD" || g.GroupCode == "MAIN_COURT"))
+                .ToListAsync())
             {
-                group.IsActive = false;
+                var hasCourts = await db.Courts.AnyAsync(c => c.CourtGroupId == group.Id);
+                if (hasCourts)
+                {
+                    group.IsActive = false;
+                }
+                else
+                {
+                    db.CourtGroups.Remove(group);
+                }
             }
 
             foreach (var hero in await db.HeroImages.ToListAsync())
             {
-                if (hero.IsDefault && (ContainsOldBrand(hero.Title) || ContainsMisspelledBrand(hero.Title) || ContainsOldSport(hero.Title)))
+                if (ContainsOldBrand(hero.Title)
+                    || ContainsGiuseppeFootball(hero.Title)
+                    || ContainsMisspelledBrand(hero.Title)
+                    || ContainsFootballOnlyCopy(hero.Title)
+                    || ContainsOldSport(hero.Title))
                 {
-                    hero.Title = "Giuseppe Football Field";
-                    hero.ImagePath = "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?auto=format&fit=crop&w=1920&q=80";
+                    if (hero.IsDefault)
+                    {
+                        hero.Title = "CAMPO TURF Field";
+                        hero.ImagePath = "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?auto=format&fit=crop&w=1920&q=80";
+                        hero.IsActive = true;
+                    }
+                    else
+                    {
+                        hero.IsActive = false;
+                    }
+                }
+            }
+
+            foreach (var gallery in await db.GalleryImages.ToListAsync())
+            {
+                if (ContainsGiuseppeFootball(gallery.Title)
+                    || ContainsGiuseppeFootball(gallery.Caption)
+                    || ContainsFootballOnlyCopy(gallery.Title)
+                    || ContainsFootballOnlyCopy(gallery.Caption)
+                    || ContainsOldSport(gallery.Title)
+                    || ContainsOldSport(gallery.Caption))
+                {
+                    gallery.Title = CleanCampoText(gallery.Title);
+                    gallery.Caption = CleanCampoText(gallery.Caption);
                 }
             }
 
@@ -689,10 +745,13 @@ namespace CourtBookingSystem.Data
             {
                 var needsUpdate = ContainsOldBrand(promo.ImageAlt)
                     || ContainsOldBrand(promo.Description)
+                    || ContainsGiuseppeFootball(promo.ImageAlt)
+                    || ContainsGiuseppeFootball(promo.Description)
                     || ContainsMisspelledBrand(promo.ImageAlt)
                     || ContainsMisspelledBrand(promo.Description)
                     || ContainsOldSport(promo.Description);
-                if (promo.Description.Contains("court rates", StringComparison.OrdinalIgnoreCase))
+                if (!string.IsNullOrWhiteSpace(promo.Description)
+                    && promo.Description.Contains("court rates", StringComparison.OrdinalIgnoreCase))
                 {
                     promo.Description = promo.Description.Replace("court rates", "field rates", StringComparison.OrdinalIgnoreCase);
                     needsUpdate = true;
@@ -700,7 +759,8 @@ namespace CourtBookingSystem.Data
 
                 if (needsUpdate)
                 {
-                    promo.ImageAlt = $"{promo.Title} artwork for Giuseppe Football";
+                    promo.Description = CleanCampoText(promo.Description);
+                    promo.ImageAlt = $"{promo.Title} artwork for CAMPO TURF";
                     promo.UpdatedDate = now;
                 }
             }
@@ -725,6 +785,32 @@ namespace CourtBookingSystem.Data
         private static bool ContainsMisspelledBrand(string? value) =>
             !string.IsNullOrWhiteSpace(value)
             && value.Contains(MisspelledGiuseppe, StringComparison.OrdinalIgnoreCase);
+
+        private static bool ContainsGiuseppeFootball(string? value) =>
+            !string.IsNullOrWhiteSpace(value)
+            && (value.Contains("Giuseppe Football", StringComparison.OrdinalIgnoreCase)
+                || value.Contains("giuseppefootball", StringComparison.OrdinalIgnoreCase));
+
+        private static bool ContainsFootballOnlyCopy(string? value) =>
+            !string.IsNullOrWhiteSpace(value)
+            && (value.Contains("Football Field", StringComparison.OrdinalIgnoreCase)
+                || value.Contains("football field", StringComparison.OrdinalIgnoreCase)
+                || value.Contains("football setup", StringComparison.OrdinalIgnoreCase)
+                || value.Contains("football booking", StringComparison.OrdinalIgnoreCase));
+
+        private static string CleanCampoText(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return value ?? "";
+
+            return value
+                .Replace("Giuseppe Football Club", "CAMPO TURF", StringComparison.OrdinalIgnoreCase)
+                .Replace("Giuseppe Football Field", "CAMPO TURF Field", StringComparison.OrdinalIgnoreCase)
+                .Replace("Giuseppe Football", "CAMPO TURF", StringComparison.OrdinalIgnoreCase)
+                .Replace("giuseppefootball", "campoturf", StringComparison.OrdinalIgnoreCase)
+                .Replace("Football Field", "Turf Field", StringComparison.OrdinalIgnoreCase)
+                .Replace("football field", "turf field", StringComparison.OrdinalIgnoreCase)
+                .Replace("football booking", "turf booking", StringComparison.OrdinalIgnoreCase);
+        }
 
         private static bool ContainsPlaceholderContact(string? value) =>
             string.IsNullOrWhiteSpace(value)

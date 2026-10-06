@@ -2,20 +2,32 @@
 @using CourtBookingSystem.Models.Enums
 @inject Microsoft.Extensions.Options.IOptions<CourtBookingSystem.Services.FootballPaymentOptions> FootballPaymentOptions
 @{
-    ViewData["Title"] = "Book a Field";
+    ViewData["Title"] = "Book a Turf";
     var minDate = PhilippineTime.Today.ToString("yyyy-MM-dd");
     var maxDate = PhilippineTime.Today.AddYears(5).ToString("yyyy-MM-dd");
     var qrExpiryMinutes = (int)CourtBookingSystem.Services.PayMongoQrPhExpiryService.CheckoutLifetime.TotalMinutes;
     var showPayMongoNote = Model.PaymentMethod == PaymentMethod.PayMongoQrPh;
     var reservationFeePercent = FootballPaymentOptions.Value.ReservationFeePercent;
+    string TurfText(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return "";
+        return text
+            .Replace("Giuseppe Football Club", "CAMPO TURF", StringComparison.OrdinalIgnoreCase)
+            .Replace("Giuseppe Football Field", "CAMPO TURF Field", StringComparison.OrdinalIgnoreCase)
+            .Replace("Football Field", "Turf Field", StringComparison.OrdinalIgnoreCase)
+            .Replace("football field", "turf field", StringComparison.OrdinalIgnoreCase);
+    }
 }
 
-<section class="section-default">
+<section class="section-default campo-booking-page">
     <div class="container">
-        <div class="row mb-3">
-            <div class="col">
-                <h2 class="mb-1">Book a Field</h2>
-                <p class="text-muted">Reserve your slot in under a minute. No account required.</p>
+        <div class="row justify-content-center mb-4">
+            <div class="col-lg-10">
+                <div class="booking-page-heading">
+                    <span class="section-eyebrow">CAMPO TURF</span>
+                    <h2 class="mb-1">Book a Turf</h2>
+                    <p class="text-muted mb-0">Select your preferred date and time.</p>
+                </div>
             </div>
         </div>
 
@@ -24,11 +36,11 @@
 
             <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
-            <div class="row">
+            <div class="row booking-layout">
                 <!-- LEFT: Selection -->
-                <div class="col-lg-7">
-                    <div class="card booking-card mb-3">
-                        <div class="card-header"><i class="fas fa-futbol mr-2"></i>1. Choose field &amp; time</div>
+                <div class="col-lg-7 col-xl-8">
+                    <div class="card booking-card booking-selection-card mb-3">
+                        <div class="card-header"><i class="fas fa-calendar-check mr-2"></i>Choose date &amp; time</div>
                         <div class="card-body">
                             <div class="form-row">
                                 <div class="form-group col-md-7">
@@ -37,7 +49,7 @@
                                         @foreach (var court in Model.Courts)
                                         {
                                             <option value="@court.Id" data-sport="@court.SportType">
-                                                @court.CourtName — @court.SportType
+                                                @TurfText(court.CourtName)
                                             </option>
                                         }
                                     </select>
@@ -63,7 +75,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label>Available Slots</label>
+                                <label>Available Time Slots</label>
                                 <div id="slotsContainer" class="slot-grid">
                                     <div class="text-muted small">Pick a field, date, and duration to see available slots.</div>
                                 </div>
@@ -74,7 +86,7 @@
                     </div>
 
                     <div class="card booking-card mb-3">
-                        <div class="card-header"><i class="fas fa-user mr-2"></i>2. Your details</div>
+                        <div class="card-header"><i class="fas fa-user mr-2"></i>Your details</div>
                         <div class="card-body">
                             <div class="form-row">
                                 <div class="form-group col-md-12">
@@ -104,7 +116,7 @@
                     </div>
 
                     <div class="card booking-card mb-3">
-                        <div class="card-header"><i class="fas fa-credit-card mr-2"></i>3. Payment method</div>
+                        <div class="card-header"><i class="fas fa-credit-card mr-2"></i>Payment method</div>
                         <div class="card-body">
                             <div class="payment-options">
 @*                                 <label class="payment-option">
@@ -170,15 +182,15 @@
                     </div>
 
                     <div class="card booking-card mb-3">
-                        <div class="card-header"><i class="fas fa-file-contract mr-2"></i>4. Terms and Conditions</div>
+                        <div class="card-header"><i class="fas fa-file-contract mr-2"></i>Terms and Conditions</div>
                         <div class="card-body">
                             <div class="border rounded p-3 mb-3 bg-light" style="max-height: 300px; overflow-y: auto;" data-testid="terms-text">
-                                <h5 class="mb-1">GIUSEPPE FOOTBALL</h5>
-                                <h6 class="text-muted mb-3">Field Booking Terms &amp; Conditions</h6>
-                                <p>By making a reservation through the Giuseppe Football website, the customer ("Player", "User", or "Client") acknowledges that they have read, understood, and agreed to the following Terms and Conditions.</p>
+                                <h5 class="mb-1">CAMPO TURF</h5>
+                                <h6 class="text-muted mb-3">Turf Booking Terms &amp; Conditions</h6>
+                                <p>By making a reservation through the CAMPO TURF website, the customer ("Player", "User", or "Client") acknowledges that they have read, understood, and agreed to the following Terms and Conditions.</p>
 
                                 <h6>1. Booking and Reservation</h6>
-                                <p>1.1 All field reservations must be made exclusively through the Giuseppe Football website.</p>
+                                <p>1.1 All turf reservations must be made exclusively through the CAMPO TURF website.</p>
                                 <p>1.2 The customer shall select their preferred date, time, and duration of play and complete the required online payment process.</p>
                                 <p>1.3 Upon successful payment, the system will automatically generate a booking confirmation email containing the reservation details and a unique reference number.</p>
                                 <p>1.4 The booking confirmation email and reference number must be presented at the field reception or counter for verification prior to field access.</p>
@@ -199,17 +211,17 @@
                                 <h6>4. Field Slot Transfers ("Pasalo")</h6>
                                 <p>4.1 Players may privately transfer or sell their booked field slot to another party ("Pasalo") at their own discretion.</p>
                                 <p>4.2 Any such arrangement shall be solely between the original booking holder and the replacement player.</p>
-                                <p>4.3 Giuseppe Football shall not participate in, mediate, verify, guarantee, or assume responsibility for any payment, dispute, fraud, misunderstanding, or agreement arising from such transfers.</p>
+                                <p>4.3 CAMPO TURF shall not participate in, mediate, verify, guarantee, or assume responsibility for any payment, dispute, fraud, misunderstanding, or agreement arising from such transfers.</p>
 
                                 <h6>5. Safety and Assumption of Risk</h6>
-                                <p>5.1 Participation in football and related activities involves inherent risks, including but not limited to slips, falls, collisions, equipment-related injuries, medical emergencies, and other unforeseen incidents.</p>
+                                <p>5.1 Participation in turf field sports and related activities involves inherent risks, including but not limited to slips, falls, collisions, equipment-related injuries, medical emergencies, and other unforeseen incidents.</p>
                                 <p>5.2 All players voluntarily participate at their own risk.</p>
                                 <p>5.3 Players are responsible for ensuring that they are physically fit and medically capable of participating in sports activities.</p>
-                                <p>5.4 Giuseppe Football, its owners, officers, employees, coaches, staff, affiliates, and representatives shall not be liable for any injury, illness, disability, death, accident, or loss resulting from participation in activities conducted on the premises.</p>
+                                <p>5.4 CAMPO TURF, its owners, officers, employees, coaches, staff, affiliates, and representatives shall not be liable for any injury, illness, disability, death, accident, or loss resulting from participation in activities conducted on the premises.</p>
 
                                 <h6>6. Personal Belongings and Property</h6>
                                 <p>6.1 Players are solely responsible for safeguarding their personal belongings at all times.</p>
-                                <p>6.2 Giuseppe Football shall not be responsible or liable for any lost, stolen, misplaced, forgotten, or damaged personal items, including but not limited to:</p>
+                                <p>6.2 CAMPO TURF shall not be responsible or liable for any lost, stolen, misplaced, forgotten, or damaged personal items, including but not limited to:</p>
                                 <ul class="mb-2">
                                     <li>Mobile phones</li>
                                     <li>Wallets</li>
@@ -224,19 +236,19 @@
 
                                 <h6>7. Property Damage</h6>
                                 <p>7.1 Players shall be responsible for any damage caused to field facilities, equipment, fixtures, furniture, or property resulting from negligence, misuse, intentional acts, or violations of field rules.</p>
-                                <p>7.2 Giuseppe Football reserves the right to assess and recover the cost of repair or replacement from the responsible party.</p>
+                                <p>7.2 CAMPO TURF reserves the right to assess and recover the cost of repair or replacement from the responsible party.</p>
 
                                 <h6>8. Emergency Situations</h6>
-                                <p>8.1 In the event of an accident, injury, medical emergency, natural disaster, power interruption, government restriction, force majeure event, or any circumstance beyond reasonable control, Giuseppe Football may suspend, delay, modify, or terminate field operations as necessary.</p>
-                                <p>8.2 Giuseppe Football shall not be liable for any direct, indirect, incidental, consequential, or special damages arising from such events.</p>
+                                <p>8.1 In the event of an accident, injury, medical emergency, natural disaster, power interruption, government restriction, force majeure event, or any circumstance beyond reasonable control, CAMPO TURF may suspend, delay, modify, or terminate field operations as necessary.</p>
+                                <p>8.2 CAMPO TURF shall not be liable for any direct, indirect, incidental, consequential, or special damages arising from such events.</p>
                                 <p>8.3 Players authorize field personnel to contact emergency responders when deemed necessary. Any medical expenses incurred shall remain the sole responsibility of the affected individual.</p>
 
                                 <h6>9. Conduct and Compliance</h6>
                                 <p>9.1 All players must observe proper sportsmanship, respect fellow players, staff, and field facilities.</p>
-                                <p>9.2 Giuseppe Football reserves the right to refuse entry, remove participants, or cancel access without refund for behavior deemed unsafe, disruptive, abusive, unlawful, or contrary to field policies.</p>
+                                <p>9.2 CAMPO TURF reserves the right to refuse entry, remove participants, or cancel access without refund for behavior deemed unsafe, disruptive, abusive, unlawful, or contrary to field policies.</p>
 
                                 <h6>10. Limitation of Liability</h6>
-                                <p>To the fullest extent permitted by applicable Philippine laws, Giuseppe Football shall not be liable for any claims, losses, damages, injuries, expenses, costs, liabilities, or causes of action arising from:</p>
+                                <p>To the fullest extent permitted by applicable Philippine laws, CAMPO TURF shall not be liable for any claims, losses, damages, injuries, expenses, costs, liabilities, or causes of action arising from:</p>
                                 <ul class="mb-2">
                                     <li>Use of the field facilities;</li>
                                     <li>Participation in sports activities;</li>
@@ -248,8 +260,8 @@
                                 </ul>
 
                                 <h6>11. Acceptance of Terms</h6>
-                                <p>By completing an online reservation and payment through the Giuseppe Football website, the customer acknowledges and agrees to be legally bound by these Terms and Conditions.</p>
-                                <p class="mb-0">The customer further confirms that they have read, understood, and voluntarily accepted all risks associated with the use of Giuseppe Football facilities.</p>
+                                <p>By completing an online reservation and payment through the CAMPO TURF website, the customer acknowledges and agrees to be legally bound by these Terms and Conditions.</p>
+                                <p class="mb-0">The customer further confirms that they have read, understood, and voluntarily accepted all risks associated with the use of CAMPO TURF facilities.</p>
                             </div>
 
                             <div class="form-check">
@@ -264,16 +276,13 @@
                 </div>
 
                 <!-- RIGHT: Summary -->
-                <div class="col-lg-5">
+                <div class="col-lg-5 col-xl-4">
                     <div class="card booking-summary sticky-top" style="top: 1rem;">
                         <div class="card-header"><i class="fas fa-receipt mr-2"></i>Booking Summary</div>
                         <div class="card-body">
                             <dl class="summary-list">
                                 <dt>Field</dt>
                                 <dd id="summaryCourt">—</dd>
-
-                                <dt>Sport</dt>
-                                <dd id="summarySport">—</dd>
 
                                 <dt>Date</dt>
                                 <dd id="summaryDate">—</dd>
@@ -358,7 +367,10 @@
             let preselectedStart = @Html.Raw(System.Text.Json.JsonSerializer.Serialize((string)(ViewBag.PreselectedStart ?? "")));
 
             function formatMoney(n) {
-                return Number(n).toFixed(2);
+                return Number(n || 0).toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
             }
 
             function formatDate(d) {
@@ -383,8 +395,7 @@
                 const rateLabel = selectedSlot && selectedSlot.isMixed
                     ? "Mixed rates"
                     : formatMoney(rate) + " / hour" + (selectedSlot && selectedSlot.isPromo ? " (promo)" : "");
-                $("#summaryCourt").text(opt.text().split(" — ")[0] || "—");
-                $("#summarySport").text(sport || "—");
+                $("#summaryCourt").text($.trim(opt.text()) || "—");
                 $("#summaryDate").text(formatDate($date.val()));
                 $("#summaryDuration").text(hrs + (hrs === 1 ? " hour" : " hours"));
                 $("#summaryRate").text(rateLabel);

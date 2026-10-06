@@ -15,6 +15,15 @@
     var expiresAtText = payment?.CheckoutExpiresAtUtc is DateTime expiresAtUtc
         ? PhilippineTime.FromUtc(expiresAtUtc).ToString("h:mm tt")
         : null;
+    string TurfText(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return "";
+        return text
+            .Replace("Giuseppe Football Club", "CAMPO TURF", StringComparison.OrdinalIgnoreCase)
+            .Replace("Giuseppe Football Field", "CAMPO TURF Field", StringComparison.OrdinalIgnoreCase)
+            .Replace("Football Field", "Turf Field", StringComparison.OrdinalIgnoreCase)
+            .Replace("football field", "turf field", StringComparison.OrdinalIgnoreCase);
+    }
 }
 
 <section class="container py-4">
@@ -95,7 +104,7 @@
                                 <dt>Booking</dt>
                                 <dd><code>@refNo</code></dd>
                                 <dt>Field</dt>
-                                <dd>@Model.Court?.CourtName</dd>
+                                <dd>@TurfText(Model.Court?.CourtName)</dd>
                                 <dt>When</dt>
                                 <dd>
                                     @Model.BookingDate.ToString("ddd, MMM d")

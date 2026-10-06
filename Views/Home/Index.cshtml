@@ -1,318 +1,216 @@
 @model IEnumerable<CourtBookingSystem.Models.Court>
 @{
     ViewData["Title"] = "Home";
-    var settings = ViewBag.Settings as CourtBookingSystem.Models.Cms.WebsiteSetting
-        ?? new CourtBookingSystem.Models.Cms.WebsiteSetting();
     var hero = ViewBag.Hero as CourtBookingSystem.Models.Cms.HeroImage;
     var about = ViewBag.About as CourtBookingSystem.Models.Cms.AboutContent
         ?? new CourtBookingSystem.Models.Cms.AboutContent();
     var galleryItems = ViewBag.Gallery as List<CourtBookingSystem.Models.Cms.GalleryImage>
         ?? new List<CourtBookingSystem.Models.Cms.GalleryImage>();
-    var promoCards = ViewBag.Promotions as List<CourtBookingSystem.Models.Cms.Promotion>
-        ?? new List<CourtBookingSystem.Models.Cms.Promotion>();
 
-    var facilityLines = (about.FacilitiesList ?? "")
-        .Split('\n', StringSplitOptions.RemoveEmptyEntries)
-        .Select(s => s.Trim())
-        .Where(s => s.Length > 0)
+    var activeCourts = (Model ?? Enumerable.Empty<CourtBookingSystem.Models.Court>())
+        .Where(c => c.IsActive)
         .ToList();
-
+    var pricingRulesByCourt = ViewBag.PricingRulesByCourt as IDictionary<int, List<BookingPricingRule>>
+        ?? new Dictionary<int, List<BookingPricingRule>>();
     string ImageUrl(string path) => path.StartsWith("http", StringComparison.OrdinalIgnoreCase) || path.StartsWith("/")
         ? path
         : "/" + path;
-    string ImageAlt(CourtBookingSystem.Models.Cms.Promotion card) => string.IsNullOrWhiteSpace(card.ImageAlt)
-        ? $"{card.Title} promotion image"
-        : card.ImageAlt;
-    var minDate = PhilippineTime.Today.ToString("yyyy-MM-dd");
-    var maxDate = PhilippineTime.Today.AddYears(5).ToString("yyyy-MM-dd");
-    var announcement = promoCards.FirstOrDefault();
-    var showAnnouncementAction = announcement != null
-        && !string.IsNullOrWhiteSpace(announcement.ButtonLabel)
-        && !string.IsNullOrWhiteSpace(announcement.ButtonUrl);
-}
-
-@if (announcement != null)
-{
-    @section AnnouncementBar {
-        <div class="announcement-bar alert alert-warning alert-dismissible fade show mb-0 rounded-0 border-0" role="alert">
-            <div class="container">
-                <div class="announcement-inner">
-                    <div class="announcement-message">
-                        <span class="announcement-icon" aria-hidden="true">@Html.Raw(announcement.IconHtml)</span>
-                        <span><strong>@announcement.Title:</strong> @announcement.ImageAlt</span>
-                    </div>
-                    @if (showAnnouncementAction)
-                    {
-                        <a href="@announcement.ButtonUrl" class="btn btn-sm btn-primary announcement-action">@announcement.ButtonLabel</a>
-                    }
-                    <button type="button" class="close announcement-close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            </div>
-        </div>
+    string TurfText(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return "";
+        return text
+            .Replace("Giuseppe Football Club", "CAMPO TURF", StringComparison.OrdinalIgnoreCase)
+            .Replace("Giuseppe Football Field", "CAMPO TURF Field", StringComparison.OrdinalIgnoreCase)
+            .Replace("Football Field", "Turf Field", StringComparison.OrdinalIgnoreCase)
+            .Replace("football field", "turf field", StringComparison.OrdinalIgnoreCase)
+            .Replace("(Football + Caf\u00e9)", "", StringComparison.OrdinalIgnoreCase);
+    }
+    string RuleWindow(BookingPricingRule rule) =>
+        $"{PhilippineTime.FormatTime(rule.StartTime)} - {PhilippineTime.FormatTime(rule.EndTime)}";
+    string RuleDates(BookingPricingRule rule)
+    {
+        if (!rule.IsPromotional) return "All dates";
+        if (rule.EffectiveStartDate.HasValue && rule.EffectiveEndDate.HasValue)
+        {
+            return rule.EffectiveStartDate.Value.Date == rule.EffectiveEndDate.Value.Date
+                ? rule.EffectiveStartDate.Value.ToString("MMM d, yyyy")
+                : $"{rule.EffectiveStartDate.Value:MMM d, yyyy} - {rule.EffectiveEndDate.Value:MMM d, yyyy}";
+        }
+        if (rule.EffectiveStartDate.HasValue) return $"From {rule.EffectiveStartDate.Value:MMM d, yyyy}";
+        if (rule.EffectiveEndDate.HasValue) return $"Until {rule.EffectiveEndDate.Value:MMM d, yyyy}";
+        return "Promo dates";
+    }
+    string GalleryIcon(string? title)
+    {
+        var text = (title ?? "").ToLowerInvariant();
+        if (text.Contains("eat") || text.Contains("food") || text.Contains("cafe") || text.Contains("lounge"))
+        {
+            return "fas fa-utensils";
+        }
+        if (text.Contains("training") || text.Contains("session"))
+        {
+            return "fas fa-dumbbell";
+        }
+        if (text.Contains("match") || text.Contains("game"))
+        {
+            return "fas fa-futbol";
+        }
+        return "fas fa-border-all";
     }
 }
 
 <!-- ============ HERO ============ -->
-<section class="hero-section hero-image home-hero" data-testid="hero-section"
+<section class="hero-section hero-image home-hero campo-home-hero" data-testid="hero-section"
          style="@(hero != null ? $"background-image: url('{(hero.ImagePath.StartsWith("http") ? hero.ImagePath : "/" + hero.ImagePath)}');" : "")">
     <div class="hero-overlay"></div>
-</section>
-
-<!-- ============ HERO INTRO / QUICK BOOKING ============ -->
-<section class="section-light home-hero-content">
-    <div class="container">
-        <div id="booking-search" class="quick-widget-section">
-            <div class="quick-widget">
-                <h5 class="quick-widget-title">
-                    <i class="fas fa-search-location mr-2"></i>Find Available Fields &amp; Times
-                </h5>
-                <form asp-controller="Availability" asp-action="Find" method="get" class="quick-widget-form">
-                    <div class="form-row align-items-end">
-                        <div class="form-group col-md-3">
-                            <label for="sport" class="quick-label">Sport</label>
-                            <select name="sport" id="sport" class="form-control">
-                                @foreach (var s in Enum.GetValues<SportType>())
-                                {
-                                    <option value="@s">@s</option>
-                                }
-                            </select>
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label for="date" class="quick-label">Date</label>
-                            <input type="date" name="date" id="date" class="form-control"
-                                   value="@minDate" min="@minDate" max="@maxDate" />
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label for="durationHours" class="quick-label">Duration</label>
-                            <select name="durationHours" id="durationHours" class="form-control">
-                                @for (var hours = 1; hours <= 8; hours++)
-                                {
-                                    <option value="@hours">@(hours == 1 ? "1 hour" : $"{hours} hours")</option>
-                                }
-                            </select>
-                        </div>
-                        <div class="form-group col-md-3">
-                            <button type="submit" class="btn btn-primary btn-block btn-lg quick-search-btn">
-                                <i class="fas fa-search mr-1"></i>Find Available Field Times
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <div class="row justify-content-center text-center home-intro-copy">
-            <div class="col-xl-9 col-lg-10">
-                <div class="home-intro-panel">
-                    <div class="home-brand-mark">
-                        @if (!string.IsNullOrEmpty(settings.NavbarLogoPath))
-                        {
-                            <img src="@(settings.NavbarLogoPath.StartsWith("http") ? settings.NavbarLogoPath : "/" + settings.NavbarLogoPath)"
-                                 alt="@settings.WebsiteName logo"
-                                 class="home-brand-logo" />
-                        }
-                        else
-                        {
-                            <span class="home-brand-logo-fallback">
-                                <i class="fas fa-calendar-check"></i>
-                            </span>
-                        }
-                    </div>
-                    <div class="home-intro-tagline text-primary" data-testid="hero-eyebrow">
-                        <span class="home-intro-tagline-text">Your Game Starts Here</span>
-                        <span class="home-intro-open">Open Daily</span>
-                    </div>
-                    <h1 class="hero-title text-dark mb-3" data-testid="hero-title">
-                        Giuseppe Football
-                    </h1>
-                    <p class="hero-subtitle text-muted mx-auto mb-4" data-testid="hero-subtitle">
-                        Book your preferred field and playing time online in just a few steps.
-                    </p>
-                    <div class="home-intro-highlights" aria-label="Booking highlights">
-                        <div class="home-intro-highlight">
-                            <span class="home-highlight-icon">
-                                <i class="fas fa-bolt"></i>
-                            </span>
-                            <span>Quick Online Booking</span>
-                        </div>
-                        <div class="home-intro-highlight">
-                            <span class="home-highlight-icon">
-                                <i class="fas fa-trophy"></i>
-                            </span>
-                            <span>Budget-Friendly Prices</span>
-                        </div>
-                        <div class="home-intro-highlight">
-                            <span class="home-highlight-icon">
-                                <i class="fas fa-parking"></i>
-                            </span>
-                            <span>Convenient Parking</span>
-                        </div>
-                    </div>
-                </div>
+    <div class="container hero-content">
+        <div class="row">
+            <div class="col-lg-7 col-xl-6">
+                <div class="hero-eyebrow campo-hero-eyebrow">CAMPO TURF</div>
+                <h1 class="hero-title mb-3" data-testid="hero-title">Play Your <span>Game.</span></h1>
+                <p class="hero-subtitle mb-4" data-testid="hero-subtitle">A multi-purpose sports turf for teams, schools, and community play.</p>
+                <a asp-controller="Availability" asp-action="Find" class="btn btn-primary btn-lg hero-book-btn">
+                    Book a Turf <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+        @*         <div class="campo-hero-notes" aria-label="Venue highlights">
+                    <span>Hourly reservations</span>
+                    <span>Multi-purpose turf field</span>
+                    <span>Easy online booking</span>
+                </div> *@
             </div>
         </div>
     </div>
 </section>
 
-<!-- ============ PROMOTIONS AND EVENTS ============ -->
-<section id="promos" class="section-default promos-section">
+<div class="campo-home-main-sections">
+<!-- ============ RATES ============ -->
+<section id="rates" class="section-default campo-rates-section">
     <div class="container">
-        <div class="section-header text-center mb-4">
-            <span class="section-eyebrow">Promotions &amp; Events</span>
-            <h2>What's Happening at Giuseppe Football</h2>
-            <p class="text-muted">Stay updated with our latest promotions, tournaments, and facility announcements.</p>
-        </div>
-
-        @if (promoCards.Any())
-        {
-            <div class="row justify-content-center">
-                @foreach (var card in promoCards)
-                {
-                    <div class="col-12 col-md-6 col-lg-4 mb-4">
-                        <div class="card promo-card h-100">
-                            <div class="promo-image-wrap">
-                                <img src="@ImageUrl(card.ImagePath)" alt="@ImageAlt(card)" class="promo-image" loading="lazy" />
-                                <span class="promo-type">@card.AnnouncementType</span>
-                            </div>
-                            <div class="card-body d-flex flex-column">
-                                <div class="promo-card-heading">
-                                    <span class="promo-card-icon" aria-hidden="true">@Html.Raw(card.IconHtml)</span>
-                                    <h5 class="card-title mb-0">@card.Title</h5>
-                                </div>
-                                <p class="card-text text-muted">@card.Description</p>
-                                <a href="@card.ButtonUrl" class="btn btn-outline-primary mt-auto align-self-start">
-                                    @card.ButtonLabel <i class="fas fa-arrow-right ml-1"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
-        }
-    </div>
-</section>
-
-<!-- ============ ABOUT GIUSEPPE FOOTBALL ============ -->
-<section id="about" class="section-light" data-testid="section-about">
-    <div class="container">
-        <div class="section-header text-center mb-4">
-            <span class="section-eyebrow">About Us</span>
-            <h2 data-testid="about-title">@about.Title</h2>
-            <p class="lead mx-auto" style="max-width: 760px;" data-testid="about-description">
-                @about.Description
-            </p>
-        </div>
-
         <div class="row justify-content-center">
-            <!-- Facilities -->
-            <div class="col-lg-8 mb-4">
-                <div class="card about-card h-100">
-                    <div class="card-body">
-                        <div class="about-card-header">
-                            <div class="about-icon about-icon-accent"><i class="fas fa-building"></i></div>
-                            <h4 class="mb-0">Facilities</h4>
-                        </div>
-                        <ul class="about-list two-col" data-testid="about-facilities">
-                            @foreach (var facility in facilityLines)
-                            {
-                                <li><i class="fas fa-check about-bullet text-success"></i>@facility</li>
-                            }
-                        </ul>
-                    </div>
+            <div class="col-lg-10 col-xl-10">
+                <div class="section-header text-center mb-4">
+                    <span class="section-eyebrow">Rates</span>
+                    <h2>Hourly Rates</h2>
+                @*     <p class="text-muted mb-0">Pricing rules are shown from the backend configuration.</p> *@
                 </div>
-            </div>
-        </div>
 
-        <!-- Info cards row -->
-        <div class="row mt-2 justify-content-center">
-            <div class="col-6 col-lg-3 mb-3">
-                <div class="info-card h-100">
-                    <div class="info-icon"><i class="fas fa-clock"></i></div>
-                    <h6 class="info-title">Opening Hours</h6>
-                    <p class="info-text mb-0">
-                        @(about.OpeningHoursDays ?? "Mon – Sun")<br />
-                        <strong data-testid="about-hours">@(about.OpeningHoursTimes ?? "8:00 AM – 10:00 PM")</strong>
-                    </p>
-                </div>
-            </div>
-            <div class="col-6 col-lg-3 mb-3">
-                <div class="info-card h-100">
-                    <div class="info-icon"><i class="fas fa-phone"></i></div>
-                    <h6 class="info-title">Contact Number</h6>
-                    <p class="info-text mb-0">
-                        <strong data-testid="about-phone">@(about.ContactPhone ?? "")</strong><br />
-                        <span class="small text-muted">Hotline</span>
-                    </p>
-                </div>
-            </div>
-           @*  <div class="col-6 col-lg-3 mb-3">
-                <div class="info-card h-100">
-                    <div class="info-icon"><i class="fas fa-envelope"></i></div>
-                    <h6 class="info-title">Email Address</h6>
-                    <p class="info-text mb-0">
-                        <strong data-testid="about-email">@(about.ContactEmail ?? "")</strong><br />
-                        <span class="small text-muted">We reply within 1 hr</span>
-                    </p>
-                </div>
-            </div> *@
-
-            <div class="col-6 col-lg-3 mb-3">
-                <div class="info-card h-100">
-                    <div class="info-icon"><i class="fab fa-facebook-f"></i></div>
-                    <h6 class="info-title">Facebook Page</h6>
-                    <p class="info-text mb-0">
-                        <a href="https://www.facebook.com/CampoGFC/"
-                           target="_blank"
-                           rel="noopener noreferrer"
-                           data-testid="about-facebook">
-                            Giuseppe Football
-                        </a><br />
-                        <span class="small text-muted">Follow us for updates</span>
-                    </p>
-                </div>
-            </div>
-            <div class="col-6 col-lg-3 mb-3">
-                <div class="info-card h-100">
-                    <div class="info-icon"><i class="fas fa-location-dot"></i></div>
-                    <h6 class="info-title">Location</h6>
-                    <p class="info-text mb-0">
-                        <strong data-testid="about-location">@(about.Location ?? "")</strong>
-                    </p>
+                <div class="campo-rate-card campo-rate-simple">
+                    @if (activeCourts.Any())
+                    {
+                        @foreach (var court in activeCourts)
+                        {
+                            var pricingRules = pricingRulesByCourt.TryGetValue(court.Id, out var configuredRules)
+                                ? configuredRules
+                                : new List<BookingPricingRule>();
+                            <div class="campo-rate-row">
+                                <div class="campo-rate-copy">
+                                    <span class="court-sport-tag">Turf Field</span>
+                                    <h3>@TurfText(court.CourtName)</h3>
+                                    @if (!string.IsNullOrWhiteSpace(court.Description))
+                                    {
+                                        <p>@TurfText(court.Description)</p>
+                                    }
+                                </div>
+                                <div class="campo-rate-rules" aria-label="Pricing rules for @TurfText(court.CourtName)">
+                                    @if (pricingRules.Any())
+                                    {
+                                        @foreach (var rule in pricingRules)
+                                        {
+                                            <div class="campo-rate-rule">
+                                                <div class="campo-rate-rule-main">
+                                                    <span class="campo-rate-rule-type @(rule.IsPromotional ? "is-promo" : "")">
+                                                        @(rule.IsPromotional ? "Promo" : "Regular")
+                                                    </span>
+                                                    <strong>@rule.Name</strong>
+                                                    <span>@RuleWindow(rule)</span>
+                                                    <span>@RuleDates(rule)</span>
+                                                </div>
+                                                <div class="campo-rate-rule-price">
+                                                    <span>PHP</span> @rule.HourlyRate.ToString("N2") <small>/ hour</small>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="campo-rate-rule">
+                                            <div class="campo-rate-rule-main">
+                                                <span class="campo-rate-rule-type">Base</span>
+                                                <strong>Standard rate</strong>
+                                                <span>All operating hours</span>
+                                                <span>Fallback court rate</span>
+                                            </div>
+                                            <div class="campo-rate-rule-price">
+                                                <span>PHP</span> @court.HourlyRate.ToString("N2") <small>/ hour</small>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center mb-0">Rates will appear here when turf information is available.</p>
+                    }
+                    <a asp-controller="Availability" asp-action="Find" class="btn btn-primary btn-block mt-4">Book a Turf</a>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
+<!-- ============ ACTIVITIES ============ -->
+@* <section id="activities" class="section-default campo-activities-section" data-testid="section-activities">
+    <div class="container">
+        <div class="section-header text-center mb-4">
+            <span class="section-eyebrow">Activities</span>
+            <h2>Built for More Than One Game</h2>
+            <p class="text-muted mb-0">CAMPO TURF is a multi-purpose sports turf for organized play, school sessions, and community events.</p>
+        </div>
+
+        <div class="campo-activities-grid" aria-label="Supported activities">
+            <div class="campo-activity-item"><i class="fas fa-futbol"></i><span>Football</span></div>
+            <div class="campo-activity-item"><i class="fas fa-compact-disc"></i><span>Ultimate Frisbee</span></div>
+            <div class="campo-activity-item"><i class="fas fa-flag"></i><span>Flag Football</span></div>
+            <div class="campo-activity-item"><i class="fas fa-football"></i><span>Rugby</span></div>
+            <div class="campo-activity-item"><i class="fas fa-school"></i><span>School PE Activities</span></div>
+            <div class="campo-activity-item"><i class="fas fa-people-group"></i><span>Community Games &amp; Sports Days</span></div>
+            <div class="campo-activity-item"><i class="fas fa-plus"></i><span>Others</span></div>
+        </div>
+    </div>
+</section> *@
+
+<div class="campo-gallery-contact-wrap">
 <!-- ============ GALLERY ============ -->
-<section id="gallery" class="section-default" data-testid="section-gallery">
+<section id="facilities" class="section-default campo-gallery-section" data-testid="section-gallery">
     <div class="container">
         <div class="section-header text-center mb-4">
             <span class="section-eyebrow">Take a look</span>
             <h2>Gallery</h2>
-            <p class="text-muted">A peek inside the fields, the lounge, and the action.</p>
+            <p class="text-muted">A peek inside the turf field, the lounge, and the action.</p>
         </div>
 
         <div class="row">
             @foreach (var item in galleryItems)
             {
-                <div class="col-12 col-sm-6 col-lg-3 mb-4">
+                <div class="col-12 col-md-6 mb-4">
                     <div class="gallery-card" data-testid="gallery-card-@item.Id">
                         <div class="gallery-image-wrap">
-                            <img src="@(item.ImagePath.StartsWith("http") ? item.ImagePath : "/" + item.ImagePath)"
-                                 alt="@item.Title" loading="lazy" class="gallery-image" />
+                            <img src="@ImageUrl(item.ImagePath)" alt="@TurfText(item.Title)" loading="lazy" />
                             <div class="gallery-overlay">
                                 <i class="fas fa-search-plus"></i>
                             </div>
                         </div>
                         <div class="gallery-body">
-                            <h6 class="gallery-title">@item.Title</h6>
-                            @if (!string.IsNullOrWhiteSpace(item.Caption))
-                            {
-                                <p class="gallery-caption">@item.Caption</p>
-                            }
+                            <span class="gallery-card-icon" aria-hidden="true"><i class="@GalleryIcon(item.Title)"></i></span>
+                            <div class="gallery-copy">
+                                <h6 class="gallery-title">@TurfText(item.Title)</h6>
+                                @if (!string.IsNullOrWhiteSpace(item.Caption))
+                                {
+                                    <p class="gallery-caption">@TurfText(item.Caption)</p>
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -321,3 +219,51 @@
     </div>
 </section>
 
+<!-- ============ CONTACT ============ -->
+<section id="contact" class="section-light campo-contact-section" data-testid="section-about">
+    <div class="container">
+        <div class="section-header text-center mb-4">
+            <span class="section-eyebrow">Contact</span>
+            <h2>Visit CAMPO TURF</h2>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-4 mb-3">
+                <div class="campo-contact-item">
+                    <div class="campo-contact-icon"><i class="far fa-clock"></i></div>
+                    <div>
+                        <h3>Opening Hours</h3>
+                        <p class="mb-0">
+                            @(about.OpeningHoursDays ?? "Mon - Sun")<br />
+                            <strong data-testid="about-hours">@(about.OpeningHoursTimes ?? "8:00 AM - 10:00 PM")</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="campo-contact-item">
+                    <div class="campo-contact-icon"><i class="fas fa-phone"></i></div>
+                    <div>
+                        <h3>Contact Number</h3>
+                        <p class="mb-0">
+                            <strong data-testid="about-phone">@(about.ContactPhone ?? "")</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="campo-contact-item">
+                    <div class="campo-contact-icon"><i class="fas fa-location-dot"></i></div>
+                    <div>
+                        <h3>Location</h3>
+                        <p class="mb-0">
+                            <strong data-testid="about-location">@TurfText(about.Location)</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</div>
+</div>
