@@ -17,7 +17,7 @@ namespace CourtBookingSystem.Controllers
             ViewBag.Sport = sport ?? SportType.Football;
             ViewBag.Date = (date ?? PhilippineTime.Today).ToString("yyyy-MM-dd");
             ViewBag.Duration = durationHours.HasValue && durationHours.Value is >= 1 and <= 8 ? durationHours.Value : 1;
-            ViewBag.MinDate = PhilippineTime.Today.ToString("yyyy-MM-dd");
+            ViewBag.MinDate = PhilippineTime.Today.AddDays(-1).ToString("yyyy-MM-dd");
             ViewBag.MaxDate = PhilippineTime.Today.AddYears(5).ToString("yyyy-MM-dd");
             return View();
         }
@@ -38,6 +38,8 @@ namespace CourtBookingSystem.Controllers
                     courtName = r.CourtName,
                     sportType = r.SportType.ToString(),
                     date = r.Date.ToString("yyyy-MM-dd"),
+                    startDate = r.StartDateTime.ToString("yyyy-MM-dd"),
+                    endDate = r.EndDateTime.ToString("yyyy-MM-dd"),
                     startTime = r.StartTime.ToString(@"hh\:mm\:ss"),
                     endTime = r.EndTime.ToString(@"hh\:mm\:ss"),
                     startLabel = PhilippineTime.FormatTime(r.StartTime),

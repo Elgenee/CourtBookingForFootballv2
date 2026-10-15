@@ -10,39 +10,47 @@ namespace CourtBookingSystem.Services
     //   Pending → ForApproval → Confirmed → Completed
     //                                    ↘ Cancelled
     //
-    // "Booking date passes" is modelled as an on-read auto-transition rather
+    // "Booking end passes" is modelled as an on-read auto-transition rather
     // than a background job to keep deployment simple for small/medium centers.
     // Dashboards and listings call AutoCompletePastBookingsAsync so any
     // Confirmed booking whose end time is in the past flips to Completed.
     public static class BookingStatusHelper
     {
-        public static async Task<int> AutoCompletePastBookingsAsync(ApplicationDbContext db)
+        public static async Task<int> AutoCompletePastBookingsAsync(ApplicationDbContext db, TimeProvider? timeProvider = null)
         {
-            var now = PhilippineTime.Now;
-            var nowDate = now.Date;
-            var nowTime = now.TimeOfDay;
+            var now = PhilippineTime.FromUtc((timeProvider ?? TimeProvider.System).GetUtcNow().UtcDateTime);
+            var tomorrow = now.Date.AddDays(1);
 
-            // First sweep: any Confirmed booking on a previous day.
-            var pastDayConfirmed = await db.Bookings
-                .Where(b => b.BookingStatus == BookingStatus.Confirmed && b.BookingDate < nowDate)
+            // Keep TimeSpan calculations in memory for SQL Server/SQLite compatibility.
+            var candidates = await db.Bookings
+                .Where(b => b.BookingStatus == BookingStatus.Confirmed && b.BookingDate < tomorrow)
                 .ToListAsync();
 
-            // Second sweep: today's Confirmed bookings whose end time has passed.
-            var endedToday = await db.Bookings
-                .Where(b => b.BookingStatus == BookingStatus.Confirmed && b.BookingDate == nowDate)
-                .ToListAsync();
-            var todayPast = endedToday.Where(b => b.EndTime <= nowTime).ToList();
+            if (candidates.Count == 0)
+            {
+                return 0;
+            }
+
+            var businessHours = await db.BusinessHours
+                .AsNoTracking()
+                .ToDictionaryAsync(h => h.DayOfWeek);
 
             var changed = 0;
-            foreach (var b in pastDayConfirmed)
+            foreach (var b in candidates)
             {
-                b.BookingStatus = BookingStatus.Completed;
-                changed++;
-            }
-            foreach (var b in todayPast)
-            {
-                b.BookingStatus = BookingStatus.Completed;
-                changed++;
+                // BookingDate is the operating date: after-midnight starts can
+                // belong to the next calendar day, just as during booking creation.
+                var start = businessHours.TryGetValue(b.BookingDate.DayOfWeek, out var hours)
+                    ? OperatingHoursHelper.ToOperatingDateTime(b.BookingDate, hours, b.StartTime)
+                    : b.BookingDate.Date.Add(b.StartTime);
+
+                // 11 PM to 12 AM ends at midnight on the following day.
+                var end = start.Add(OperatingHoursHelper.GetDuration(b.StartTime, b.EndTime));
+                if (end <= now)
+                {
+                    b.BookingStatus = BookingStatus.Completed;
+                    changed++;
+                }
             }
 
             if (changed > 0)
