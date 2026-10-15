@@ -5,6 +5,8 @@ using CourtBookingSystem.Services;
 using Microsoft.Data.Sqlite;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace CourtBookingSystem.Data
 {
@@ -36,6 +38,7 @@ namespace CourtBookingSystem.Data
                 await RemapLegacyStatusesAsync(db);
                 await EnsureSqliteCmsSchemaAsync(db);
                 await EnsureSqlitePartialPaymentSchemaAsync(db);
+                await ApplySqliteOperatingHoursAsync(db);
             }
             else
             {
@@ -175,8 +178,8 @@ namespace CourtBookingSystem.Data
         {
             if (await db.BusinessHours.AnyAsync()) return;
 
-            var open = new TimeSpan(8, 0, 0);
-            var close = new TimeSpan(22, 0, 0);
+            var open = OperatingHoursHelper.DefaultOpenTime;
+            var close = OperatingHoursHelper.DefaultCloseTime;
 
             var hours = Enum.GetValues<DayOfWeek>()
                 .Select(d => new BusinessHour
@@ -189,6 +192,25 @@ namespace CourtBookingSystem.Data
 
             await db.BusinessHours.AddRangeAsync(hours);
             await db.SaveChangesAsync();
+        }
+
+        // SQLite uses EnsureCreated rather than the SQL Server migration chain.
+        // Record this data upgrade once so later admin edits survive restarts.
+        private static async Task ApplySqliteOperatingHoursAsync(ApplicationDbContext db)
+        {
+            var history = db.GetService<IHistoryRepository>();
+            await db.Database.ExecuteSqlRawAsync(history.GetCreateIfNotExistsScript());
+            if ((await history.GetAppliedMigrationsAsync())
+                .Any(m => m.MigrationId == Migrations.ExtendOperatingHours.MigrationId))
+            {
+                return;
+            }
+
+            await using var transaction = await db.Database.BeginTransactionAsync();
+            await db.Database.ExecuteSqlRawAsync(Migrations.ExtendOperatingHours.UpdateSql);
+            await db.Database.ExecuteSqlRawAsync(history.GetInsertScript(
+                new HistoryRow(Migrations.ExtendOperatingHours.MigrationId, "8.0.0")));
+            await transaction.CommitAsync();
         }
 
         private static async Task SeedCourtsAsync(ApplicationDbContext db)
@@ -451,7 +473,7 @@ namespace CourtBookingSystem.Data
                 ContactEmail = "hello@campoturf.ph",
                 Location = "CAMPO TURF Sanchez Compound Banilad 6000 Cebu (PH)",
                 OpeningHoursDays = "Mon – Sun",
-                OpeningHoursTimes = "5:00 AM – 12:00 AM",
+                OpeningHoursTimes = "6:00 AM – 4:00 AM (next day)",
                 UpdatedDate = DateTime.UtcNow
             });
             await db.SaveChangesAsync();
@@ -615,7 +637,7 @@ namespace CourtBookingSystem.Data
                     about.ContactEmail = "hello@campoturf.ph";
                     about.Location = "CAMPO TURF Sanchez Compound Banilad 6000 Cebu (PH)";
                     about.OpeningHoursDays = string.IsNullOrWhiteSpace(about.OpeningHoursDays) ? "Mon – Sun" : about.OpeningHoursDays;
-                    about.OpeningHoursTimes = "5:00 AM – 12:00 AM";
+                    about.OpeningHoursTimes = "6:00 AM – 4:00 AM (next day)";
                     about.UpdatedDate = now;
                 }
             }

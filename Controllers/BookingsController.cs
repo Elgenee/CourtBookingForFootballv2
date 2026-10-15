@@ -803,6 +803,8 @@ namespace CourtBookingSystem.Controllers
                 {
                     StartTime = s.Start.ToString(@"hh\:mm\:ss"),
                     EndTime = s.End.ToString(@"hh\:mm\:ss"),
+                    StartDate = s.StartDateTime.ToString("yyyy-MM-dd"),
+                    EndDate = s.EndDateTime.ToString("yyyy-MM-dd"),
                     Label = $"{FormatTime(s.Start)} – {FormatTime(s.End)}",
                     IsAvailable = s.IsAvailable,
                     Reason = s.Reason,

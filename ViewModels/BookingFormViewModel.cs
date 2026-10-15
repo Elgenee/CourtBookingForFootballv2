@@ -65,6 +65,8 @@ namespace CourtBookingSystem.ViewModels
     {
         public string StartTime { get; set; } = string.Empty;  // "HH:mm:ss" — used as form value
         public string EndTime { get; set; } = string.Empty;
+        public string StartDate { get; set; } = string.Empty;
+        public string EndDate { get; set; } = string.Empty;
         public string Label { get; set; } = string.Empty;      // "8:00 AM – 9:00 AM" — display
         public bool IsAvailable { get; set; }
         public string? Reason { get; set; }                    // "Booked", "Blocked", "Past"

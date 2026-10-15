@@ -6,6 +6,7 @@
     <form asp-action="Index" method="post">
         @Html.AntiForgeryToken()
         <div class="card-body p-0">
+            <p class="text-muted small m-3">When the closing time is earlier than the opening time, closing is on the next day. For example, 6:00 AM to 4:00 AM covers one operating day.</p>
             <div asp-validation-summary="All" class="alert alert-danger m-3 mb-0" role="alert"></div>
             <div class="table-responsive"> 
             <table class="table mb-0">
@@ -24,6 +25,10 @@
                         </td>
                         <td>
                             <input type="time" asp-for="Days[i].CloseTime" class="form-control form-control-sm" />
+                            @if (Model.Days[i].CloseTime < Model.Days[i].OpenTime)
+                            {
+                                <small class="text-muted">Next day</small>
+                            }
                         </td>
                         <td class="text-center align-middle">
                             <div class="custom-control custom-switch">

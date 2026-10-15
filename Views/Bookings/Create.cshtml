@@ -3,7 +3,7 @@
 @inject Microsoft.Extensions.Options.IOptions<CourtBookingSystem.Services.FootballPaymentOptions> FootballPaymentOptions
 @{
     ViewData["Title"] = "Book a Turf";
-    var minDate = PhilippineTime.Today.ToString("yyyy-MM-dd");
+    var minDate = PhilippineTime.Today.AddDays(-1).ToString("yyyy-MM-dd");
     var maxDate = PhilippineTime.Today.AddYears(5).ToString("yyyy-MM-dd");
     var qrExpiryMinutes = (int)CourtBookingSystem.Services.PayMongoQrPhExpiryService.CheckoutLifetime.TotalMinutes;
     var showPayMongoNote = Model.PaymentMethod == PaymentMethod.PayMongoQrPh;
@@ -72,11 +72,12 @@
                                 <input asp-for="BookingDate" type="date" class="form-control" id="BookingDate"
                                        min="@minDate" max="@maxDate" />
                                 <span asp-validation-for="BookingDate" class="text-danger small"></span>
+                                <small class="form-text text-muted">Choose the operating date. Slots after midnight belong to the following calendar day; for an early-morning booking today, select yesterday.</small>
                             </div>
 
                             <div class="form-group">
                                 <label>Available Time Slots</label>
-                                <div id="slotsContainer" class="slot-grid">
+                                <div id="slotsContainer">
                                     <div class="text-muted small">Pick a field, date, and duration to see available slots.</div>
                                 </div>
                                 <input type="hidden" asp-for="StartTime" id="StartTime" />
@@ -362,6 +363,29 @@
             const reservationFeePercent = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(reservationFeePercent));
 
             let selectedSlot = null;
+            const periods = [
+                { key: 'morning', label: 'Morning', icon: 'fa-sun' },
+                { key: 'afternoon', label: 'Afternoon', icon: 'fa-cloud-sun' },
+                { key: 'evening', label: 'Evening', icon: 'fa-cloud-moon' },
+                { key: 'late-night', label: 'Late Night', icon: 'fa-moon' }
+            ];
+
+            function periodKey(slot) {
+                const hour = parseInt(slot.startTime.split(':')[0], 10);
+                if (hour >= 6 && hour < 12) return 'morning';
+                if (hour >= 12 && hour < 18) return 'afternoon';
+                if (hour >= 18 && hour < 22) return 'evening';
+                return 'late-night';
+            }
+
+            function dayNote(slot) {
+                const operatingDate = $date.val();
+                const label = value => new Date(value + 'T00:00:00')
+                    .toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                if (slot.startDate && slot.startDate > operatingDate) return 'Next day · ' + label(slot.startDate);
+                if (slot.endDate && slot.endDate > operatingDate) return 'Ends next day · ' + label(slot.endDate);
+                return '';
+            }
 
             // Capture preselected time from the query string, when present.
             let preselectedStart = @Html.Raw(System.Text.Json.JsonSerializer.Serialize((string)(ViewBag.PreselectedStart ?? "")));
@@ -405,7 +429,9 @@
                 $("#summaryRemainingBalance").text(formatMoney(remainingBalance));
                 $("#footballPaymentAmountOptions").toggle(isFootball && isPayMongo);
                 $("#summaryRemainingAfterPayment").toggle(isReservationOnly && remainingBalance > 0);
-                $("#summaryTime").text(selectedSlot ? selectedSlot.label : "—");
+                $("#summaryTime").text(selectedSlot
+                    ? selectedSlot.label + (selectedSlot.dayNote ? ' · ' + selectedSlot.dayNote : '')
+                    : "—");
                 $("#paymongoExpiryNote, #summaryPayMongoExpiryNote").toggle(isPayMongo);
                 $submit.prop("disabled", !selectedSlot || !$paymentMethod.filter(":checked").length || !$acceptedTerms.is(":checked"));
             }
@@ -420,22 +446,44 @@
                     $slots.append('<div class="text-muted small">No slots in this window.</div>');
                     return;
                 }
-                payload.slots.forEach(function (s) {
-                    const rateClass = s.isMixedRate ? " slot-mixed" : (s.isPromoRate ? " slot-promo" : "");
-                    const cls = (s.isAvailable ? "slot-btn" : "slot-btn slot-unavailable") + rateClass;
-                    const title = s.reason ? ' title="' + s.reason + '"' : '';
-                    const badge = s.isMixedRate
-                        ? '<span class="slot-rate-badge">Mixed</span>'
-                        : (s.isPromoRate ? '<span class="slot-rate-badge">Promo</span>' : '');
-                    const $b = $('<button type="button" class="' + cls + '"' + title + '><span class="slot-time">' + s.label + '</span>' + badge + '</button>');
-                    $b.data("start", s.startTime);
-                    $b.data("label", s.label);
-                    $b.data("rate", s.hourlyRate);
-                    $b.data("total", s.totalAmount);
-                    $b.data("promo", s.isPromoRate);
-                    $b.data("mixed", s.isMixedRate);
-                    if (!s.isAvailable) $b.attr("disabled", "disabled");
-                    $slots.append($b);
+                periods.forEach(function (period) {
+                    const slots = payload.slots.filter(s => periodKey(s) === period.key);
+                    if (slots.length === 0) return;
+
+                    const $section = $('<section>', {
+                        class: 'availability-period availability-period-' + period.key,
+                        'aria-label': period.label
+                    });
+                    const $heading = $('<div>', { class: 'availability-period-heading' });
+                    $('<h3>', { class: 'availability-period-title' })
+                        .append($('<i>', { class: 'fas ' + period.icon, 'aria-hidden': 'true' }))
+                        .append(document.createTextNode(period.label))
+                        .appendTo($heading);
+                    $('<span>', { class: 'availability-period-count' })
+                        .text(slots.filter(s => s.isAvailable).length + ' available')
+                        .appendTo($heading);
+                    const $grid = $('<div>', { class: 'slot-grid' });
+                    slots.forEach(function (s) {
+                        const rateClass = s.isMixedRate ? " slot-mixed" : (s.isPromoRate ? " slot-promo" : "");
+                        const cls = (s.isAvailable ? "slot-btn" : "slot-btn slot-unavailable") + rateClass;
+                        const note = dayNote(s);
+                        const $b = $('<button>', { type: 'button', class: cls, disabled: !s.isAvailable });
+                        if (s.reason) $b.attr('title', s.reason);
+                        $('<span>', { class: 'slot-time', text: s.label }).appendTo($b);
+                        if (s.isMixedRate || s.isPromoRate) {
+                            $('<span>', { class: 'slot-rate-badge', text: s.isMixedRate ? 'Mixed' : 'Promo' }).appendTo($b);
+                        }
+                        if (note) $('<span>', { class: 'availability-day-note', text: note }).appendTo($b);
+                        $b.data("start", s.startTime);
+                        $b.data("label", s.label);
+                        $b.data("dayNote", note);
+                        $b.data("rate", s.hourlyRate);
+                        $b.data("total", s.totalAmount);
+                        $b.data("promo", s.isPromoRate);
+                        $b.data("mixed", s.isMixedRate);
+                        $grid.append($b);
+                    });
+                    $section.append($heading, $grid).appendTo($slots);
                 });
             }
 
@@ -478,6 +526,7 @@
                 selectedSlot = {
                     start: $(this).data("start"),
                     label: $(this).data("label"),
+                    dayNote: $(this).data("dayNote"),
                     rate: parseFloat($(this).data("rate")) || 0,
                     total: parseFloat($(this).data("total")) || 0,
                     isPromo: $(this).data("promo") === true,

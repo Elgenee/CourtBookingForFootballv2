@@ -1,6 +1,7 @@
 using CourtBookingSystem.Areas.Admin.ViewModels;
 using CourtBookingSystem.Data;
 using CourtBookingSystem.Models;
+using CourtBookingSystem.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -28,8 +29,8 @@ namespace CourtBookingSystem.Areas.Admin.Controllers
                     _db.BusinessHours.Add(new BusinessHour
                     {
                         DayOfWeek = d,
-                        OpenTime = new TimeSpan(8, 0, 0),
-                        CloseTime = new TimeSpan(22, 0, 0),
+                        OpenTime = OperatingHoursHelper.DefaultOpenTime,
+                        CloseTime = OperatingHoursHelper.DefaultCloseTime,
                         IsClosed = false
                     });
                 }

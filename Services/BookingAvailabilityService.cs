@@ -39,7 +39,9 @@ namespace CourtBookingSystem.Services
             decimal HourlyRate,
             decimal TotalAmount,
             bool IsPromoRate,
-            bool IsMixedRate);
+            bool IsMixedRate,
+            DateTime StartDateTime,
+            DateTime EndDateTime);
 
         // For one specific court — used by Bookings/Create slot grid.
         public async Task<List<TimeSlot>> GenerateSlotsForCourtAsync(int courtId, DateTime date, int durationHours)
@@ -117,7 +119,8 @@ namespace CourtBookingSystem.Services
                     results.Add(new AvailableSlotRow(
                         court.Id, court.CourtName, court.SportType,
                         date.Date, slotStart.TimeOfDay, slotEnd.TimeOfDay,
-                        price.HourlyRate, price.TotalAmount, price.IsPromoApplied, price.IsMixedRate));
+                        price.HourlyRate, price.TotalAmount, price.IsPromoApplied, price.IsMixedRate,
+                        slotStart, slotEnd));
                 }
             }
 

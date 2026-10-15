@@ -4,6 +4,9 @@ namespace CourtBookingSystem.Services
 {
     public static class OperatingHoursHelper
     {
+        public static readonly TimeSpan DefaultOpenTime = new(6, 0, 0);
+        public static readonly TimeSpan DefaultCloseTime = new(4, 0, 0);
+
         public static (DateTime Start, DateTime End) GetOperatingRange(DateTime operatingDate, BusinessHour hours)
         {
             var start = operatingDate.Date.Add(hours.OpenTime);
