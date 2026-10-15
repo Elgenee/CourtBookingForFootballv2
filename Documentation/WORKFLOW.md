@@ -90,14 +90,16 @@ Giuseppe Football is a football field-booking platform for a multi-sport facilit
 
 **Inputs:** CourtId, BookingDate, StartTime, DurationHours (1–4), CustomerName, CustomerEmail, CustomerMobile, PaymentMethod, optional Notes.
 
-**Validation:** Date ≥ today; within `BusinessHour` open/close for that DayOfWeek; no overlap with existing Bookings (excl. Cancelled); no overlap with `BlockedSlot`; not past time today.
+**Validation:** The operating date can be yesterday to allow its remaining after-midnight slots. The actual slot start must not be in the past; the complete session must fit within `BusinessHour` open/close for that operating day, without overlaps with existing Bookings (excl. Cancelled), blocked slots, or shared fields.
+
+**Operating hours:** Daily, 6:00 AM through 4:00 AM the following calendar day (Philippine time). The booking date identifies the operating day, so October 15 includes October 16's midnight–4 AM slots. One-hour slots run from 6–7 AM through next-day 3–4 AM; bookings must finish by 4 AM. Existing installations receive the new hours once at startup; subsequent edits in Business Hours remain editable and survive restarts.
 
 **Status transitions for Guest flow:**
 - New booking → `Pending` (Payment `Unpaid`)
 - GCash proof uploaded → `ForApproval` (Payment `Submitted`)
 - Admin/Staff Approve → `Confirmed` (Payment `Approved`)
 - Admin/Staff Reject → Booking back to `Pending`; Payment `Rejected`; customer can re-upload
-- Booking date passes → Booking auto-promoted to `Completed`
+- Confirmed booking's full end date/time passes (Philippine time) → Booking auto-promoted to `Completed` on the next dashboard/status refresh. Overnight sessions include the next calendar day: October 15, 11 PM–12 AM ends on October 16 at midnight. After-midnight starts follow the selected operating day's business hours.
 
 ---
 
