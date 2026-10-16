@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 2400" fill="none">
+  <defs>
+    <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse">
+      <circle cx="4" cy="4" r="2.5" fill="#EE7136" fill-opacity=".13"/>
+    </pattern>
+  </defs>
+  <!-- This edge artwork spans the complete shared homepage container. -->
+  <g stroke="#204B31" stroke-opacity=".09" stroke-width="2">
+    <rect x="-145" y="180" width="305" height="620" rx="8"/>
+    <path d="M-145 490H160"/>
+    <circle cx="8" cy="490" r="65"/>
+    <path d="M-145 265H-30V395H-145M-145 585H-30V715H-145"/>
+    <circle cx="-75" cy="1410" r="155"/>
+    <circle cx="-75" cy="1410" r="170"/>
+  </g>
+  <g stroke="#D9B88B" stroke-opacity=".2" stroke-width="2">
+    <path d="M20-40C230 220-90 560 48 820S205 1260 58 1510S-50 2040 32 2440"/>
+    <path d="M42-40C252 220-68 560 70 820S227 1260 80 1510S-28 2040 54 2440"/>
+    <rect x="-205" y="1760" width="375" height="580" rx="8"/>
+    <path d="M-205 2050H170"/>
+    <circle cx="-18" cy="2050" r="62"/>
+  </g>
+  <rect x="18" y="60" width="110" height="72" fill="url(#dots)"/>
+  <rect x="54" y="1050" width="95" height="72" fill="url(#dots)"/>
+  <rect x="18" y="2220" width="110" height="72" fill="url(#dots)"/>
+</svg>

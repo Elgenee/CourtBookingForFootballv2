@@ -1052,6 +1052,7 @@ section.home-hero-content .container {
     }
     .about-list.two-col { column-count: 1; }
     .about-card-header h4 { font-size: 1.1rem; }
+
 }
 
 @media (max-width: 575.98px) {
@@ -1079,6 +1080,7 @@ section.home-hero-content .container {
     .home-intro-highlights {
         max-width: 100%;
     }
+
 }
 
 /* ============================================================
@@ -1558,6 +1560,7 @@ section.home-hero-content .container {
     .content-wrapper, body { margin: 0 !important; padding: 0 !important; }
     .receipt-page { background: #fff !important; padding: 0 !important; }
     .receipt-card { box-shadow: none !important; border: 1px solid #e6e8ee; max-width: 100% !important; }
+
 }
 
 /* ============================================================
@@ -2188,6 +2191,7 @@ body {
     .booking-page-heading {
         padding-left: 0;
     }
+
 }
 
 @media (max-width: 767.98px) {
@@ -2263,6 +2267,7 @@ body {
     .footer-brand {
         margin-right: 0;
     }
+
 }
 
 @media (max-width: 575.98px) {
@@ -2317,6 +2322,7 @@ body {
     .campo-activities-grid {
         grid-template-columns: 1fr;
     }
+
 }
 
 /* Simplified CAMPO TURF homepage */
@@ -2589,61 +2595,7 @@ body {
     .campo-activity-item {
         min-height: 104px;
     }
-}
 
-/* Royal Pitch-inspired homepage polish */
-.public-home-page .site-navbar {
-    position: absolute;
-    top: 0;
-    right: 0;
-    left: 0;
-    z-index: 1030;
-    background: linear-gradient(180deg, rgba(0, 28, 18, .72), rgba(0, 28, 18, .18)) !important;
-    border-bottom-color: rgba(255, 255, 255, .12);
-    box-shadow: none;
-}
-
-.public-home-page .site-navbar .campo-brand-name,
-.public-home-page .site-navbar .campo-brand-mark,
-.public-home-page .site-navbar .campo-brand-tagline,
-.public-home-page .site-navbar .nav-link {
-    color: #fff !important;
-}
-
-.public-home-page .site-navbar .campo-brand-sub {
-    color: var(--campo-orange);
-}
-
-.public-home-page .site-navbar .nav-link.active,
-.public-home-page .site-navbar .nav-link:hover,
-.public-home-page .site-navbar .nav-link:focus {
-    color: #fff !important;
-}
-
-.public-home-page .site-navbar .nav-link.active::after {
-    background: var(--campo-orange);
-}
-
-.public-home-page .site-navbar .navbar-toggler {
-    border-color: rgba(255, 255, 255, .38);
-}
-
-.public-home-page .site-navbar .navbar-toggler-icon {
-    filter: invert(1) grayscale(1);
-}
-
-.public-home-page .campo-home-hero {
-    min-height: 720px;
-    padding-top: 8.5rem;
-    padding-bottom: 5.5rem;
-    background-position: center;
-}
-
-.public-home-page .campo-home-hero .hero-overlay {
-    background:
-        radial-gradient(circle at 78% 18%, rgba(242, 106, 27, .22), transparent 30%),
-        linear-gradient(90deg, rgba(0, 20, 13, .88) 0%, rgba(0, 45, 29, .70) 42%, rgba(0, 0, 0, .22) 100%),
-        linear-gradient(180deg, rgba(0, 20, 13, .10), rgba(0, 20, 13, .42));
 }
 
 .campo-hero-eyebrow {
@@ -2653,22 +2605,6 @@ body {
     font-size: .75rem;
     font-weight: 900;
     letter-spacing: .18em;
-}
-
-.public-home-page .campo-home-hero .hero-title {
-    max-width: 720px;
-    font-size: clamp(4rem, 8vw, 6.6rem);
-}
-
-.public-home-page .campo-home-hero .hero-subtitle {
-    color: rgba(255, 255, 255, .92);
-    font-size: 1.45rem;
-}
-
-.public-home-page .hero-book-btn {
-    min-width: 230px;
-    border: 1px solid rgba(255, 255, 255, .14);
-    box-shadow: 0 18px 34px rgba(0, 0, 0, .28);
 }
 
 .campo-hero-notes {
@@ -2692,165 +2628,16 @@ body {
     backdrop-filter: blur(6px);
 }
 
-.public-home-page .campo-rates-section {
-    padding-top: 5.5rem;
-    padding-bottom: 5.5rem;
-    background:
-        linear-gradient(180deg, #fff 0%, #f6faf7 100%);
-}
-
-.public-home-page .campo-rate-simple {
-    position: relative;
-    padding-top: .25rem;
-    border: 0;
-    border-radius: 8px;
-    background:
-        linear-gradient(#fff, #fff) padding-box,
-        linear-gradient(135deg, rgba(0, 107, 63, .38), rgba(242, 106, 27, .32)) border-box;
-    border: 1px solid transparent;
-    box-shadow: 0 28px 70px rgba(0, 38, 24, .12);
-}
-
-.public-home-page .campo-rate-row {
-    padding: 1.65rem 1.75rem;
-}
-
-.public-home-page .campo-rate-row + .campo-rate-row {
-    border-top: 1px solid rgba(0, 63, 40, .10);
-}
-
-.public-home-page .campo-rate-row h3 {
-    font-size: 1.35rem;
-}
-
-.public-home-page .campo-rate-row p {
-    max-width: 430px;
-}
-
-.public-home-page .campo-rate-row .campo-rate-price {
-    min-width: 168px;
-    padding: .65rem .9rem;
-    border-radius: 8px;
-    background: #f2fbf6;
-    text-align: center;
-}
-
-.public-home-page .campo-rate-simple > .btn-primary {
-    margin-top: 1rem !important;
-    margin-bottom: 1.65rem;
-}
-
-.public-home-page .campo-facilities-section {
-    padding-top: 5.25rem;
-    padding-bottom: 4.5rem;
-    background: var(--campo-green-dark);
-    color: #fff;
-}
-
-.public-home-page .campo-facilities-section .section-header h2,
-.public-home-page .campo-facilities-section .section-header p {
-    color: #fff;
-}
-
-.public-home-page .campo-facility-card {
-    position: relative;
-    min-height: 390px;
-    border: 1px solid rgba(255, 255, 255, .14);
-    border-radius: 8px;
-    background: #001f15;
-    box-shadow: 0 24px 58px rgba(0, 0, 0, .22);
-}
-
-.public-home-page .campo-facility-card img {
-    height: 100%;
-    min-height: 390px;
-    aspect-ratio: auto;
-    opacity: .86;
-}
-
-.public-home-page .campo-facility-card::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, transparent 30%, rgba(0, 20, 13, .88) 100%);
-    pointer-events: none;
-}
-
-.public-home-page .campo-facility-card figcaption {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 1;
-    padding: 1.4rem;
-}
-
-.public-home-page .campo-facility-card h3 {
-    color: #fff;
-    font-size: 1.35rem;
-}
-
-.public-home-page .campo-facility-card p {
-    max-width: 430px;
-    color: rgba(255, 255, 255, .80);
-}
-
-.public-home-page .campo-contact-section {
-    padding-top: 5rem;
-    padding-bottom: 5rem;
-    background: #fff;
-}
-
-.public-home-page .campo-contact-item {
-    padding: 1.6rem;
-    border: 1px solid rgba(0, 63, 40, .10);
-    border-top: 4px solid var(--campo-orange);
-    box-shadow: 0 18px 48px rgba(0, 38, 24, .07);
-}
-
-.public-home-page .campo-contact-item h3 {
-    font-size: 1.05rem;
-}
-
-@media (max-width: 991.98px) {
-    .public-home-page .site-navbar .navbar-collapse {
-        margin-top: .7rem;
-        padding: .75rem 1rem;
-        border: 1px solid rgba(255, 255, 255, .14);
-        border-radius: 8px;
-        background: rgba(0, 38, 24, .92);
-    }
-}
-
 @media (max-width: 767.98px) {
-    .public-home-page .campo-home-hero {
-        min-height: 620px;
-        padding-top: 7.25rem;
-    }
-
-    .public-home-page .campo-home-hero .hero-title {
-        font-size: 3.55rem;
-    }
 
     .campo-hero-notes {
         gap: .5rem;
     }
 
-    .public-home-page .campo-rate-row .campo-rate-price {
-        display: inline-block;
-        min-width: 0;
-        text-align: left;
-    }
-
-    .public-home-page .campo-facility-card,
-    .public-home-page .campo-facility-card img {
-        min-height: 320px;
-    }
 }
 
 /* Official CAMPO logo and palette refinements */
-.site-navbar,
-.public-home-page .site-navbar {
+.site-navbar {
     position: relative;
     top: auto;
     right: auto;
@@ -2862,8 +2649,7 @@ body {
     box-shadow: 0 10px 28px rgba(16, 47, 32, .08);
 }
 
-.site-navbar .container,
-.public-home-page .site-navbar .container {
+.site-navbar .container {
     min-height: 88px;
 }
 
@@ -2885,90 +2671,17 @@ body {
     max-height: 58px;
 }
 
-.public-home-page .site-navbar .nav-link,
-.public-home-page .site-navbar .nav-link.active,
-.public-home-page .site-navbar .nav-link:hover,
-.public-home-page .site-navbar .nav-link:focus {
-    color: var(--campo-green-dark) !important;
-}
-
-.site-navbar .nav-link.active::after,
-.public-home-page .site-navbar .nav-link.active::after {
+.site-navbar .nav-link.active::after {
     background: var(--campo-orange);
 }
 
-.public-home-page .site-navbar .navbar-collapse {
-    background: transparent;
-}
-
-.public-home-page .site-navbar .navbar-toggler {
-    border-color: rgba(27, 79, 49, .34);
-}
-
-.public-home-page .site-navbar .navbar-toggler-icon {
-    filter: none;
-}
-
-.public-home-page .campo-home-hero {
-    min-height: 640px;
-    padding-top: 5.75rem;
-    padding-bottom: 5rem;
-}
-
-.public-home-page .campo-home-hero .hero-overlay {
-    background:
-        radial-gradient(circle at 78% 18%, rgba(243, 111, 50, .18), transparent 30%),
-        linear-gradient(90deg, rgba(16, 47, 32, .86) 0%, rgba(27, 79, 49, .68) 44%, rgba(0, 0, 0, .24) 100%),
-        linear-gradient(180deg, rgba(16, 47, 32, .08), rgba(16, 47, 32, .36));
-}
-
-.public-home-page .campo-rates-section,
 .campo-rates-section {
     background: linear-gradient(180deg, #fff 0%, var(--campo-cream) 100%);
 }
 
-.public-home-page .campo-facilities-section {
-    background: var(--campo-green-dark);
-}
-
-.public-home-page .campo-facility-card {
-    min-height: 280px;
-    max-width: 520px;
-    margin-right: auto;
-    margin-left: auto;
-}
-
-.public-home-page .campo-facility-card img {
-    min-height: 280px;
-}
-
-.public-home-page .campo-facility-card figcaption {
-    padding: 1rem 1.1rem;
-}
-
-.public-home-page .campo-facility-card h3 {
-    font-size: 1.15rem;
-}
-
-.public-home-page .campo-facility-card p {
-    font-size: .92rem;
-}
-
-@media (max-width: 991.98px) {
-    .public-home-page .site-navbar .navbar-collapse {
-        margin-top: .7rem;
-        padding: .75rem 1rem;
-        border: 1px solid rgba(27, 79, 49, .14);
-        border-radius: 8px;
-        background: rgba(240, 235, 225, .98);
-    }
-}
-
 @media (max-width: 767.98px) {
     .site-navbar,
-    .public-home-page .site-navbar,
-    .site-navbar .container,
-    .public-home-page .site-navbar .container {
+.site-navbar .container {
         min-height: 76px;
     }
 
@@ -2977,68 +2690,6 @@ body {
         max-height: 56px;
     }
 
-    .public-home-page .campo-home-hero {
-        min-height: 560px;
-        padding-top: 4.5rem;
-    }
-
-    .public-home-page .campo-facility-card,
-    .public-home-page .campo-facility-card img {
-        min-height: 240px;
-    }
-}
-
-/* Facilities/contact requested refinements */
-.public-home-page .campo-facilities-section {
-    padding-top: 4rem;
-    padding-bottom: 3.4rem;
-}
-
-.public-home-page .campo-facility-card {
-    min-height: 0;
-    max-width: 460px;
-    aspect-ratio: 16 / 9;
-    border-radius: 8px;
-}
-
-.public-home-page .campo-facility-card img {
-    width: 100%;
-    height: 100%;
-    min-height: 0;
-    aspect-ratio: auto;
-    object-fit: cover;
-    opacity: 1;
-}
-
-.public-home-page .campo-facility-card::after,
-.public-home-page .campo-facility-card figcaption {
-    display: none;
-}
-
-.public-home-page .campo-contact-section {
-    padding-top: 4.4rem;
-    padding-bottom: 4.8rem;
-    background:
-        linear-gradient(180deg, #fff 0%, rgba(240, 235, 225, .52) 100%);
-}
-
-.public-home-page .campo-contact-section .section-header {
-    margin-bottom: 2rem !important;
-}
-
-.public-home-page .campo-contact-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    min-height: 142px;
-    padding: 1.35rem;
-    border: 1px solid rgba(27, 79, 49, .12);
-    border-top: 0;
-    border-left: 4px solid var(--campo-orange);
-    border-radius: 8px;
-    background:
-        linear-gradient(135deg, rgba(240, 235, 225, .74), #fff 52%);
-    box-shadow: 0 18px 42px rgba(16, 47, 32, .08);
 }
 
 .campo-contact-icon {
@@ -3053,89 +2704,6 @@ body {
     color: var(--campo-cream);
     font-size: 1.05rem;
     box-shadow: 0 10px 18px rgba(16, 47, 32, .18);
-}
-
-.public-home-page .campo-contact-item h3 {
-    margin-bottom: .38rem;
-    color: var(--campo-green-dark);
-    font-size: .92rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: .04em;
-}
-
-.public-home-page .campo-contact-item p {
-    color: var(--campo-muted);
-    line-height: 1.55;
-}
-
-.public-home-page .campo-contact-item strong {
-    color: var(--campo-ink);
-    font-size: 1.02rem;
-}
-
-@media (max-width: 767.98px) {
-    .public-home-page .campo-facility-card {
-        max-width: 100%;
-    }
-
-    .public-home-page .campo-contact-item {
-        min-height: 0;
-    }
-}
-
-/* Original gallery restored for homepage facilities */
-.public-home-page .campo-gallery-section {
-    padding-top: 4.75rem;
-    padding-bottom: 4.25rem;
-    background: #fff;
-}
-
-.public-home-page .campo-gallery-section .gallery-card {
-    overflow: hidden;
-    border: 1px solid rgba(27, 79, 49, .14);
-    border-radius: 8px;
-    background: #fff;
-    box-shadow: 0 16px 36px rgba(16, 47, 32, .07);
-}
-
-.public-home-page .campo-gallery-section .gallery-image-wrap {
-    aspect-ratio: 4 / 3;
-}
-
-.public-home-page .campo-gallery-section .gallery-overlay {
-    background: linear-gradient(180deg, transparent 35%, rgba(16, 47, 32, .40));
-}
-
-.public-home-page .campo-gallery-section .gallery-title {
-    color: var(--campo-ink);
-    font-weight: 900;
-}
-
-.public-home-page .campo-gallery-section .gallery-caption {
-    color: var(--campo-muted);
-}
-
-.public-home-page .campo-contact-item {
-    position: relative;
-    overflow: hidden;
-}
-
-.public-home-page .campo-contact-item::after {
-    content: "";
-    position: absolute;
-    right: -34px;
-    bottom: -42px;
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    background: rgba(243, 111, 50, .10);
-    pointer-events: none;
-}
-
-.public-home-page .campo-contact-icon {
-    background: var(--campo-orange);
-    color: #fff;
 }
 
 /* Client-approved CAMPO TURF palette */
@@ -3164,8 +2732,7 @@ body {
 }
 
 .btn-primary,
-.quick-search-btn,
-.public-home-page .hero-book-btn {
+.quick-search-btn {
     background: var(--campo-green);
     border-color: var(--campo-green);
     color: #fff;
@@ -3182,8 +2749,7 @@ body {
     color: #fff;
 }
 
-.site-navbar,
-.public-home-page .site-navbar {
+.site-navbar {
     background: var(--campo-cream) !important;
     border-bottom-color: var(--campo-line);
     box-shadow: 0 10px 28px rgba(24, 59, 42, .08);
@@ -3192,47 +2758,18 @@ body {
 .site-navbar .nav-link,
 .site-navbar .nav-link.active,
 .site-navbar .nav-link:hover,
-.site-navbar .nav-link:focus,
-.public-home-page .site-navbar .nav-link,
-.public-home-page .site-navbar .nav-link.active,
-.public-home-page .site-navbar .nav-link:hover,
-.public-home-page .site-navbar .nav-link:focus {
+.site-navbar .nav-link:focus {
     color: var(--campo-ink) !important;
 }
 
 .site-navbar .nav-link:hover,
 .site-navbar .nav-link:focus,
-.site-navbar .nav-link.active,
-.public-home-page .site-navbar .nav-link:hover,
-.public-home-page .site-navbar .nav-link:focus,
-.public-home-page .site-navbar .nav-link.active {
+.site-navbar .nav-link.active {
     background: rgba(252, 233, 222, .78);
 }
 
-.site-navbar .nav-link.active::after,
-.public-home-page .site-navbar .nav-link.active::after {
+.site-navbar .nav-link.active::after {
     background: var(--campo-orange);
-}
-
-.public-home-page .site-navbar-cta .btn-book-turf {
-    background: var(--campo-green-dark);
-    border-color: var(--campo-green-dark);
-    color: #fff;
-    box-shadow: 0 12px 24px rgba(23, 79, 50, .20);
-}
-
-.public-home-page .site-navbar-cta .btn-book-turf:hover,
-.public-home-page .site-navbar-cta .btn-book-turf:focus {
-    background: var(--campo-green);
-    border-color: var(--campo-green);
-    color: #fff;
-}
-
-.public-home-page .campo-home-hero .hero-overlay {
-    background:
-        radial-gradient(circle at 78% 18%, rgba(244, 121, 58, .16), transparent 32%),
-        linear-gradient(90deg, rgba(23, 79, 50, .92) 0%, rgba(23, 79, 50, .72) 45%, rgba(23, 79, 50, .34) 100%),
-        linear-gradient(180deg, rgba(23, 79, 50, .12), rgba(23, 79, 50, .42));
 }
 
 .section-eyebrow,
@@ -3245,21 +2782,11 @@ body {
     background: rgba(247, 242, 232, .13);
 }
 
-.public-home-page .campo-rates-section,
 .campo-rates-section {
     background: var(--campo-cream);
 }
 
-.public-home-page .campo-rates-section,
-.public-home-page .campo-gallery-section,
-.public-home-page .campo-contact-section {
-    background: var(--campo-cream);
-}
-
-.public-home-page .campo-rate-simple,
-.campo-rate-simple,
-.public-home-page .campo-gallery-section .gallery-card,
-.public-home-page .campo-contact-item {
+.campo-rate-simple {
     background: var(--campo-card);
     border-color: var(--campo-line);
     box-shadow: var(--campo-shadow);
@@ -3268,128 +2795,6 @@ body {
 .court-sport-tag {
     background: var(--campo-orange-soft);
     color: var(--campo-orange);
-}
-
-.public-home-page .campo-rate-row .campo-rate-price {
-    background: var(--campo-cream);
-    color: var(--campo-green);
-}
-
-.public-home-page .campo-rate-row .campo-rate-price::before {
-    color: var(--campo-orange);
-}
-
-.public-home-page .campo-rate-copy {
-    flex: 1 1 260px;
-}
-
-.public-home-page .campo-rate-rules {
-    flex: 1.35 1 380px;
-    display: grid;
-    gap: .75rem;
-}
-
-.public-home-page .campo-rate-rule {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: .8rem .9rem;
-    border: 1px solid var(--campo-line);
-    border-left: 4px solid var(--campo-orange);
-    border-radius: 8px;
-    background: var(--campo-card);
-    box-shadow: 0 16px 34px rgba(24, 59, 42, .07);
-}
-
-.public-home-page .campo-rate-rule-main {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: .4rem .65rem;
-    min-width: 0;
-    color: var(--campo-muted);
-    font-size: .86rem;
-    line-height: 1.3;
-}
-
-.public-home-page .campo-rate-rule-main strong {
-    color: var(--campo-green-dark);
-    font-size: .95rem;
-}
-
-.public-home-page .campo-rate-rule-type {
-    display: inline-flex;
-    align-items: center;
-    min-height: 24px;
-    padding: .2rem .55rem;
-    border-radius: 999px;
-    background: var(--campo-orange-soft);
-    color: var(--campo-orange);
-    font-size: .7rem;
-    font-weight: 900;
-    letter-spacing: .04em;
-    text-transform: uppercase;
-}
-
-.public-home-page .campo-rate-rule-type.is-promo {
-    background: var(--campo-orange);
-    color: #fff;
-}
-
-.public-home-page .campo-rate-rule-price {
-    flex: 0 0 auto;
-    color: var(--campo-green);
-    font-size: 1.35rem;
-    font-weight: 900;
-    line-height: 1;
-    text-align: right;
-}
-
-.public-home-page .campo-rate-rule-price span {
-    color: var(--campo-orange);
-    font-size: .72rem;
-    font-weight: 900;
-}
-
-.public-home-page .campo-rate-rule-price small {
-    color: var(--campo-muted);
-    font-size: .78rem;
-    font-weight: 700;
-}
-
-.public-home-page .campo-gallery-section {
-    background: var(--campo-cream);
-}
-
-.public-home-page .campo-gallery-section .row {
-    justify-content: center;
-}
-
-.public-home-page .campo-gallery-section .gallery-image-wrap img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center center;
-    transition: transform .35s ease;
-}
-
-.public-home-page .campo-gallery-section .gallery-card:hover .gallery-image-wrap img {
-    transform: scale(1.06);
-}
-
-.public-home-page .campo-contact-section {
-    background: var(--campo-cream);
-}
-
-.public-home-page .campo-contact-icon {
-    background: var(--campo-orange);
-    color: #fff;
-}
-
-.public-home-page .campo-contact-item {
-    border-left-color: var(--campo-orange);
 }
 
 .campo-footer {
@@ -3418,7 +2823,6 @@ body {
 
 .btn-primary,
 .quick-search-btn,
-.public-home-page .campo-rate-simple > .btn-primary,
 #submitBookingBtn {
     background: var(--campo-green);
     border-color: var(--campo-green);
@@ -3431,64 +2835,11 @@ body {
 .btn-primary:not(:disabled):not(.disabled):active,
 .quick-search-btn:hover,
 .quick-search-btn:focus,
-.public-home-page .campo-rate-simple > .btn-primary:hover,
-.public-home-page .campo-rate-simple > .btn-primary:focus,
 #submitBookingBtn:hover,
 #submitBookingBtn:focus {
     background: var(--campo-green-dark);
     border-color: var(--campo-green-dark);
     color: #fff;
-}
-
-.public-home-page .hero-book-btn {
-    background: var(--campo-orange);
-    border-color: var(--campo-orange);
-    color: #fff;
-    box-shadow: 0 18px 34px rgba(244, 121, 58, .30);
-}
-
-.public-home-page .hero-book-btn:hover,
-.public-home-page .hero-book-btn:focus {
-    background: #DC632B;
-    border-color: #DC632B;
-    color: #fff;
-}
-
-.public-home-page .campo-rate-simple > .btn-primary {
-    background: var(--campo-green-dark);
-    border-color: var(--campo-green-dark);
-    color: #fff;
-    box-shadow: 0 16px 30px rgba(23, 79, 50, .22);
-}
-
-.public-home-page .campo-rate-simple > .btn-primary:hover,
-.public-home-page .campo-rate-simple > .btn-primary:focus {
-    background: var(--campo-green);
-    border-color: var(--campo-green);
-    color: #fff;
-}
-
-.public-home-page .section-header h2,
-.public-home-page .campo-rate-row h3 {
-    color: var(--campo-ink);
-}
-
-.public-home-page .text-muted,
-.public-home-page .section-header p,
-.public-home-page .campo-rate-row p {
-    color: var(--campo-muted) !important;
-}
-
-.public-home-page .campo-rate-row + .campo-rate-row {
-    border-top-color: var(--campo-line);
-}
-
-.public-home-page .campo-gallery-section .gallery-overlay {
-    background: linear-gradient(180deg, transparent 35%, rgba(23, 79, 50, .48));
-}
-
-.public-home-page .campo-contact-item::after {
-    background: var(--campo-orange-soft);
 }
 
 .badge-info,
@@ -3520,1083 +2871,21 @@ body {
     color: #fff;
 }
 
-.public-home-page .campo-contact-icon {
-    background: var(--campo-orange);
-    color: #fff;
-}
-
-.public-home-page section.campo-contact-section.section-light {
-/*    background: var(--campo-cream) !important;*/
-}
-
-.public-home-page .campo-contact-section {
-    border-top: 0;
-}
-
-.public-home-page .campo-contact-item {
-    position: relative;
-    isolation: isolate;
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    min-height: 148px;
-    padding: 1.35rem 1.4rem;
-    border: 1px solid var(--campo-line);
-    border-left: 4px solid var(--campo-orange);
-    border-radius: 8px;
-    background:
-        linear-gradient(135deg, #fff 0%, rgba(252, 250, 246, .96) 100%),
-        var(--campo-card);
-    box-shadow: 0 16px 34px rgba(24, 59, 42, .07);
-    transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
-}
-
-.public-home-page .campo-contact-item:hover {
-    border-color: #E3D7CA;
-    border-left-color: var(--campo-orange);
-    transform: translateY(-2px);
-    box-shadow: 0 22px 48px rgba(24, 59, 42, .11);
-}
-
-.public-home-page .campo-contact-item::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0;
-    left: 0;
-    height: 3px;
-    z-index: 0;
-    border-radius: 8px 8px 0 0;
-    background: linear-gradient(90deg, rgba(244, 121, 58, .58), rgba(244, 121, 58, .08) 58%, transparent);
-    pointer-events: none;
-}
-
-.public-home-page .campo-contact-item::after {
-    z-index: 0;
-    right: -34px;
-    bottom: -42px;
-    width: 112px;
-    height: 112px;
-    background: var(--campo-orange-soft);
-    opacity: .72;
-}
-
-.public-home-page .campo-contact-item > * {
-    position: relative;
-    z-index: 1;
-}
-
-.public-home-page .campo-contact-icon {
-    width: 42px;
-    height: 42px;
-    flex: 0 0 42px;
-    margin-top: .08rem;
-    background: var(--campo-orange-soft);
-    color: var(--campo-orange);
-    font-size: 1rem;
-    box-shadow: inset 0 0 0 1px rgba(244, 121, 58, .16);
-}
-
-.public-home-page .campo-contact-item h3 {
-    display: inline-flex;
-    align-items: center;
-    min-height: 24px;
-    margin-bottom: .55rem;
-    padding: .2rem .55rem;
-    border-radius: 999px;
-    background: var(--campo-orange-soft);
-    color: var(--campo-orange);
-    font-size: .7rem;
-    font-weight: 900;
-    letter-spacing: .04em;
-    line-height: 1;
-}
-
-.public-home-page .campo-contact-item p {
-    color: var(--campo-muted);
-    line-height: 1.55;
-}
-
-.public-home-page .campo-contact-item strong {
-    color: var(--campo-ink);
-    font-size: 1.02rem;
-    font-weight: 900;
-    line-height: 1.48;
-}
-
-/* Simple, elegant homepage section polish */
-.public-home-page .campo-rates-section,
-.public-home-page .campo-gallery-section,
-.public-home-page .campo-contact-section {
-    position: relative;
-    padding-top: 5.25rem;
-    padding-bottom: 5.25rem;
-    background:
-        linear-gradient(180deg, rgba(252, 250, 246, .52), rgba(247, 242, 232, 0) 12rem),
-        var(--campo-cream);
-}
-
-.public-home-page .section-header {
-    max-width: 680px;
-    margin-right: auto;
-    margin-left: auto;
-}
-
-.public-home-page .section-header h2 {
-    margin-bottom: .45rem;
-    color: var(--campo-ink);
-    font-size: clamp(2rem, 3.2vw, 2.7rem);
-    font-weight: 900;
-    line-height: 1.08;
-}
-
-.public-home-page .section-header p {
-    color: var(--campo-muted) !important;
-    font-size: 1.02rem;
-    line-height: 1.55;
-}
-
-.public-home-page .section-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 24px;
-    margin-bottom: .75rem;
-    padding: .16rem .58rem;
-    border-radius: 999px;
-    background: rgba(252, 233, 222, .72);
-    color: var(--campo-orange);
-    font-size: .68rem;
-    font-weight: 900;
-    letter-spacing: .14em;
-}
-
-.public-home-page .campo-rate-simple,
-.public-home-page .gallery-card,
-.public-home-page .campo-contact-item {
-    border: 1px solid var(--campo-line);
-    border-radius: 8px;
-    background: var(--campo-card);
-    box-shadow: 0 18px 44px rgba(24, 59, 42, .08);
-}
-
-.public-home-page .gallery-card,
-.public-home-page .campo-contact-item {
-    width: 100%;
-}
-
-.public-home-page .campo-rate-simple,
-.public-home-page .gallery-card,
-.public-home-page .campo-contact-item,
-.public-home-page .campo-rate-rule {
-    transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease;
-}
-
-.public-home-page .campo-rate-simple {
-    overflow: hidden;
-    padding: .6rem .85rem 1.25rem;
-}
-
-.public-home-page .campo-rate-row {
-    gap: 1.5rem;
-    padding: 1.35rem 1.25rem;
-}
-
-.public-home-page .campo-rate-row + .campo-rate-row {
-    border-top: 1px solid var(--campo-line);
-}
-
-.public-home-page .campo-rate-row h3,
-.public-home-page .gallery-title,
-.public-home-page .campo-contact-item strong {
-    color: var(--campo-ink);
-}
-
-.public-home-page .campo-rate-row p,
-.public-home-page .gallery-caption,
-.public-home-page .campo-contact-item p {
-    color: var(--campo-muted);
-}
-
-.public-home-page .campo-rate-rule {
-    box-shadow: none;
-}
-
-.public-home-page .campo-rate-rule:hover {
-    border-color: #E3D7CA;
-    transform: translateY(-1px);
-    box-shadow: 0 12px 28px rgba(24, 59, 42, .07);
-}
-
-.public-home-page .campo-gallery-section .row {
-    justify-content: center;
-    row-gap: .35rem;
-}
-
-.public-home-page .campo-gallery-section .row > [class*="col-"],
-.public-home-page .campo-contact-section .row > [class*="col-"] {
-    display: flex;
-}
-
-.public-home-page .campo-gallery-section .gallery-card {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.public-home-page .campo-gallery-section .gallery-card:hover {
-    border-color: #E3D7CA;
-    transform: translateY(-3px);
-    box-shadow: 0 24px 54px rgba(24, 59, 42, .12);
-}
-
-.public-home-page .campo-gallery-section .gallery-image-wrap {
-    aspect-ratio: 4 / 3;
-    background: var(--campo-cream-light);
-}
-
-.public-home-page .campo-gallery-section .gallery-body {
-    display: flex;
-    flex: 1 1 auto;
-    flex-direction: column;
-    justify-content: center;
-    min-height: 96px;
-    padding: 1rem 1.1rem 1.15rem;
-}
-
-.public-home-page .campo-contact-section {
-    border-top: 0;
-    padding-top: 4.75rem;
-}
-
-.public-home-page .campo-contact-section .row {
-    row-gap: 1rem;
-}
-
-.public-home-page .campo-contact-item {
-    min-height: 154px;
-}
-
-.public-home-page .campo-contact-item::after {
-    content: none;
-    display: none;
-}
-
 @media (max-width: 991.98px) {
-    .public-home-page .site-navbar .navbar-collapse {
-        background: var(--campo-cream);
-        border-color: var(--campo-line);
-    }
 
-    .public-home-page .campo-rate-row,
     .campo-rate-row {
         align-items: stretch;
     }
-}
 
-@media (max-width: 767.98px) {
-    .public-home-page .campo-rates-section,
-    .public-home-page .campo-gallery-section,
-    .public-home-page .campo-contact-section {
-        padding-top: 3.4rem;
-        padding-bottom: 3.4rem;
-    }
-
-    .public-home-page .section-header h2 {
-        font-size: 2rem;
-    }
-
-    .public-home-page .campo-rate-row {
-        display: block;
-    }
-
-    .public-home-page .campo-rate-rules {
-        margin-top: 1rem;
-    }
-
-    .public-home-page .campo-rate-rule {
-        align-items: flex-start;
-    }
-
-    .public-home-page .campo-contact-item {
-        min-height: 0;
-        padding: 1.25rem;
-    }
-}
-
-@media (max-width: 575.98px) {
-    .public-home-page .campo-rate-rule {
-        display: grid;
-    }
-
-    .public-home-page .campo-rate-rule-price {
-        text-align: left;
-    }
-}
-
-/* Mockup-inspired homepage refresh */
-.public-home-page {
-    background: var(--campo-cream);
-}
-
-.public-home-page .content-wrapper {
-    background: var(--campo-cream);
-}
-
-.public-home-page .site-navbar {
-    min-height: 88px;
-    border-bottom: 1px solid var(--campo-line);
-    background: var(--campo-cream) !important;
-    box-shadow: 0 10px 30px rgba(24, 59, 42, .06);
-}
-
-.public-home-page .site-navbar .container {
-    min-height: 88px;
-}
-
-.public-home-page .campo-logo-img {
-    width: min(230px, 52vw);
-    max-height: 68px;
-}
-
-.public-home-page .site-navbar .nav-link {
-    min-height: 40px;
-    padding: .55rem .9rem !important;
-    border-radius: 0;
-    background: transparent;
-    color: var(--campo-ink) !important;
-    font-size: .96rem;
-    font-weight: 800;
-    box-shadow: none;
-}
-
-.public-home-page .site-navbar .nav-link:hover,
-.public-home-page .site-navbar .nav-link:focus,
-.public-home-page .site-navbar .nav-link.active {
-    background: transparent;
-    color: var(--campo-green-dark) !important;
-}
-
-.public-home-page .site-navbar .nav-link.active::after {
-    right: .9rem;
-    left: .9rem;
-    bottom: .28rem;
-    height: 3px;
-    background: var(--campo-orange);
-}
-
-.public-home-page .site-navbar-cta .btn-book-turf {
-    min-height: 48px;
-    padding: .8rem 1.6rem;
-    border-radius: 999px;
-    background: var(--campo-green-dark);
-    border-color: var(--campo-green-dark);
-    color: #fff;
-    font-weight: 900;
-    box-shadow: 0 14px 30px rgba(23, 79, 50, .24);
-}
-
-.public-home-page .site-navbar-cta .btn-book-turf::before {
-    content: "\f073";
-    margin-right: .58rem;
-    font-family: "Font Awesome 6 Free";
-    font-weight: 900;
-}
-
-.public-home-page .site-navbar-cta .btn-book-turf:hover,
-.public-home-page .site-navbar-cta .btn-book-turf:focus {
-    background: var(--campo-green);
-    border-color: var(--campo-green);
-    transform: translateY(-1px);
-}
-
-.public-home-page .campo-home-hero {
-    min-height: clamp(560px, 72vh, 720px);
-    display: flex;
-    align-items: center;
-    padding-top: 5.25rem;
-    padding-bottom: 4.75rem;
-    background-position: center center;
-}
-
-.public-home-page .campo-home-hero::before {
-    content: "";
-    position: absolute;
-    inset: 0 auto 0 -24vw;
-    width: 54vw;
-    border-radius: 0 50% 50% 0;
-    background: rgba(23, 79, 50, .34);
-    z-index: 1;
-    pointer-events: none;
-}
-
-.public-home-page .campo-home-hero .hero-overlay {
-    background:
-        radial-gradient(circle at 80% 18%, rgba(244, 121, 58, .22), transparent 30%),
-        linear-gradient(90deg, rgba(12, 48, 30, .95) 0%, rgba(23, 79, 50, .72) 42%, rgba(23, 79, 50, .20) 100%),
-        linear-gradient(180deg, rgba(14, 42, 27, .08), rgba(14, 42, 27, .42));
-}
-
-.public-home-page .campo-home-hero .hero-content {
-    width: 100%;
-}
-
-.public-home-page .campo-hero-eyebrow {
-    min-height: 28px;
-    padding: .28rem .92rem;
-    border: 1px solid rgba(153, 245, 157, .52);
-    background: rgba(23, 79, 50, .30);
-    color: #B7F7A8;
-    font-size: .72rem;
-    font-weight: 900;
-    letter-spacing: .22em;
-}
-
-.public-home-page .campo-home-hero .hero-title {
-    max-width: 660px;
-    color: #fff;
-    font-size: clamp(3.6rem, 7.4vw, 6.25rem);
-    font-weight: 900;
-    letter-spacing: 0;
-    line-height: .94;
-    text-shadow: 0 18px 44px rgba(0, 0, 0, .28);
-}
-
-.public-home-page .campo-home-hero .hero-title span {
-    display: block;
-    color: #91F28C;
-}
-
-.public-home-page .campo-home-hero .hero-subtitle {
-    max-width: 490px;
-    color: rgba(255, 255, 255, .94);
-    font-size: clamp(1.05rem, 1.6vw, 1.3rem);
-    font-weight: 700;
-    line-height: 1.36;
-}
-
-.public-home-page .hero-book-btn {
-    min-height: 56px;
-    padding: .9rem 2.1rem;
-    border-radius: 999px;
-    background: var(--campo-orange);
-    border-color: var(--campo-orange);
-    color: #fff;
-    font-weight: 900;
-    box-shadow: 0 18px 34px rgba(244, 121, 58, .34);
-}
-
-.public-home-page .hero-book-btn:hover,
-.public-home-page .hero-book-btn:focus {
-    background: #DF672D;
-    border-color: #DF672D;
-    transform: translateY(-1px);
-}
-
-.public-home-page .campo-hero-notes {
-    gap: 1rem 1.35rem;
-    margin-top: 1.8rem;
-}
-
-.public-home-page .campo-hero-notes span {
-    gap: .7rem;
-    min-height: 42px;
-    padding: 0;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    color: rgba(255, 255, 255, .92);
-    font-size: .92rem;
-    font-weight: 800;
-    box-shadow: none;
-    backdrop-filter: none;
-}
-
-.public-home-page .campo-hero-notes span::before {
-    display: inline-flex;
-    width: 34px;
-    height: 34px;
-    align-items: center;
-    justify-content: center;
-    flex: 0 0 34px;
-    border: 1px solid rgba(183, 247, 168, .46);
-    border-radius: 50%;
-    color: #B7F7A8;
-    font-family: "Font Awesome 6 Free";
-    font-weight: 900;
-}
-
-.public-home-page .campo-hero-notes span:nth-child(1)::before {
-    content: "\f274";
-}
-
-.public-home-page .campo-hero-notes span:nth-child(2)::before {
-    content: "\f1e3";
-}
-
-.public-home-page .campo-hero-notes span:nth-child(3)::before {
-    content: "\f058";
-}
-
-.public-home-page .campo-rates-section,
-.public-home-page .campo-gallery-section,
-.public-home-page .campo-contact-section {
-    overflow: hidden;
-    padding-top: 5.8rem;
-    padding-bottom: 5.8rem;
-    background:
-        radial-gradient(circle at -8% 12%, rgba(47, 107, 70, .10), transparent 28rem),
-        radial-gradient(circle at 106% 6%, rgba(244, 121, 58, .07), transparent 24rem),
-        var(--campo-cream-light);
-}
-
-.public-home-page .campo-gallery-section,
-.public-home-page .campo-contact-section {
-    background:
-        radial-gradient(circle at -10% 95%, rgba(47, 107, 70, .10), transparent 23rem),
-        radial-gradient(circle at 105% 12%, rgba(47, 107, 70, .09), transparent 24rem),
-        var(--campo-cream-light);
-}
-
-.public-home-page .campo-rates-section > .container,
-.public-home-page .campo-gallery-section > .container,
-.public-home-page .campo-contact-section > .container {
-    position: relative;
-    z-index: 1;
-}
-
-.public-home-page .section-header {
-    max-width: 760px;
-    margin-bottom: 2rem !important;
-}
-
-.public-home-page .section-header h2 {
-    margin-bottom: .65rem;
-    color: var(--campo-ink);
-    font-size: clamp(2.35rem, 4vw, 3.2rem);
-    font-weight: 900;
-    letter-spacing: 0;
-    line-height: 1;
-}
-
-.public-home-page .section-header p {
-    color: var(--campo-muted) !important;
-    font-size: 1.08rem;
-    line-height: 1.55;
-}
-
-.public-home-page .section-eyebrow {
-    gap: .55rem;
-    min-height: 24px;
-    padding: 0;
-    border-radius: 0;
-    background: transparent;
-    color: var(--campo-green-dark);
-    font-size: .75rem;
-    font-weight: 900;
-    letter-spacing: .10em;
-}
-
-.public-home-page .section-eyebrow::after {
-    content: "";
-    width: 34px;
-    height: 3px;
-    border-radius: 999px;
-    background: var(--campo-green);
-}
-
-.public-home-page .campo-rate-simple {
-    position: relative;
-    padding: 2rem 2.2rem 2.05rem;
-    border: 1px solid rgba(233, 226, 216, .92);
-    border-radius: 12px;
-    background:
-        linear-gradient(135deg, rgba(255, 255, 255, .97), rgba(252, 250, 246, .93)),
-        var(--campo-card);
-    box-shadow: 0 28px 70px rgba(24, 59, 42, .11);
-}
-
-.public-home-page .campo-rate-row {
-    display: grid;
-    grid-template-columns: minmax(220px, .85fr) minmax(360px, 1.25fr);
-    gap: 2rem;
-    align-items: center;
-    padding: 0;
-    border-top: 0;
-}
-
-.public-home-page .campo-rate-row + .campo-rate-row {
-    margin-top: 1.65rem;
-    padding-top: 1.65rem;
-    border-top: 1px solid var(--campo-line);
-}
-
-.public-home-page .campo-rate-copy h3 {
-    margin-top: .75rem;
-    margin-bottom: .58rem;
-    color: var(--campo-ink);
-    font-size: 1.45rem;
-    font-weight: 900;
-    letter-spacing: 0;
-}
-
-.public-home-page .campo-rate-copy p {
-    max-width: 360px;
-    color: var(--campo-muted) !important;
-    font-size: 1.02rem;
-    line-height: 1.55;
-}
-
-.public-home-page .court-sport-tag,
-.public-home-page .campo-rate-rule-type,
-.public-home-page .campo-contact-item h3 {
-    min-height: 26px;
-    padding: .28rem .68rem;
-    border-radius: 999px;
-    background: var(--campo-orange-soft);
-    color: var(--campo-orange);
-    font-size: .72rem;
-    font-weight: 900;
-    letter-spacing: .06em;
-}
-
-.public-home-page .campo-rate-rules {
-    gap: .85rem;
-}
-
-.public-home-page .campo-rate-rule {
-    min-height: 76px;
-    padding: .95rem 1rem .95rem 1.15rem;
-    border: 1px solid rgba(233, 226, 216, .98);
-    border-left: 4px solid var(--campo-orange);
-    border-radius: 10px;
-    background: rgba(255, 255, 255, .94);
-    box-shadow: 0 14px 30px rgba(24, 59, 42, .06);
-}
-
-.public-home-page .campo-rate-rule:hover {
-    border-color: #E0D6CA;
-    border-left-color: var(--campo-orange);
-    transform: translateY(-2px);
-    box-shadow: 0 18px 36px rgba(24, 59, 42, .10);
-}
-
-.public-home-page .campo-rate-rule-main {
-    gap: .45rem .7rem;
-    font-size: .92rem;
-}
-
-.public-home-page .campo-rate-rule-main strong {
-    color: var(--campo-ink);
-    font-size: 1rem;
-}
-
-.public-home-page .campo-rate-rule-price {
-    color: var(--campo-green-dark);
-    font-size: 1.55rem;
-}
-
-.public-home-page .campo-rate-simple > .btn-primary {
-    min-height: 58px;
-    margin-top: 1.8rem !important;
-    margin-bottom: 0;
-    border-radius: 999px;
-    background: var(--campo-green-dark);
-    border-color: var(--campo-green-dark);
-    color: #fff;
-    font-size: 1.05rem;
-    font-weight: 900;
-    box-shadow: 0 18px 34px rgba(23, 79, 50, .25);
-}
-
-.public-home-page .campo-rate-simple > .btn-primary::before {
-    content: "\f073";
-    margin-right: .58rem;
-    font-family: "Font Awesome 6 Free";
-    font-weight: 900;
-}
-
-.public-home-page .campo-rate-simple > .btn-primary::after {
-    content: "\f061";
-    margin-left: .58rem;
-    font-family: "Font Awesome 6 Free";
-    font-weight: 900;
-}
-
-.public-home-page .campo-rate-simple > .btn-primary:hover,
-.public-home-page .campo-rate-simple > .btn-primary:focus {
-    background: var(--campo-green);
-    border-color: var(--campo-green);
-    transform: translateY(-1px);
-}
-
-.public-home-page .campo-gallery-section .section-header,
-.public-home-page .campo-contact-section .section-header {
-    max-width: 1040px;
-    margin-left: auto;
-    margin-right: auto;
-    text-align: left !important;
-}
-
-.public-home-page .campo-gallery-section .row {
-    justify-content: center;
-    margin-right: -14px;
-    margin-left: -14px;
-    row-gap: .75rem;
-}
-
-.public-home-page .campo-gallery-section .row > [class*="col-"] {
-    padding-right: 14px;
-    padding-left: 14px;
-}
-
-.public-home-page .campo-gallery-section .gallery-card {
-    min-height: 100%;
-    border: 1px solid rgba(233, 226, 216, .94);
-    border-radius: 12px;
-    background: #fff;
-    box-shadow: 0 20px 46px rgba(24, 59, 42, .10);
-}
-
-.public-home-page .campo-gallery-section .gallery-card:hover {
-    border-color: #DDD1C5;
-    transform: translateY(-4px);
-    box-shadow: 0 28px 62px rgba(24, 59, 42, .14);
-}
-
-.public-home-page .campo-gallery-section .gallery-image-wrap {
-    aspect-ratio: 16 / 9;
-    background: var(--campo-cream);
-}
-
-.public-home-page .campo-gallery-section .gallery-body {
-    min-height: 86px;
-    display: grid;
-    grid-template-columns: 46px 1fr 34px;
-    gap: .8rem;
-    align-items: center;
-    padding: 1rem 1.05rem;
-}
-
-.public-home-page .campo-gallery-section .gallery-body::before {
-    content: "\f1e3";
-    display: inline-flex;
-    width: 42px;
-    height: 42px;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid rgba(47, 107, 70, .22);
-    border-radius: 8px;
-    background: rgba(47, 107, 70, .08);
-    color: var(--campo-green);
-    font-family: "Font Awesome 6 Free";
-    font-size: 1.15rem;
-    font-weight: 900;
-}
-
-.public-home-page .campo-gallery-section .gallery-body::after {
-    content: "\f061";
-    display: inline-flex;
-    width: 34px;
-    height: 34px;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid rgba(47, 107, 70, .22);
-    border-radius: 50%;
-    color: var(--campo-green);
-    font-family: "Font Awesome 6 Free";
-    font-size: .82rem;
-    font-weight: 900;
-}
-
-.public-home-page .campo-gallery-section .gallery-title {
-    margin-bottom: .15rem;
-    color: var(--campo-ink);
-    font-size: 1.15rem;
-    font-weight: 900;
-    line-height: 1.2;
-}
-
-.public-home-page .campo-gallery-section .gallery-caption {
-    color: var(--campo-muted);
-    font-size: .92rem;
-    line-height: 1.35;
-}
-
-.public-home-page .campo-gallery-section .gallery-overlay {
-    background: linear-gradient(180deg, transparent 45%, rgba(23, 79, 50, .44));
-}
-
-.public-home-page .campo-contact-section {
-    padding-top: 5.2rem;
-    background:
-        radial-gradient(circle at 90% 38%, rgba(47, 107, 70, .10), transparent 17rem),
-        radial-gradient(circle at 4% 92%, rgba(47, 107, 70, .08), transparent 20rem),
-        var(--campo-cream-light) !important;
-}
-
-.public-home-page .campo-contact-section .section-header h2 {
-    margin-bottom: .8rem;
-}
-
-.public-home-page .campo-contact-section .section-header h2::after {
-    content: "We'd love to hear from you. Get in touch or drop by.";
-    display: block;
-    margin-top: .75rem;
-    color: var(--campo-muted);
-    font-size: 1.04rem;
-    font-weight: 700;
-    line-height: 1.45;
-}
-
-.public-home-page .campo-contact-section .row {
-    row-gap: 1.25rem;
-}
-
-.public-home-page .campo-contact-item {
-    min-height: 150px;
-    padding: 1.55rem;
-    border: 1px solid rgba(233, 226, 216, .94);
-    border-left: 0;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, .96);
-    box-shadow: 0 20px 46px rgba(24, 59, 42, .09);
-}
-
-.public-home-page .campo-contact-item::before {
-    height: 0;
-    background: none;
-}
-
-.public-home-page .campo-contact-item:hover {
-    border-color: #DDD1C5;
-    transform: translateY(-3px);
-    box-shadow: 0 28px 58px rgba(24, 59, 42, .13);
-}
-
-.public-home-page .campo-contact-icon {
-    width: 54px;
-    height: 54px;
-    flex-basis: 54px;
-    border-radius: 50%;
-    background: var(--campo-orange-soft);
-    color: var(--campo-orange);
-    font-size: 1.08rem;
-    box-shadow: inset 0 0 0 1px rgba(244, 121, 58, .18);
-}
-
-.public-home-page .campo-contact-item h3 {
-    margin-bottom: .58rem;
-    background: transparent;
-    color: var(--campo-green);
-    padding: 0;
-    letter-spacing: .08em;
-}
-
-.public-home-page .campo-contact-item p {
-    color: var(--campo-muted);
-    font-size: 1rem;
-    line-height: 1.55;
-}
-
-.public-home-page .campo-contact-item strong {
-    color: var(--campo-ink);
-    font-size: 1.06rem;
-    font-weight: 900;
-}
-
-.public-home-page .campo-footer {
-    padding-top: 2rem;
-    padding-bottom: 2rem;
-    background:
-        radial-gradient(circle at 16% 120%, rgba(47, 107, 70, .42), transparent 22rem),
-        linear-gradient(135deg, #0F3C26, var(--campo-green-dark));
-    color: #fff;
-    border-top: 0;
-}
-
-.public-home-page .campo-footer .footer-links {
-    display: flex;
-    gap: .75rem;
-}
-
-.public-home-page .campo-footer .footer-links a {
-    padding: .35rem .7rem;
-    border-radius: 999px;
-    color: rgba(255, 255, 255, .90);
-    font-weight: 800;
-}
-
-.public-home-page .campo-footer .footer-links a:hover,
-.public-home-page .campo-footer .footer-links a:focus {
-    background: rgba(255, 255, 255, .08);
-    color: #fff;
-}
-
-.public-home-page .campo-footer .footer-social a {
-    width: 42px;
-    height: 42px;
-    background: rgba(255, 255, 255, .12);
-    color: #fff;
-}
-
-.public-home-page .campo-footer .footer-social a:hover,
-.public-home-page .campo-footer .footer-social a:focus {
-    background: var(--campo-orange);
-    color: #fff;
-}
-
-@media (max-width: 991.98px) {
-    .public-home-page .site-navbar .navbar-collapse {
-        margin-top: .8rem;
-        padding: .85rem;
-        border: 1px solid var(--campo-line);
-        border-radius: 12px;
-        background: var(--campo-cream-light);
-        box-shadow: 0 18px 36px rgba(24, 59, 42, .10);
-    }
-
-    .public-home-page .campo-home-hero {
-        min-height: 620px;
-    }
-
-    .public-home-page .campo-home-hero::before {
-        width: 72vw;
-    }
-
-    .public-home-page .campo-rate-row {
-        grid-template-columns: 1fr;
-        gap: 1.25rem;
-    }
-
-    .public-home-page .campo-rate-copy p {
-        max-width: 100%;
-    }
-}
-
-@media (max-width: 767.98px) {
-    .public-home-page .site-navbar,
-    .public-home-page .site-navbar .container {
-        min-height: 76px;
-    }
-
-    .public-home-page .site-navbar-cta .btn-book-turf {
-        min-height: 42px;
-        padding: .68rem .95rem;
-        font-size: .9rem;
-    }
-
-    .public-home-page .site-navbar-cta .btn-book-turf::before {
-        display: none;
-    }
-
-    .public-home-page .campo-home-hero {
-        min-height: 560px;
-        padding-top: 4rem;
-        padding-bottom: 3.75rem;
-    }
-
-    .public-home-page .campo-home-hero::before {
-        width: 92vw;
-        opacity: .62;
-    }
-
-    .public-home-page .campo-home-hero .hero-title {
-        font-size: clamp(3rem, 15vw, 4.35rem);
-    }
-
-    .public-home-page .campo-home-hero .hero-subtitle {
-        font-size: 1.02rem;
-    }
-
-    .public-home-page .hero-book-btn {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .public-home-page .campo-hero-notes {
-        display: grid;
-        grid-template-columns: 1fr;
-    }
-
-    .public-home-page .campo-rates-section,
-    .public-home-page .campo-gallery-section,
-    .public-home-page .campo-contact-section {
-        padding-top: 4rem;
-        padding-bottom: 4rem;
-    }
-
-    .public-home-page .section-header h2 {
-        font-size: 2.35rem;
-    }
-
-    .public-home-page .campo-gallery-section .section-header,
-    .public-home-page .campo-contact-section .section-header {
-        text-align: center !important;
-    }
-
-    .public-home-page .section-eyebrow {
-        justify-content: center;
-    }
-
-    .public-home-page .campo-rate-simple {
-        padding: 1.35rem;
-    }
-
-    .public-home-page .campo-rate-rule {
-        grid-template-columns: 1fr;
-        gap: .75rem;
-    }
-
-    .public-home-page .campo-rate-rule-price {
-        text-align: left;
-    }
-
-    .public-home-page .campo-gallery-section .gallery-body {
-        grid-template-columns: 42px 1fr;
-    }
-
-    .public-home-page .campo-gallery-section .gallery-body::after {
-        display: none;
-    }
-
-    .public-home-page .campo-contact-item {
-        min-height: 0;
-    }
-}
-
-@media (max-width: 575.98px) {
-    .public-home-page .campo-logo-img {
-        width: min(178px, 48vw);
-    }
-
-    .public-home-page .site-navbar .container {
-        gap: .35rem;
-    }
-
-    .public-home-page .campo-home-hero .hero-title {
-        max-width: 360px;
-    }
-
-    .public-home-page .campo-rate-rule-price {
-        font-size: 1.35rem;
-    }
-
-    .public-home-page .campo-contact-item {
-        display: grid;
-        grid-template-columns: 54px 1fr;
-    }
 }
 
 /* Mobile navbar alignment */
 @media (max-width: 767.98px) {
-    .site-navbar,
-    .public-home-page .site-navbar {
+    .site-navbar {
         padding: .55rem 0;
     }
 
-    .site-navbar .container,
-    .public-home-page .site-navbar .container {
+    .site-navbar .container {
         display: grid;
         grid-template-columns: minmax(0, 1fr) 56px;
         gap: .55rem;
@@ -4604,8 +2893,7 @@ body {
         min-height: 64px;
     }
 
-    .site-navbar .navbar-brand,
-    .public-home-page .site-navbar .navbar-brand {
+    .site-navbar .navbar-brand {
         grid-column: 1;
         justify-self: end;
         min-width: 0;
@@ -4613,14 +2901,12 @@ body {
         margin-right: 0;
     }
 
-    .site-navbar .campo-logo-img,
-    .public-home-page .campo-logo-img {
+    .site-navbar .campo-logo-img {
         width: clamp(140px, 36vw, 178px);
         max-height: 56px;
     }
 
-    .site-navbar .navbar-toggler,
-    .public-home-page .site-navbar .navbar-toggler {
+    .site-navbar .navbar-toggler {
         grid-column: 2;
         justify-self: end;
         width: 54px;
@@ -4628,14 +2914,12 @@ body {
         padding: .42rem;
     }
 
-    .site-navbar .navbar-toggler-icon,
-    .public-home-page .site-navbar .navbar-toggler-icon {
+    .site-navbar .navbar-toggler-icon {
         width: 1.75em;
         height: 1.75em;
     }
 
-    .site-navbar .navbar-collapse,
-    .public-home-page .site-navbar .navbar-collapse {
+    .site-navbar .navbar-collapse {
         grid-column: 1 / -1;
         width: 100%;
         margin-top: .65rem;
@@ -4646,31 +2930,25 @@ body {
         box-shadow: 0 18px 36px rgba(24, 59, 42, .10);
     }
 
-    .site-navbar .navbar-collapse.collapse:not(.show),
-    .public-home-page .site-navbar .navbar-collapse.collapse:not(.show) {
+    .site-navbar .navbar-collapse.collapse:not(.show) {
         display: none !important;
     }
 
     .site-navbar .navbar-collapse.show,
-    .site-navbar .navbar-collapse.collapsing,
-    .public-home-page .site-navbar .navbar-collapse.show,
-    .public-home-page .site-navbar .navbar-collapse.collapsing {
+.site-navbar .navbar-collapse.collapsing {
         display: block !important;
     }
 
-    .site-navbar .site-navbar-nav,
-    .public-home-page .site-navbar .site-navbar-nav {
+    .site-navbar .site-navbar-nav {
         gap: .25rem;
         padding: 0;
     }
 
-    .site-navbar .navbar-collapse .nav-item,
-    .public-home-page .site-navbar .navbar-collapse .nav-item {
+    .site-navbar .navbar-collapse .nav-item {
         width: 100%;
     }
 
-    .site-navbar .navbar-collapse .nav-link,
-    .public-home-page .site-navbar .navbar-collapse .nav-link {
+    .site-navbar .navbar-collapse .nav-link {
         width: 100%;
         min-height: 42px;
         justify-content: flex-start;
@@ -4693,22 +2971,20 @@ body {
         font-size: .95rem;
         font-weight: 900;
     }
+
 }
 
 @media (max-width: 389.98px) {
-    .site-navbar .container,
-    .public-home-page .site-navbar .container {
+    .site-navbar .container {
         grid-template-columns: minmax(0, 1fr) 52px;
         gap: .4rem;
     }
 
-    .site-navbar .campo-logo-img,
-    .public-home-page .campo-logo-img {
+    .site-navbar .campo-logo-img {
         width: clamp(128px, 34vw, 150px);
     }
 
-    .site-navbar .navbar-toggler,
-    .public-home-page .site-navbar .navbar-toggler {
+    .site-navbar .navbar-toggler {
         width: 50px;
         height: 50px;
     }
@@ -4717,18 +2993,17 @@ body {
         min-height: 44px;
         font-size: .9rem;
     }
+
 }
 
 /* Center the brand/logo consistently */
-.site-navbar .navbar-brand,
-.public-home-page .site-navbar .navbar-brand {
+.site-navbar .navbar-brand {
     justify-content: center;
     min-width: 260px;
     text-align: center;
 }
 
-.site-navbar .navbar-brand .campo-logo-img,
-.public-home-page .site-navbar .navbar-brand .campo-logo-img {
+.site-navbar .navbar-brand .campo-logo-img {
     width: min(270px, 56vw);
     max-height: 78px;
     margin-right: auto;
@@ -4736,270 +3011,22 @@ body {
 }
 
 @media (max-width: 767.98px) {
-    .site-navbar .navbar-brand,
-    .public-home-page .site-navbar .navbar-brand {
+    .site-navbar .navbar-brand {
         justify-self: center;
         min-width: 0;
     }
 
-    .site-navbar .navbar-brand .campo-logo-img,
-    .public-home-page .site-navbar .navbar-brand .campo-logo-img {
+    .site-navbar .navbar-brand .campo-logo-img {
         width: clamp(165px, 46vw, 205px);
         max-height: 64px;
     }
+
 }
 
 @media (max-width: 389.98px) {
-    .site-navbar .navbar-brand .campo-logo-img,
-    .public-home-page .site-navbar .navbar-brand .campo-logo-img {
+    .site-navbar .navbar-brand .campo-logo-img {
         width: clamp(148px, 42vw, 178px);
         max-height: 58px;
     }
-}
 
-/* Soft CAMPO leaf and icon decorations */
-.public-home-page .campo-rates-section,
-.public-home-page .campo-gallery-section,
-.public-home-page .campo-contact-section {
-    isolation: isolate;
-}
-
-.public-home-page .campo-rate-simple {
-    position: relative;
-}
-
-.public-home-page .campo-rate-simple > * {
-    position: relative;
-    z-index: 1;
-}
-
-.public-home-page .campo-rate-simple::before {
-    content: "\f1e3";
-    position: absolute;
-    left: 28%;
-    bottom: 5.6rem;
-    z-index: 0;
-    color: rgba(47, 107, 70, .08);
-    font-family: "Font Awesome 6 Free";
-    font-size: 3.1rem;
-    font-weight: 900;
-    transform: rotate(-15deg);
-}
-
-.public-home-page .campo-rate-copy::after {
-    content: "";
-    position: absolute;
-    right: 1rem;
-    bottom: .2rem;
-    width: 5.2rem;
-    height: 7.4rem;
-    background:
-        radial-gradient(circle at 50% 12%, rgba(47, 107, 70, .13) 0 .52rem, transparent .56rem),
-        linear-gradient(78deg, transparent 0 39%, rgba(47, 107, 70, .10) 40% 48%, transparent 49%),
-        linear-gradient(105deg, transparent 0 35%, rgba(47, 107, 70, .10) 36% 44%, transparent 45%);
-    opacity: .72;
-    pointer-events: none;
-}
-
-.public-home-page .campo-rate-copy {
-    position: relative;
-}
-
-.public-home-page .campo-gallery-section .gallery-body::before {
-    display: none;
-}
-
-.public-home-page .gallery-card-icon {
-    display: inline-flex;
-    width: 42px;
-    height: 42px;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid rgba(47, 107, 70, .22);
-    border-radius: 8px;
-    background: rgba(47, 107, 70, .08);
-    color: var(--campo-green);
-    font-size: 1.15rem;
-}
-
-.public-home-page .gallery-copy {
-    min-width: 0;
-}
-
-/* Continuous subtle turf-line background */
-.public-home-page .campo-rates-section::before,
-.public-home-page .campo-rates-section::after,
-.public-home-page .campo-gallery-section::before,
-.public-home-page .campo-gallery-section::after,
-.public-home-page .campo-contact-section::before,
-.public-home-page .campo-contact-section::after,
-.public-home-page .campo-rate-copy::after {
-    content: none;
-    display: none;
-}
-
-/* Unified Rates, Gallery, and Contact area */
-.public-home-page .campo-home-main-sections {
-    --campo-home-vine-art: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 1600'%3E%3Cg fill='none' stroke='%232F6B46' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M88 1572C42 1414 132 1298 82 1168C38 1054 126 950 84 824C48 716 128 618 88 496C56 398 82 296 126 28' stroke-width='12'/%3E%3Cpath d='M88 1438C56 1404 34 1372 18 1332' stroke-width='7'/%3E%3Cpath d='M94 1280c34-38 58-76 74-118' stroke-width='7'/%3E%3Cpath d='M78 1092c-31-34-52-70-64-108' stroke-width='6'/%3E%3Cpath d='M94 920c32-34 55-70 70-112' stroke-width='6'/%3E%3Cpath d='M82 752c-30-32-52-66-66-104' stroke-width='6'/%3E%3Cpath d='M92 586c32-34 56-70 74-110' stroke-width='6'/%3E%3Cpath d='M98 392c-31-34-53-70-66-108' stroke-width='6'/%3E%3Cpath d='M110 210c-28-34-50-70-62-110' stroke-width='6'/%3E%3C/g%3E%3Cg fill='%232F6B46'%3E%3Cellipse cx='30' cy='1332' rx='36' ry='14' transform='rotate(38 30 1332)'/%3E%3Cellipse cx='144' cy='1162' rx='38' ry='15' transform='rotate(-42 144 1162)'/%3E%3Cellipse cx='32' cy='984' rx='34' ry='14' transform='rotate(34 32 984)'/%3E%3Cellipse cx='142' cy='808' rx='36' ry='14' transform='rotate(-38 142 808)'/%3E%3Cellipse cx='34' cy='648' rx='34' ry='14' transform='rotate(34 34 648)'/%3E%3Cellipse cx='144' cy='476' rx='37' ry='14' transform='rotate(-38 144 476)'/%3E%3Cellipse cx='48' cy='284' rx='34' ry='14' transform='rotate(42 48 284)'/%3E%3Cellipse cx='66' cy='100' rx='32' ry='13' transform='rotate(48 66 100)'/%3E%3Cellipse cx='76' cy='1494' rx='35' ry='14' transform='rotate(48 76 1494)'/%3E%3C/g%3E%3C/svg%3E");
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    background:
-        radial-gradient(circle at 9% 10%, rgba(47, 107, 70, .055), transparent 22rem),
-        radial-gradient(circle at 6% 92%, rgba(47, 107, 70, .045), transparent 20rem),
-        radial-gradient(circle at 94% 64%, rgba(47, 107, 70, .045), transparent 24rem),
-        linear-gradient(180deg, var(--campo-cream-light) 0%, var(--campo-cream) 55%, var(--campo-cream-light) 100%);
-}
-
-.public-home-page .campo-home-main-sections::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: clamp(.75rem, 2vw, 2rem);
-    z-index: 0;
-    width: clamp(8rem, 11vw, 13rem);
-    pointer-events: none;
-    opacity: .11;
-    background-repeat: no-repeat;
-    background-position: left top;
-    background-size: 100% 100%;
-    background-image: var(--campo-home-vine-art);
-}
-
-.public-home-page .campo-home-main-sections::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: clamp(.75rem, 2vw, 2rem);
-    bottom: 0;
-    z-index: 0;
-    width: clamp(8rem, 11vw, 13rem);
-    pointer-events: none;
-    opacity: .095;
-    background-repeat: no-repeat;
-    background-position: right top;
-    background-size: 100% 100%;
-    background-image: var(--campo-home-vine-art);
-    transform: scaleX(-1);
-    transform-origin: center;
-}
-
-.public-home-page .campo-home-main-sections > .campo-rates-section,
-.public-home-page .campo-home-main-sections > .campo-gallery-contact-wrap {
-    position: relative;
-    z-index: 1;
-    background: transparent !important;
-}
-
-.public-home-page .campo-home-main-sections > section + section {
-    padding-top: clamp(2.75rem, 5vw, 5rem);
-}
-
-.public-home-page .campo-home-main-sections .container {
-    position: relative;
-    z-index: 1;
-}
-
-@media (max-width: 767.98px) {
-    .public-home-page .campo-home-main-sections::before {
-        top: 0;
-        bottom: 0;
-        left: .35rem;
-        width: 5rem;
-        opacity: .07;
-    }
-
-    .public-home-page .campo-home-main-sections::after {
-        top: 0;
-        right: .35rem;
-        bottom: 0;
-        width: 5rem;
-        opacity: .06;
-    }
-}
-
-/* Remove homepage decorative background artwork */
-.public-home-page .campo-rates-section,
-.public-home-page .campo-gallery-section,
-.public-home-page .campo-contact-section {
-    background-image: none;
-    background-color: var(--campo-cream-light);
-}
-
-.public-home-page .campo-rates-section::before,
-.public-home-page .campo-rates-section::after,
-.public-home-page .campo-gallery-section::before,
-.public-home-page .campo-gallery-section::after,
-.public-home-page .campo-contact-section::before,
-.public-home-page .campo-contact-section::after,
-.public-home-page .campo-rate-copy::after {
-    content: none;
-    display: none;
-}
-
-/* Final combined-section guard */
-.public-home-page .campo-home-main-sections > .campo-rates-section,
-.public-home-page .campo-gallery-contact-wrap > .campo-gallery-section,
-.public-home-page .campo-gallery-contact-wrap > .campo-contact-section {
-    background: transparent !important;
-}
-
-/* Shared Gallery and Contact spacing within the lower decorative canvas */
-.public-home-page .campo-home-main-sections {
-    overflow: hidden;
-}
-
-.public-home-page .campo-gallery-contact-wrap {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    z-index: 1;
-}
-
-.public-home-page .campo-gallery-contact-wrap::before,
-.public-home-page .campo-gallery-contact-wrap::after {
-    content: none;
-    display: none;
-}
-
-.public-home-page .campo-rates-section,
-.public-home-page .campo-gallery-contact-wrap > .campo-gallery-section,
-.public-home-page .campo-gallery-contact-wrap > .campo-contact-section {
-    position: relative;
-    z-index: 1;
-    background: transparent !important;
-}
-
-.public-home-page .campo-gallery-contact-wrap .container {
-    position: relative;
-    z-index: 2;
-}
-
-/* Subtle contact backdrop */
-.public-home-page .campo-gallery-contact-wrap > .campo-contact-section {
-    overflow: hidden;
-    background-color: transparent !important;
-    background-image:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 320'%3E%3Cg fill='none' stroke='%232F6B46' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M56 284C218 174 366 150 530 210C718 278 872 224 1036 74' stroke-width='5' stroke-opacity='.11'/%3E%3Cpath d='M148 306C330 232 478 232 638 276C794 318 930 286 1090 174' stroke-width='4' stroke-opacity='.075'/%3E%3Cpath d='M834 42C936 74 1018 138 1108 246' stroke-width='4' stroke-opacity='.065'/%3E%3Ccircle cx='214' cy='222' r='88' stroke-width='4' stroke-opacity='.045'/%3E%3Ccircle cx='1008' cy='190' r='110' stroke-width='4' stroke-opacity='.05'/%3E%3C/g%3E%3Cg fill='%232F6B46' fill-opacity='.055'%3E%3Cellipse cx='128' cy='250' rx='42' ry='14' transform='rotate(26 128 250)'/%3E%3Cellipse cx='1058' cy='122' rx='46' ry='15' transform='rotate(-28 1058 122)'/%3E%3Cellipse cx='912' cy='256' rx='38' ry='13' transform='rotate(-16 912 256)'/%3E%3C/g%3E%3C/svg%3E") !important;
-    background-position: center bottom;
-    background-repeat: no-repeat;
-    background-size: min(78rem, 94vw) 20rem;
-}
-
-/* Tighter lower homepage section rhythm */
-.public-home-page .campo-rates-section,
-.public-home-page .campo-gallery-contact-wrap > .campo-gallery-section,
-.public-home-page .campo-gallery-contact-wrap > .campo-contact-section {
-    padding-top: clamp(3.6rem, 4.2vw, 4.1rem);
-    padding-bottom: clamp(3.6rem, 4.2vw, 4.1rem);
-}
-
-@media (max-width: 767.98px) {
-    .public-home-page .campo-rates-section,
-    .public-home-page .campo-gallery-contact-wrap > .campo-gallery-section,
-    .public-home-page .campo-gallery-contact-wrap > .campo-contact-section {
-        padding-top: 3rem;
-        padding-bottom: 3rem;
-    }
 }

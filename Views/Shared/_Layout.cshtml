@@ -47,9 +47,12 @@
         }
     </style>
 
+    <!-- Customer presentation only; admin and staff use separate layouts. -->
+    <link rel="stylesheet" href="~/css/public.css" asp-append-version="true" />
+
     @await RenderSectionAsync("Styles", required: false)
 </head>
-<body class="hold-transition layout-top-nav @(isHomePage ? "public-home-page" : "")" data-color-scheme="@theme.Key">
+<body class="hold-transition layout-top-nav public-site @(isHomePage ? "public-home-page" : "")" data-color-scheme="@theme.Key">
     <div class="wrapper">
         @await RenderSectionAsync("AnnouncementBar", required: false)
 
