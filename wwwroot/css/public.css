@@ -53,8 +53,8 @@
     position: relative;
     padding: 1rem 0;
     min-height: 88px;
-    border-bottom: 1px solid var(--campo-line);
-    background: var(--campo-cream) !important;
+    border-bottom: 1px solid rgba(245, 240, 231, .15);
+    background: var(--campo-green-deep) !important;
     box-shadow: none;
 }
 
@@ -78,6 +78,11 @@
     object-fit: contain;
 }
 
+.public-site .site-navbar .campo-logo-img,
+.public-site .campo-footer .campo-logo-img {
+    filter: brightness(0) invert(1);
+}
+
 .public-site .site-navbar .navbar-collapse {
     justify-content: center;
 }
@@ -85,9 +90,9 @@
 .public-site .site-navbar-nav {
     gap: .2rem;
     padding: .3rem;
-    border: 1px solid var(--campo-line);
+    border: 1px solid rgba(245, 240, 231, .25);
     border-radius: 999px;
-    background: rgba(255, 255, 255, .65);
+    background: rgba(245, 240, 231, .06);
 }
 
 .public-site .site-navbar .nav-link {
@@ -95,7 +100,7 @@
     padding: .6rem 1rem !important;
     border-radius: 999px;
     background: transparent;
-    color: var(--campo-green) !important;
+    color: var(--campo-cream) !important;
     font-size: .95rem;
     font-weight: 600;
     white-space: nowrap;
@@ -106,7 +111,7 @@
 .public-site .site-navbar .nav-link:focus,
 .public-site .site-navbar .nav-link.active {
     background: var(--campo-cream);
-    color: var(--campo-green-dark) !important;
+    color: var(--campo-ink) !important;
 }
 
 .public-site .site-navbar .nav-link.active::after {
@@ -134,32 +139,6 @@
 }
 
 /* Homepage hero: retain the CMS photograph and all existing copy. */
-.public-home-page .site-navbar {
-    background: var(--campo-green-deep) !important;
-    border-bottom-color: rgba(245, 240, 231, .15);
-}
-
-.public-home-page .site-navbar .campo-logo-img,
-.public-site .campo-footer .campo-logo-img {
-    filter: brightness(0) invert(1);
-}
-
-.public-home-page .site-navbar-nav {
-    background: rgba(245, 240, 231, .06);
-    border-color: rgba(245, 240, 231, .25);
-}
-
-.public-home-page .site-navbar .nav-link {
-    color: var(--campo-cream) !important;
-}
-
-.public-home-page .site-navbar .nav-link:hover,
-.public-home-page .site-navbar .nav-link:focus,
-.public-home-page .site-navbar .nav-link.active {
-    color: var(--campo-ink) !important;
-    background: var(--campo-cream);
-}
-
 .public-home-page .campo-home-hero {
     display: flex;
     align-items: flex-end;
@@ -276,8 +255,10 @@
     bottom: 0;
     left: 0;
     z-index: -1;
-    width: clamp(56px, 13vw, 220px);
-    background: url('../img/branding/campo-section-pattern.svg') left top / auto 100% no-repeat;
+    width: clamp(72px, 18vw, 300px);
+    /* The wider SVG canvas keeps the balls inward while letting artwork reach the page edge. */
+    background: url('../img/branding/campo-section-pattern.svg') 33.333333% top / auto 100% no-repeat;
+    mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
     opacity: .8;
     pointer-events: none;
 }
@@ -1110,14 +1091,10 @@
         height: 48px;
         padding: .5rem;
         border-radius: 50%;
-        border-color: var(--campo-line);
-    }
-
-    .public-home-page .site-navbar .navbar-toggler {
         border-color: rgba(245, 240, 231, .4);
     }
 
-    .public-home-page .site-navbar .navbar-toggler-icon {
+    .public-site .site-navbar .navbar-toggler-icon {
         filter: invert(1);
     }
 

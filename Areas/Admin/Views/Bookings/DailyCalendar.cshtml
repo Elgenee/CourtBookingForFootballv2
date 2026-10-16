@@ -1,0 +1,11 @@
+@model CourtBookingSystem.ViewModels.DailyBookingCalendarViewModel
+@{
+    ViewData["Title"] = "Daily Booking Calendar";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/daily-booking-calendar.css" asp-append-version="true" />
+}
+<partial name="_DailyBookingCalendar" model="Model" />
+@section Scripts {
+    <script src="~/js/daily-booking-calendar.js" asp-append-version="true"></script>
+}

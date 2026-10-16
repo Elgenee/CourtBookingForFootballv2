@@ -1,0 +1,8 @@
+@model CourtBookingSystem.ViewModels.DailyBookingCalendarViewModel
+<div class="daily-calendar" data-daily-calendar>
+    <div class="daily-calendar-feedback" role="status" aria-live="polite" aria-atomic="true"></div>
+    <button type="button" class="btn btn-outline-secondary btn-sm mb-3" data-calendar-retry hidden>Retry loading</button>
+    <div class="daily-calendar-body">
+        <partial name="_DailyBookingCalendarContent" model="Model" />
+    </div>
+</div>

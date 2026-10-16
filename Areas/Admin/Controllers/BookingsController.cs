@@ -70,6 +70,26 @@ namespace CourtBookingSystem.Areas.Admin.Controllers
             return View(filter);
         }
 
+        [HttpGet]
+        [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+        public async Task<IActionResult> DailyCalendar([FromServices] DailyBookingCalendarService calendar,
+            DateTime? date, int? courtId, bool partial = false)
+        {
+            var selectedDate = (date ?? PhilippineTime.Today).Date;
+            if (!ModelState.IsValid || selectedDate.Year < 1900 || selectedDate.Year > 2100)
+                return BadRequest("Choose a valid date between 1900 and 2100.");
+
+            try
+            {
+                var model = await calendar.BuildAsync(selectedDate, courtId);
+                return partial ? PartialView("_DailyBookingCalendarContent", model) : View(model);
+            }
+            catch (ArgumentException)
+            {
+                return BadRequest("The selected field does not exist.");
+            }
+        }
+
         public async Task<IActionResult> Calendar(string? month, int? courtId, SportType? sport, BookingStatus? status)
         {
             var model = await BuildCalendarViewModelAsync(month, courtId, sport, status);
