@@ -6,6 +6,9 @@
         ?? new CourtBookingSystem.Models.Cms.AboutContent();
     var galleryItems = ViewBag.Gallery as List<CourtBookingSystem.Models.Cms.GalleryImage>
         ?? new List<CourtBookingSystem.Models.Cms.GalleryImage>();
+    var contactEmail = about.ContactEmail?.Trim();
+    var contactPhoneLink = "tel:" + new string((about.ContactPhone ?? "")
+        .Where(c => char.IsDigit(c) || c == '+').ToArray());
 
     var activeCourts = (Model ?? Enumerable.Empty<CourtBookingSystem.Models.Court>())
         .Where(c => c.IsActive)
@@ -27,6 +30,14 @@
     }
     string RuleWindow(BookingPricingRule rule) =>
         $"{PhilippineTime.FormatTime(rule.StartTime)} - {PhilippineTime.FormatTime(rule.EndTime)}";
+    // Presentation labels only; the configured time windows and amounts remain authoritative.
+    (string Key, string Label, string Icon) RatePeriod(TimeSpan start) => start.Hours switch
+    {
+        >= 5 and < 12 => ("morning", "Morning", "fas fa-cloud-sun"),
+        >= 12 and < 18 => ("afternoon", "Afternoon", "fas fa-sun"),
+        _ => ("night", "Night", "fas fa-moon")
+    };
+    string RateAmount(decimal rate) => rate.ToString(rate == decimal.Truncate(rate) ? "N0" : "N2");
     string RuleDates(BookingPricingRule rule)
     {
         if (!rule.IsPromotional) return "All dates";
@@ -90,8 +101,8 @@
             <div class="col-lg-10 col-xl-10">
                 <div class="section-header text-center mb-4">
                     <span class="section-eyebrow">Rates</span>
-                    <h2>Hourly Rates</h2>
-                @*     <p class="text-muted mb-0">Pricing rules are shown from the backend configuration.</p> *@
+                    <h2>Hourly <span>Rates</span></h2>
+                    <p class="mb-0">Simple hourly pricing for matches, training, school activities, and private bookings.</p>
                 </div>
 
                 <div class="campo-rate-card campo-rate-simple">
@@ -116,17 +127,22 @@
                                     {
                                         @foreach (var rule in pricingRules)
                                         {
-                                            <div class="campo-rate-rule">
+                                            var period = RatePeriod(rule.StartTime);
+                                            <div class="campo-rate-rule campo-rate-rule--@period.Key">
+                                                <span class="campo-rate-icon" aria-hidden="true"><i class="@period.Icon"></i></span>
                                                 <div class="campo-rate-rule-main">
-                                                    <span class="campo-rate-rule-type @(rule.IsPromotional ? "is-promo" : "")">
-                                                        @(rule.IsPromotional ? "Promo" : "Regular")
-                                                    </span>
-                                                    <strong>@rule.Name</strong>
-                                                    <span>@RuleWindow(rule)</span>
-                                                    <span>@RuleDates(rule)</span>
+                                                    <div class="campo-rate-rule-heading">
+                                                        <span class="campo-rate-period">@period.Label</span>
+                                                        <span class="campo-rate-rule-type @(rule.IsPromotional ? "is-promo" : "")">
+                                                            @(rule.IsPromotional ? "Promo" : "Regular")
+                                                        </span>
+                                                    </div>
+                                                    <strong>@RuleWindow(rule)</strong>
+                                                    <span class="campo-rate-rule-meta">@rule.Name · @RuleDates(rule)</span>
                                                 </div>
                                                 <div class="campo-rate-rule-price">
-                                                    <span>PHP</span> @rule.HourlyRate.ToString("N2") <small>/ hour</small>
+                                                    <div><span>₱</span> @RateAmount(rule.HourlyRate)</div>
+                                                    <small>/ hour</small>
                                                 </div>
                                             </div>
                                         }
@@ -134,14 +150,18 @@
                                     else
                                     {
                                         <div class="campo-rate-rule">
+                                            <span class="campo-rate-icon" aria-hidden="true"><i class="far fa-clock"></i></span>
                                             <div class="campo-rate-rule-main">
-                                                <span class="campo-rate-rule-type">Base</span>
-                                                <strong>Standard rate</strong>
-                                                <span>All operating hours</span>
-                                                <span>Fallback court rate</span>
+                                                <div class="campo-rate-rule-heading">
+                                                    <span class="campo-rate-period">Standard rate</span>
+                                                    <span class="campo-rate-rule-type">Base</span>
+                                                </div>
+                                                <strong>All operating hours</strong>
+                                                <span class="campo-rate-rule-meta">Fallback court rate</span>
                                             </div>
                                             <div class="campo-rate-rule-price">
-                                                <span>PHP</span> @court.HourlyRate.ToString("N2") <small>/ hour</small>
+                                                <div><span>₱</span> @RateAmount(court.HourlyRate)</div>
+                                                <small>/ hour</small>
                                             </div>
                                         </div>
                                     }
@@ -153,7 +173,7 @@
                     {
                         <p class="text-muted text-center mb-0">Rates will appear here when turf information is available.</p>
                     }
-                    <a asp-controller="Availability" asp-action="Find" class="btn btn-primary btn-block mt-4">Book a Turf</a>
+                    <a asp-controller="Availability" asp-action="Find" class="btn btn-primary btn-block mt-4">Book a Turf <i class="fas fa-chevron-right ml-2" aria-hidden="true"></i></a>
                 </div>
             </div>
         </div>
@@ -161,25 +181,48 @@
 </section>
 
 <!-- ============ ACTIVITIES ============ -->
-@* <section id="activities" class="section-default campo-activities-section" data-testid="section-activities">
+<section id="activities" class="section-default campo-activities-section campo-sports-section" data-testid="section-activities" aria-labelledby="sports-title">
     <div class="container">
-        <div class="section-header text-center mb-4">
-            <span class="section-eyebrow">Activities</span>
-            <h2>Built for More Than One Game</h2>
-            <p class="text-muted mb-0">CAMPO TURF is a multi-purpose sports turf for organized play, school sessions, and community events.</p>
+        <div class="section-header">
+            <span class="section-eyebrow">Bring any ball</span>
+            <h2 id="sports-title">Five sports, <em>one pitch.</em></h2>
+            <p class="mb-0">Same price for every sport. Tap one to start booking it.</p>
         </div>
 
         <div class="campo-activities-grid" aria-label="Supported activities">
-            <div class="campo-activity-item"><i class="fas fa-futbol"></i><span>Football</span></div>
-            <div class="campo-activity-item"><i class="fas fa-compact-disc"></i><span>Ultimate Frisbee</span></div>
-            <div class="campo-activity-item"><i class="fas fa-flag"></i><span>Flag Football</span></div>
-            <div class="campo-activity-item"><i class="fas fa-football"></i><span>Rugby</span></div>
-            <div class="campo-activity-item"><i class="fas fa-school"></i><span>School PE Activities</span></div>
-            <div class="campo-activity-item"><i class="fas fa-people-group"></i><span>Community Games &amp; Sports Days</span></div>
-            <div class="campo-activity-item"><i class="fas fa-plus"></i><span>Others</span></div>
+            <a asp-controller="Availability" asp-action="Find" class="campo-activity-item campo-sport-card">
+                <span class="campo-sport-art"><img src="~/img/sports/football.svg" alt="" width="112" height="112" loading="lazy" /></span>
+                <strong>Football</strong>
+                <small>5s &amp; 7s</small>
+                <span class="campo-sport-arrow" aria-hidden="true"><i class="fas fa-arrow-right"></i></span>
+            </a>
+            <a asp-controller="Availability" asp-action="Find" class="campo-activity-item campo-sport-card">
+                <span class="campo-sport-art"><img src="~/img/sports/flag-football.svg" alt="" width="112" height="112" loading="lazy" /></span>
+                <strong>Flag football</strong>
+                <small>belts and leagues</small>
+                <span class="campo-sport-arrow" aria-hidden="true"><i class="fas fa-arrow-right"></i></span>
+            </a>
+            <a asp-controller="Availability" asp-action="Find" class="campo-activity-item campo-sport-card">
+                <span class="campo-sport-art"><img src="~/img/sports/frisbee.svg" alt="" width="112" height="112" loading="lazy" /></span>
+                <strong>Frisbee</strong>
+                <small>ultimate, open play</small>
+                <span class="campo-sport-arrow" aria-hidden="true"><i class="fas fa-arrow-right"></i></span>
+            </a>
+            <a asp-controller="Availability" asp-action="Find" class="campo-activity-item campo-sport-card">
+                <span class="campo-sport-art"><img src="~/img/sports/rugby.svg" alt="" width="112" height="112" loading="lazy" /></span>
+                <strong>Rugby</strong>
+                <small>touch &amp; tag</small>
+                <span class="campo-sport-arrow" aria-hidden="true"><i class="fas fa-arrow-right"></i></span>
+            </a>
+            <a asp-controller="Availability" asp-action="Find" class="campo-activity-item campo-sport-card">
+                <span class="campo-sport-art"><img src="~/img/sports/cricket.svg" alt="" width="112" height="112" loading="lazy" /></span>
+                <strong>Cricket</strong>
+                <small>box cricket</small>
+                <span class="campo-sport-arrow" aria-hidden="true"><i class="fas fa-arrow-right"></i></span>
+            </a>
         </div>
     </div>
-</section> *@
+</section>
 
 <div class="campo-gallery-contact-wrap">
 <!-- ============ GALLERY ============ -->
@@ -194,7 +237,7 @@
         <div class="row">
             @foreach (var item in galleryItems)
             {
-                <div class="col-12 col-md-6 mb-4">
+                <div class="col-12 col-md-6 mb-3">
                     <div class="gallery-card" data-testid="gallery-card-@item.Id">
                         <div class="gallery-image-wrap">
                             <img src="@ImageUrl(item.ImagePath)" alt="@TurfText(item.Title)" loading="lazy" />
@@ -211,6 +254,9 @@
                                     <p class="gallery-caption">@TurfText(item.Caption)</p>
                                 }
                             </div>
+                            <a href="@ImageUrl(item.ImagePath)" class="gallery-photo-link" target="_blank" rel="noopener noreferrer" aria-label="View photo: @TurfText(item.Title)">
+                                <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -222,43 +268,93 @@
 <!-- ============ CONTACT ============ -->
 <section id="contact" class="section-light campo-contact-section" data-testid="section-about">
     <div class="container">
-        <div class="section-header text-center mb-4">
-            <span class="section-eyebrow">Contact</span>
-            <h2>Visit CAMPO TURF</h2>
+        <div class="section-header text-center campo-contact-heading">
+            <span class="section-eyebrow">Get in touch</span>
+            <h2>Contact <span>Us</span></h2>
+            <p>Have questions or need assistance? We're here to help.<br class="d-none d-md-inline" />
+                Reach out to us through any of the channels below.</p>
         </div>
 
-        <div class="row justify-content-center">
-            <div class="col-md-4 mb-3">
-                <div class="campo-contact-item">
-                    <div class="campo-contact-icon"><i class="far fa-clock"></i></div>
-                    <div>
-                        <h3>Opening Hours</h3>
-                        <p class="mb-0">
-                            @(about.OpeningHoursDays ?? "Mon - Sun")<br />
-                            <strong data-testid="about-hours">@(about.OpeningHoursTimes ?? "6:00 AM – 4:00 AM (next day)")</strong>
-                        </p>
+        <div class="row campo-contact-layout">
+            <div class="col-lg-5 mb-4 mb-lg-0">
+                <div class="campo-contact-details">
+                    <div class="campo-contact-item">
+                        <div class="campo-contact-icon" aria-hidden="true"><i class="fas fa-location-dot"></i></div>
+                        <div>
+                            <h3>Location</h3>
+                            <p class="mb-0"><strong data-testid="about-location">@TurfText(about.Location)</strong></p>
+                        </div>
+                    </div>
+
+                    <div class="campo-contact-item">
+                        <div class="campo-contact-icon" aria-hidden="true"><i class="fas fa-phone"></i></div>
+                        <div>
+                            <h3>Phone</h3>
+                            <p class="mb-0">
+                                @if (!string.IsNullOrWhiteSpace(about.ContactPhone))
+                                {
+                                    <a href="@contactPhoneLink" data-testid="about-phone">@about.ContactPhone</a>
+                                }
+                                else
+                                {
+                                    <span data-testid="about-phone">Message us on Facebook</span>
+                                }
+                            </p>
+                            <small>Call us for quick questions.</small>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(contactEmail))
+                    {
+                        <div class="campo-contact-item">
+                            <div class="campo-contact-icon" aria-hidden="true"><i class="fas fa-envelope"></i></div>
+                            <div>
+                                <h3>Email</h3>
+                                <p class="mb-0"><a href="mailto:@contactEmail">@contactEmail</a></p>
+                                <small>We'd love to hear from you.</small>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="campo-contact-item">
+                        <div class="campo-contact-icon" aria-hidden="true"><i class="fab fa-facebook-f"></i></div>
+                        <div>
+                            <h3>Facebook</h3>
+                            <p class="mb-0"><a href="https://www.facebook.com/CampoGFC/" target="_blank" rel="noopener noreferrer">facebook.com/CampoGFC</a></p>
+                            <small>Get the latest updates and promos.</small>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 mb-3">
-                <div class="campo-contact-item">
-                    <div class="campo-contact-icon"><i class="fas fa-phone"></i></div>
+
+            <div class="col-lg-7">
+                <div class="campo-contact-panel">
                     <div>
-                        <h3>Contact Number</h3>
-                        <p class="mb-0">
-                            <strong data-testid="about-phone">@(about.ContactPhone ?? "")</strong>
-                        </p>
+                        <span class="campo-message-icon" aria-hidden="true"><i class="far fa-comments"></i></span>
+                        <h3>Send us a Message</h3>
+                        <p>We'd love to hear from you. Get in touch or drop by.</p>
+                        <p>Choose a contact channel below to reach our team about the turf, group activities, or your visit.</p>
                     </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-3">
-                <div class="campo-contact-item">
-                    <div class="campo-contact-icon"><i class="fas fa-location-dot"></i></div>
-                    <div>
-                        <h3>Location</h3>
-                        <p class="mb-0">
-                            <strong data-testid="about-location">@TurfText(about.Location)</strong>
-                        </p>
+                    <div class="campo-contact-actions">
+                        <a class="btn campo-contact-message-btn" href="https://www.facebook.com/CampoGFC/" target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-facebook-messenger mr-2" aria-hidden="true"></i>Message us on Facebook
+                        </a>
+                      @*   @if (!string.IsNullOrWhiteSpace(contactEmail))
+                        {
+                            <a class="btn btn-outline-primary" href="mailto:@contactEmail">
+                                <i class="far fa-envelope mr-2" aria-hidden="true"></i>Send us an Email
+                            </a>
+                        } *@
+                    </div>
+                    <div class="campo-contact-hours">
+                        <i class="far fa-clock" aria-hidden="true"></i>
+                        <div>
+                            <h4>Opening Hours</h4>
+                            <p class="mb-0">
+                                @(about.OpeningHoursDays ?? "Mon - Sun")<br />
+                                <strong data-testid="about-hours">@(about.OpeningHoursTimes ?? "6:00 AM – 4:00 AM (next day)")</strong>
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>

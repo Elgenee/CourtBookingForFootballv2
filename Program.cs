@@ -66,6 +66,7 @@ builder.Services.AddRazorPages();
 
 // ----- App services -----
 builder.Services.AddScoped<CourtBookingSystem.Services.BookingAvailabilityService>();
+builder.Services.AddScoped<CourtBookingSystem.Services.DailyBookingCalendarService>();
 builder.Services.AddScoped<CourtBookingSystem.Services.CourtGroupAvailabilityService>();
 builder.Services.AddScoped<CourtBookingSystem.Services.BookingPricingService>();
 builder.Services.AddScoped<CourtBookingSystem.Services.SiteContentService>();

@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-120 0 360 2400" fill="none">
+  <defs>
+    <!-- Brand-colour vector artwork adapted from the existing sports icons. -->
+    <clipPath id="football-clip">
+      <circle cx="60" cy="60" r="50"/>
+    </clipPath>
+    <symbol id="football" viewBox="0 0 120 120">
+      <circle cx="60" cy="60" r="50" fill="#F5F0E7"/>
+      <g clip-path="url(#football-clip)" fill="#204B31">
+        <polygon points="60,41 78,54 71,75 49,75 42,54"/>
+        <polygon points="60,2 74,10 70,22 50,22 46,10"/>
+        <polygon points="112,40 118,56 108,64 96,52 100,40"/>
+        <polygon points="96,104 84,112 76,100 84,88 98,90"/>
+        <polygon points="24,104 22,90 36,88 44,100 36,112"/>
+        <polygon points="8,40 20,40 24,52 12,64 2,56"/>
+      </g>
+      <g stroke="#204B31" stroke-width="2" clip-path="url(#football-clip)">
+        <path d="M60 41V22M78 54l18-2M71 75l13 13M49 75l-13 13M42 54l-18-2"/>
+      </g>
+      <circle cx="60" cy="60" r="50" stroke="#204B31" stroke-width="2.5"/>
+    </symbol>
+    <symbol id="flag-ball" viewBox="0 0 120 120">
+      <g transform="rotate(-32 60 60)">
+        <path d="M10 60Q60 18 110 60Q60 102 10 60Z" fill="#EE7136" stroke="#204B31" stroke-width="2.5"/>
+        <path d="M26 48q5 12 0 24M94 48q-5 12 0 24M42 60h36M48 54v12M54 54v12M60 54v12M66 54v12M72 54v12" stroke="#F5F0E7" stroke-width="2.5"/>
+      </g>
+    </symbol>
+    <symbol id="frisbee" viewBox="0 0 120 120">
+      <g transform="rotate(-18 60 60)">
+        <path d="M8 58q52 36 104 0v8q-52 36-104 0Z" fill="#204B31"/>
+        <ellipse cx="60" cy="58" rx="52" ry="24" fill="#EE7136" stroke="#204B31" stroke-width="2.5"/>
+        <ellipse cx="60" cy="56" rx="38" ry="15" stroke="#F5F0E7" stroke-width="3"/>
+        <ellipse cx="60" cy="55" rx="22" ry="8" stroke="#F5F0E7" stroke-width="2"/>
+      </g>
+    </symbol>
+    <symbol id="rugby-ball" viewBox="0 0 120 120">
+      <g transform="rotate(28 60 60)">
+        <path d="M6 60Q60 12 114 60Q60 108 6 60Z" fill="#F5F0E7" stroke="#204B31" stroke-width="2.5"/>
+        <path d="M34 38q12 22 0 44M86 38q-12 22 0 44" stroke="#204B31" stroke-width="7"/>
+        <path d="M6 60Q60 48 114 60M50 52v14M56 51v16M62 51v16M68 52v14" stroke="#204B31" stroke-width="2"/>
+      </g>
+    </symbol>
+    <symbol id="cricket-ball" viewBox="0 0 120 120">
+      <circle cx="60" cy="60" r="48" fill="#EE7136" stroke="#204B31" stroke-width="2.5"/>
+      <path d="M26 26q34 34 68 68" stroke="#F5F0E7" stroke-width="2.5"/>
+      <path d="M32 20q34 34 68 68M20 32q34 34 68 68" stroke="#F5F0E7" stroke-width="2.5" stroke-dasharray="3 5"/>
+    </symbol>
+    <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse">
+      <circle cx="4" cy="4" r="2.5" fill="#EE7136" fill-opacity=".1"/>
+    </pattern>
+  </defs>
+  <!-- One continuous, non-repeating composition along each homepage edge. -->
+  <g fill="#EE7136" fill-opacity=".045">
+    <path d="M-120 10C145 45 170 230-120 270Z"/>
+    <path d="M-120 1180C150 1240 160 1440-120 1500Z"/>
+    <path d="M-120 2070C150 2110 145 2325-120 2370Z"/>
+  </g>
+  <g stroke="#D9B88B" stroke-opacity=".18" stroke-width="2">
+    <path d="M20-40C230 220-90 560 48 820S205 1260 58 1510S-50 2040 32 2440"/>
+    <path d="M42-40C252 220-68 560 70 820S227 1260 80 1510S-28 2040 54 2440"/>
+  </g>
+  <g opacity=".16">
+    <use href="#football" x="-74" y="95" width="180" height="180"/>
+    <use href="#flag-ball" x="-64" y="600" width="170" height="170"/>
+    <use href="#frisbee" x="-56" y="1070" width="160" height="160"/>
+    <use href="#rugby-ball" x="-64" y="1570" width="170" height="170"/>
+    <use href="#cricket-ball" x="-65" y="2110" width="160" height="160"/>
+  </g>
+  <rect x="18" y="400" width="90" height="50" fill="url(#dots)"/>
+  <rect x="35" y="1390" width="80" height="50" fill="url(#dots)"/>
+  <rect x="18" y="1910" width="90" height="50" fill="url(#dots)"/>
+</svg>

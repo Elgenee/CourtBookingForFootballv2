@@ -1,0 +1,138 @@
+@model CourtBookingSystem.ViewModels.DailyBookingCalendarViewModel
+@using System.Globalization
+@{
+    string dateKey(DateTime date) => date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+    string timeLabel(DateTime date) => date.ToString("h:mm tt", CultureInfo.InvariantCulture);
+    var weekdays = new[] { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+    var area = ViewContext.RouteData.Values["area"]?.ToString();
+    var selectedField = Model.Courts.FirstOrDefault(c => c.Id == Model.CourtId);
+    var daytime = Model.Slots.Where(s => s.Start.Date == Model.Date).ToList();
+    var overnight = Model.Slots.Where(s => s.Start.Date > Model.Date).ToList();
+}
+<div class="daily-calendar-toolbar">
+    <p class="daily-calendar-intro"><i class="fas fa-eye mr-1" aria-hidden="true"></i> View only · All times in Philippine time</p>
+    <form method="get" asp-action="DailyCalendar" class="daily-calendar-field-form">
+        <input type="hidden" name="date" value="@dateKey(Model.Date)" />
+        <label for="daily-calendar-field">Field</label>
+        <select id="daily-calendar-field" name="courtId" class="form-control form-control-sm" disabled="@(Model.Courts.Count == 0)">
+            @foreach (var court in Model.Courts)
+            {
+                <option value="@court.Id" selected="@(court.Id == Model.CourtId)">@court.CourtName@(!court.IsActive ? " (inactive)" : "")</option>
+            }
+        </select>
+        <button class="btn btn-outline-secondary btn-sm" type="submit" disabled="@(Model.Courts.Count == 0)">View</button>
+    </form>
+</div>
+<div class="daily-calendar-columns">
+    <section class="daily-calendar-panel" aria-labelledby="daily-calendar-date-heading">
+        <h2 id="daily-calendar-date-heading">1 · Choose a date</h2>
+        <div class="daily-calendar-month-nav">
+            @if (Model.Month > new DateTime(1900, 1, 1))
+            {
+                <a asp-action="DailyCalendar" asp-route-date="@dateKey(Model.Month.AddMonths(-1))" asp-route-courtId="@Model.CourtId"
+                   class="daily-calendar-arrow" data-calendar-link aria-label="Previous month"><i class="fas fa-chevron-left" aria-hidden="true"></i></a>
+            }
+            else
+            {
+                <span class="daily-calendar-arrow is-disabled" aria-hidden="true">‹</span>
+            }
+            <h3>@Model.Month.ToString("MMMM yyyy", CultureInfo.InvariantCulture)</h3>
+            @if (Model.Month < new DateTime(2100, 12, 1))
+            {
+                <a asp-action="DailyCalendar" asp-route-date="@dateKey(Model.Month.AddMonths(1))" asp-route-courtId="@Model.CourtId"
+                   class="daily-calendar-arrow" data-calendar-link aria-label="Next month"><i class="fas fa-chevron-right" aria-hidden="true"></i></a>
+            }
+            else
+            {
+                <span class="daily-calendar-arrow is-disabled" aria-hidden="true">›</span>
+            }
+        </div>
+        <div class="daily-calendar-month" aria-label="@Model.Month.ToString("MMMM yyyy")">
+            @foreach (var weekday in weekdays)
+            {
+                <span class="daily-calendar-weekday">@weekday</span>
+            }
+            @foreach (var day in Model.Days)
+            {
+                if (!day.IsCurrentMonth)
+                {
+                    <span class="daily-calendar-spacer" aria-hidden="true"></span>
+                    continue;
+                }
+                var isSelected = day.Date == Model.Date;
+                var isToday = day.Date == PhilippineTime.Today;
+                var isPast = day.Date < PhilippineTime.Today;
+                <a asp-action="DailyCalendar" asp-route-date="@dateKey(day.Date)" asp-route-courtId="@Model.CourtId" data-calendar-link
+                   class="daily-calendar-day @(isSelected ? "is-selected" : "") @(isToday ? "is-today" : "") @(isPast ? "is-past" : "") @(day.IsClosed ? "is-closed" : "")"
+                   aria-current="@(isSelected ? "date" : null)" aria-label="@day.Date.ToString("dddd, MMMM d, yyyy", CultureInfo.InvariantCulture)@(day.IsClosed ? ", facility closed" : "")">
+                    <span>@day.Date.Day</span>
+                    <small>@(day.IsClosed ? "Closed" : isToday ? "Today" : isPast ? "Past" : "View")</small>
+                </a>
+            }
+        </div>
+        <div class="daily-calendar-month-footer">
+            <p>Choose any date to view its hours, including past bookings.</p>
+            <a asp-action="DailyCalendar" asp-route-date="@dateKey(PhilippineTime.Today)" asp-route-courtId="@Model.CourtId" data-calendar-link>Back to today</a>
+        </div>
+    </section>
+    <section class="daily-calendar-panel" aria-labelledby="daily-calendar-slots-heading">
+        <h2 id="daily-calendar-slots-heading">2 · Daily time slots</h2>
+        <p class="daily-calendar-selected-date"><strong>@Model.Date.ToString("ddd, d MMM yyyy", CultureInfo.InvariantCulture)</strong>@(selectedField == null ? "" : $" · {selectedField.CourtName}")</p>
+        <div class="daily-calendar-legend" aria-label="Slot status legend">
+            <span><i class="daily-calendar-dot is-available" aria-hidden="true"></i>Available</span>
+            <span><i class="daily-calendar-dot is-booked" aria-hidden="true"></i>Booked</span>
+            <span><i class="daily-calendar-dot is-unavailable" aria-hidden="true"></i>Blocked / unavailable</span>
+        </div>
+        @if (Model.Slots.Count > 0)
+        {
+            <p class="daily-calendar-summary">@Model.AvailableHours available · @Model.BookedHours booked · @(Model.Slots.Count - Model.AvailableHours - Model.BookedHours) blocked / unavailable hourly slots</p>
+        }
+        @if (Model.EmptyMessage != null)
+        {
+            <div class="daily-calendar-empty"><i class="far fa-calendar-times" aria-hidden="true"></i><p>@Model.EmptyMessage</p></div>
+        }
+        @foreach (var group in new[] { daytime, overnight })
+        {
+            if (group.Count == 0) { continue; }
+            if (group == overnight)
+            {
+                <h3 class="daily-calendar-overnight">After midnight · @Model.Date.AddDays(1).ToString("ddd, d MMM", CultureInfo.InvariantCulture)</h3>
+                <p class="daily-calendar-overnight-note">These hours belong to the selected operating date.</p>
+            }
+            <ul class="daily-calendar-slots" aria-label="@(group == overnight ? "After-midnight slots" : "Day and evening slots")">
+                @foreach (var slot in group)
+                {
+                    <li class="daily-calendar-slot is-@slot.Status @(slot.Bookings.Count == 1 ? "has-booking-link" : "")">
+                        <strong class="daily-calendar-slot-time">@timeLabel(slot.Start) – @timeLabel(slot.End)</strong>
+                        @if (slot.Bookings.Count > 0)
+                        {
+                            @foreach (var booking in slot.Bookings)
+                            {
+                                <a asp-area="@area" asp-controller="Bookings" asp-action="Details" asp-route-id="@booking.Id"
+                                   class="daily-calendar-slot-label daily-calendar-booking-link @(slot.Bookings.Count == 1 ? "stretched-link" : "")"
+                                   aria-label="View booking for @booking.CustomerName, @timeLabel(slot.Start) – @timeLabel(slot.End)">@booking.CustomerName</a>
+                            }
+                        }
+                        else
+                        {
+                            <span class="daily-calendar-slot-label">@slot.Label</span>
+                        }
+                        @if (slot.HourlyRate.HasValue)
+                        {
+                            <span class="daily-calendar-slot-detail">@slot.HourlyRate.Value.ToString("C0", CultureInfo.GetCultureInfo("en-PH")) / hr</span>
+                        }
+                        else if (!string.IsNullOrWhiteSpace(slot.Description) && slot.Description != slot.Label)
+                        {
+                            <span class="daily-calendar-slot-detail">@slot.Description</span>
+                        }
+                        @if (slot.Bookings.Count > 0)
+                        {
+                            <span class="daily-calendar-slot-detail">@(slot.Bookings.Count == 1 ? "View booking" : "Choose a booking") <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+                        }
+                    </li>
+                }
+            </ul>
+        }
+        <p class="daily-calendar-readonly">Select a booked slot to view its booking details.</p>
+    </section>
+</div>

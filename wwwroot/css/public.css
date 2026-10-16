@@ -1,0 +1,1166 @@
+/* Customer theme. Reuses Bootstrap 4 and site.css components.
+   Keep every selector scoped: site.css is also loaded by admin and staff. */
+.public-site {
+    --campo-green: #204B31;
+    --campo-green-dark: #12301F;
+    --campo-green-deep: #0A1A11;
+    --campo-green-soft: #F5F0E7;
+    --campo-orange: #EE7136;
+    --campo-orange-soft: #FBE9DD;
+    --campo-cream: #F5F0E7;
+    --campo-cream-light: #FCFAF6;
+    --campo-ink: #0B0F0C;
+    --campo-muted: #5E6B62;
+    --campo-line: #E4DED2;
+    --campo-shadow: 0 18px 42px rgba(18, 48, 31, .07);
+    color: var(--campo-ink);
+    background: var(--campo-cream-light);
+    line-height: 1.55;
+}
+
+.public-site .content-wrapper {
+    background: var(--campo-cream-light);
+}
+
+.public-site .btn {
+    border-radius: 999px;
+}
+
+.public-site .btn-primary {
+    background: var(--campo-green);
+    border-color: var(--campo-green);
+    box-shadow: none;
+}
+
+.public-site .btn-primary:hover,
+.public-site .btn-primary:focus,
+.public-site .btn-primary:not(:disabled):not(.disabled):active {
+    background: var(--campo-green-dark);
+    border-color: var(--campo-green-dark);
+}
+
+.public-site a:focus-visible,
+.public-site button:focus-visible,
+.public-site input:focus-visible,
+.public-site select:focus-visible,
+.public-site textarea:focus-visible {
+    outline: 3px solid var(--campo-orange);
+    outline-offset: 3px;
+}
+
+/* Navigation: same links, Bootstrap collapse, and booking actions. */
+.public-site .site-navbar {
+    position: relative;
+    padding: 1rem 0;
+    min-height: 88px;
+    border-bottom: 1px solid rgba(245, 240, 231, .15);
+    background: var(--campo-green-deep) !important;
+    box-shadow: none;
+}
+
+.public-site .site-navbar .container {
+    display: flex;
+    align-items: center;
+    min-height: 56px;
+    gap: 1rem;
+}
+
+.public-site .site-navbar .navbar-brand {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.public-site .site-navbar .navbar-brand .campo-logo-img {
+    width: 210px;
+    max-width: 100%;
+    max-height: 60px;
+    object-fit: contain;
+}
+
+.public-site .site-navbar .campo-logo-img,
+.public-site .campo-footer .campo-logo-img {
+    filter: brightness(0) invert(1);
+}
+
+.public-site .site-navbar .navbar-collapse {
+    justify-content: center;
+}
+
+.public-site .site-navbar-nav {
+    gap: .2rem;
+    padding: .3rem;
+    border: 1px solid rgba(245, 240, 231, .25);
+    border-radius: 999px;
+    background: rgba(245, 240, 231, .06);
+}
+
+.public-site .site-navbar .nav-link {
+    min-height: 44px;
+    padding: .6rem 1rem !important;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--campo-cream) !important;
+    font-size: .95rem;
+    font-weight: 600;
+    white-space: nowrap;
+    box-shadow: none;
+}
+
+.public-site .site-navbar .nav-link:hover,
+.public-site .site-navbar .nav-link:focus,
+.public-site .site-navbar .nav-link.active {
+    background: var(--campo-cream);
+    color: var(--campo-ink) !important;
+}
+
+.public-site .site-navbar .nav-link.active::after {
+    content: none;
+}
+
+.public-site .site-navbar .btn-book-turf {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: .7rem 1.5rem;
+    background: var(--campo-orange);
+    border-color: var(--campo-orange);
+    color: var(--campo-ink);
+    white-space: nowrap;
+    box-shadow: none;
+}
+
+.public-site .site-navbar .btn-book-turf:hover,
+.public-site .site-navbar .btn-book-turf:focus,
+.public-site .site-navbar .btn-book-turf:not(:disabled):not(.disabled):active {
+    background: #F58A55;
+    border-color: #F58A55;
+}
+
+/* Homepage hero: retain the CMS photograph and all existing copy. */
+.public-home-page .campo-home-hero {
+    display: flex;
+    align-items: flex-end;
+    min-height: clamp(480px, 64vh, 680px);
+    padding: clamp(3rem, 6vw, 5rem) 0 clamp(2rem, 4vw, 3rem);
+    background-color: var(--campo-green-deep);
+    background-position: center;
+}
+
+.public-home-page .campo-home-hero::after {
+    content: none;
+}
+
+.public-home-page .campo-home-hero .hero-overlay {
+    background: linear-gradient(90deg, rgba(10, 26, 17, .85), rgba(10, 26, 17, .18)),
+        linear-gradient(180deg, rgba(10, 26, 17, .15) 20%, rgba(10, 26, 17, .94));
+}
+
+.public-home-page .campo-hero-eyebrow {
+    margin-bottom: 1rem;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    color: var(--campo-cream);
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .18em;
+    backdrop-filter: none;
+}
+
+.public-home-page .campo-hero-eyebrow::before {
+    content: "";
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: .8rem;
+    border-radius: 50%;
+    background: var(--campo-orange);
+    vertical-align: middle;
+}
+
+.public-home-page .campo-home-hero .hero-title {
+    margin-top: 0;
+    color: var(--campo-cream);
+    font-size: clamp(4rem, 9vw, 8.5rem);
+    font-weight: 700;
+    letter-spacing: -.045em;
+    line-height: .95;
+    text-transform: none;
+    text-shadow: none;
+}
+
+.public-home-page .campo-home-hero .hero-title span {
+    display: block;
+    color: var(--campo-orange);
+    font-weight: 300;
+    font-style: italic;
+}
+
+.public-home-page .campo-home-hero .hero-subtitle {
+    max-width: 370px;
+    margin-top: 1.5rem;
+    color: var(--campo-cream);
+    font-size: 1.15rem;
+    font-weight: 400;
+    line-height: 1.55;
+}
+
+.public-home-page .hero-book-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 52px;
+    min-width: 0;
+    padding: .8rem 1.75rem;
+    background: var(--campo-orange);
+    border-color: var(--campo-orange);
+    color: var(--campo-ink);
+    font-size: 1rem;
+    box-shadow: none;
+}
+
+.public-home-page .hero-book-btn:hover,
+.public-home-page .hero-book-btn:focus,
+.public-home-page .hero-book-btn:not(:disabled):not(.disabled):active {
+    background: #F58A55;
+    border-color: #F58A55;
+    color: var(--campo-ink);
+}
+
+/* Shared homepage rhythm keeps the redesigned sections compact. */
+.public-home-page .campo-rates-section,
+.public-home-page .campo-gallery-section,
+.public-home-page .campo-contact-section,
+.public-home-page .campo-sports-section {
+    padding: clamp(2rem, 4vw, 3rem) 0;
+    background: transparent;
+}
+
+/* One uninterrupted canvas for rates, sports, gallery, and contact.
+   Edge-only layers scale with the parent height and never tile per section. */
+.public-home-page .campo-home-main-sections {
+    position: relative;
+    isolation: isolate;
+    background: var(--campo-cream-light);
+}
+
+.public-home-page .campo-home-main-sections::before,
+.public-home-page .campo-home-main-sections::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+    width: clamp(72px, 18vw, 300px);
+    /* The wider SVG canvas keeps the balls inward while letting artwork reach the page edge. */
+    background: url('../img/branding/campo-section-pattern.svg') 33.333333% top / auto 100% no-repeat;
+    mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+    opacity: .8;
+    pointer-events: none;
+}
+
+.public-home-page .campo-home-main-sections::after {
+    right: 0;
+    left: auto;
+    transform: rotate(180deg);
+    opacity: .65;
+}
+
+.public-home-page .campo-sports-section,
+.public-home-page .campo-gallery-section {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+}
+
+.public-home-page .campo-sports-section > .container,
+.public-home-page .campo-gallery-section > .container {
+    position: relative;
+    z-index: 1;
+}
+
+.public-home-page #contact.campo-contact-section {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: transparent;
+}
+
+.public-home-page .campo-contact-section > .container {
+    position: relative;
+    z-index: 1;
+}
+
+.public-home-page .campo-contact-heading {
+    position: relative;
+    max-width: 800px;
+}
+
+.public-home-page .campo-contact-heading .section-eyebrow {
+    letter-spacing: .22em;
+}
+
+.public-home-page .campo-contact-heading h2 span {
+    color: var(--campo-orange);
+}
+
+.public-home-page .campo-contact-heading p {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    line-height: 1.6;
+}
+
+.public-home-page .section-header {
+    max-width: 760px;
+    margin: 0 auto 1.5rem;
+}
+
+.public-home-page .section-header h2 {
+    color: var(--campo-green);
+    font-size: clamp(2.5rem, 5.5vw, 4.75rem);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -.04em;
+}
+
+.public-home-page .section-header p {
+    margin-top: .65rem;
+    color: var(--campo-muted);
+    font-size: 1.1rem;
+}
+
+.public-home-page .section-eyebrow {
+    padding: 0;
+    margin-bottom: .6rem;
+    color: var(--campo-green);
+    background: none;
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .15em;
+}
+
+/* Sports artwork comes from the supplied concept; cards use the existing turf booking route. */
+.public-home-page .campo-sports-section .section-header {
+    max-width: none;
+    margin-right: 0;
+    margin-left: 0;
+    text-align: center;
+}
+
+.public-home-page .campo-sports-section .section-eyebrow,
+.public-home-page .campo-gallery-section .section-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: .75rem;
+    color: #B84A21;
+}
+
+.public-home-page .campo-sports-section .section-eyebrow::before,
+.public-home-page .campo-sports-section .section-eyebrow::after,
+.public-home-page .campo-gallery-section .section-eyebrow::before,
+.public-home-page .campo-gallery-section .section-eyebrow::after {
+    content: "";
+    width: 48px;
+    height: 1px;
+    background: var(--campo-orange);
+    opacity: .5;
+}
+
+.public-home-page .campo-sports-section h2 em {
+    position: relative;
+    display: inline-block;
+    color: var(--campo-green-dark);
+    font-weight: 300;
+}
+
+.public-home-page .campo-sports-section h2 em::after {
+    content: "";
+    position: absolute;
+    right: .1em;
+    bottom: -.15em;
+    width: 65%;
+    height: .12em;
+    border-top: 2px solid var(--campo-orange);
+    border-radius: 50%;
+    transform: rotate(4deg);
+}
+
+.public-home-page .campo-sports-section .section-header p {
+    max-width: none;
+}
+
+.public-home-page .campo-sports-section .campo-activities-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 1.25rem;
+}
+
+.public-home-page .campo-sport-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 36px;
+    align-content: center;
+    align-items: start;
+    min-height: 230px;
+    gap: .4rem .5rem;
+    padding: 1.25rem 1rem;
+    border: 1px solid #fff;
+    border-radius: 24px;
+    background: rgba(255, 253, 249, .95);
+    color: var(--campo-green-dark);
+    text-align: left;
+    text-decoration: none;
+    box-shadow: 0 12px 26px rgba(94, 65, 32, .07);
+}
+
+.public-home-page .campo-sport-art {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: min(124px, 100%);
+    aspect-ratio: 1;
+    margin-bottom: .5rem;
+    border-radius: 50%;
+    background: #FFF0DE;
+}
+
+.public-home-page .campo-sport-card img {
+    width: 82%;
+    height: auto;
+    max-width: 100px;
+}
+
+.public-home-page .campo-sport-card strong {
+    grid-column: 1;
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -.025em;
+    line-height: 1.2;
+}
+
+.public-home-page .campo-sport-card small {
+    grid-column: 1;
+    color: var(--campo-muted);
+    font-size: .85rem;
+}
+
+.public-home-page .campo-sport-arrow,
+.public-home-page .gallery-photo-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #FFF0DE;
+    color: #B84A21;
+    font-size: .9rem;
+}
+
+.public-home-page .campo-sport-arrow {
+    grid-column: 2;
+    grid-row: 2 / span 2;
+    align-self: center;
+}
+
+.public-home-page .campo-sport-card:hover,
+.public-home-page .campo-sport-card:focus-visible {
+    border-color: var(--campo-green);
+    color: var(--campo-green);
+    text-decoration: none;
+}
+
+.public-home-page .campo-rates-section .section-header h2 span {
+    color: var(--campo-orange);
+}
+
+.public-home-page .campo-rates-section .section-header p {
+    max-width: 48ch;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.public-home-page .campo-rate-simple {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: clamp(1rem, 2.5vw, 1.75rem);
+    border: 1px solid var(--campo-line);
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: var(--campo-shadow);
+}
+
+.public-home-page .campo-rate-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: 1.1rem;
+    padding: 0;
+    background: transparent;
+}
+
+.public-home-page .campo-rate-row + .campo-rate-row {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--campo-line);
+}
+
+.public-home-page .campo-rate-copy h3 {
+    margin: .5rem 0;
+    color: var(--campo-green);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -.025em;
+    overflow-wrap: anywhere;
+}
+
+.public-home-page .campo-rate-copy p {
+    margin-bottom: 0;
+    color: var(--campo-muted);
+    font-size: .95rem;
+    line-height: 1.6;
+}
+
+.public-home-page .campo-rate-copy {
+    text-align: center;
+}
+
+.public-home-page .court-sport-tag {
+    display: inline-block;
+    color: var(--campo-muted);
+    background: transparent;
+    padding: 0;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.public-home-page .campo-rate-rule-type {
+    display: inline-flex;
+    align-items: center;
+    padding: .15rem .4rem;
+    border-radius: 999px;
+    background: var(--campo-cream);
+    color: var(--campo-green);
+    font-size: .6rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.public-home-page .campo-rate-rules {
+    display: grid;
+    gap: .65rem;
+    min-width: 0;
+}
+
+.public-home-page .campo-rate-rule {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr) minmax(140px, .65fr);
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border: 0;
+    border-radius: 12px;
+    background: #F0F5F1;
+}
+
+.public-home-page .campo-rate-rule--afternoon {
+    background: #FFF6EB;
+}
+
+.public-home-page .campo-rate-rule--night {
+    background: #EDF3F7;
+}
+
+.public-home-page .campo-rate-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #E4EDDD;
+    color: #82691E;
+    font-size: 1.5rem;
+}
+
+.public-home-page .campo-rate-rule--afternoon .campo-rate-icon {
+    background: #FFE3BF;
+    color: #B44C09;
+}
+
+.public-home-page .campo-rate-rule--night .campo-rate-icon {
+    background: #D7E6EE;
+    color: #214A5B;
+}
+
+.public-home-page .campo-rate-rule-main {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .2rem;
+    min-width: 0;
+    color: var(--campo-muted);
+    font-size: .9rem;
+    overflow-wrap: anywhere;
+}
+
+.public-home-page .campo-rate-rule-main strong {
+    color: var(--campo-green-dark);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.public-home-page .campo-rate-rule-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .35rem .5rem;
+}
+
+.public-home-page .campo-rate-period {
+    color: var(--campo-green);
+    font-size: .65rem;
+    font-weight: 700;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+}
+
+.public-home-page .campo-rate-rule-meta {
+    color: var(--campo-muted);
+    font-size: .8rem;
+}
+
+.public-home-page .campo-rate-rule-type.is-promo {
+    background: var(--campo-orange);
+    color: var(--campo-ink);
+}
+
+.public-home-page .campo-rate-rule-price {
+    min-width: 0;
+    padding-left: 1.25rem;
+    border-left: 1px solid rgba(32, 75, 49, .12);
+    color: #153E49;
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+}
+
+.public-home-page .campo-rate-rule-price span {
+    font-size: .55em;
+    vertical-align: .2em;
+}
+
+.public-home-page .campo-rate-rule-price small {
+    display: block;
+    margin-top: .3rem;
+    color: var(--campo-muted);
+    font-size: .8rem;
+    font-weight: 400;
+}
+
+.public-home-page .campo-rate-simple > .btn-primary {
+    width: 100%;
+    min-height: 50px;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    border-radius: 10px;
+}
+
+.public-home-page .campo-gallery-section .gallery-card {
+    border: 1px solid #fff;
+    border-radius: 20px;
+    background: #FFFDF9;
+    box-shadow: 0 12px 26px rgba(94, 65, 32, .07);
+}
+
+.public-home-page .campo-gallery-section .row {
+    max-width: 1000px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.public-home-page .campo-gallery-section .gallery-card:hover {
+    transform: none;
+    box-shadow: var(--campo-shadow);
+}
+
+.public-home-page .gallery-image-wrap {
+    aspect-ratio: 16 / 6;
+    background: var(--campo-cream);
+}
+
+.public-home-page .gallery-image-wrap img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.public-home-page .gallery-body {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .7rem .9rem;
+}
+
+.public-home-page .gallery-card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+    border: 1px solid rgba(238, 113, 54, .25);
+    border-radius: 50%;
+    background: var(--campo-orange-soft);
+    color: var(--campo-green);
+    font-size: 1rem;
+    box-shadow: none;
+}
+
+.public-home-page .gallery-copy {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.public-home-page .gallery-title {
+    margin-bottom: .35rem;
+    color: var(--campo-green);
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.public-home-page .gallery-caption {
+    margin-bottom: 0;
+    color: var(--campo-muted);
+    line-height: 1.5;
+}
+
+.public-home-page .gallery-photo-link {
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+}
+
+.public-home-page .gallery-photo-link:hover,
+.public-home-page .gallery-photo-link:focus {
+    background: var(--campo-orange);
+    color: var(--campo-ink);
+    text-decoration: none;
+}
+
+.public-home-page .campo-contact-details {
+    display: grid;
+    grid-auto-rows: 1fr;
+    gap: 1rem;
+    height: 100%;
+}
+
+.public-home-page .campo-contact-item {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    min-height: 120px;
+    height: auto;
+    padding: 1.5rem;
+    border: 1px solid var(--campo-line);
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 8px 26px rgba(18, 48, 31, .045);
+}
+
+.public-home-page .campo-contact-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 64px;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #E6F1DC;
+    color: var(--campo-green-dark);
+    font-size: 1.8rem;
+    box-shadow: none;
+}
+
+.public-home-page .campo-contact-item > div:last-child {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.public-home-page .campo-contact-item h3 {
+    margin-bottom: .4rem;
+    color: var(--campo-green-dark);
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: -.025em;
+    text-transform: none;
+}
+
+.public-home-page .campo-contact-item p {
+    color: var(--campo-muted);
+    line-height: 1.55;
+}
+
+.public-home-page .campo-contact-item strong,
+.public-home-page .campo-contact-item a {
+    color: var(--campo-muted);
+    font-size: 1.05rem;
+    font-weight: 400;
+}
+
+.public-home-page .campo-contact-item a:hover,
+.public-home-page .campo-contact-item a:focus {
+    color: var(--campo-green);
+    text-decoration: underline;
+}
+
+.public-home-page .campo-contact-item small {
+    display: block;
+    margin-top: .3rem;
+    color: var(--campo-muted);
+    font-size: .9rem;
+}
+
+.public-home-page .campo-contact-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    height: 100%;
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+    border: 1px solid var(--campo-line);
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 8px 26px rgba(18, 48, 31, .045);
+}
+
+.public-home-page .campo-message-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    margin-bottom: 1.25rem;
+    border-radius: 16px;
+    background: #E6F1DC;
+    color: var(--campo-green-dark);
+    font-size: 1.6rem;
+}
+
+.public-home-page .campo-contact-panel h3 {
+    margin-bottom: .75rem;
+    color: var(--campo-green-dark);
+    font-size: clamp(1.65rem, 3vw, 2.1rem);
+    font-weight: 700;
+    letter-spacing: -.03em;
+}
+
+.public-home-page .campo-contact-panel p {
+    color: var(--campo-muted);
+    font-size: 1.05rem;
+    line-height: 1.6;
+}
+
+.public-home-page .campo-contact-actions {
+    display: grid;
+    gap: .85rem;
+}
+
+.public-home-page .campo-contact-actions .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 56px;
+    padding: .85rem 1rem;
+    border-radius: 12px;
+    font-size: 1.05rem;
+    white-space: normal;
+}
+
+.public-home-page .campo-contact-message-btn {
+    background: var(--campo-orange);
+    border-color: var(--campo-orange);
+    color: var(--campo-ink);
+}
+
+.public-home-page .campo-contact-message-btn:hover,
+.public-home-page .campo-contact-message-btn:focus {
+    background: #F58A55;
+    border-color: #F58A55;
+    color: var(--campo-ink);
+}
+
+.public-home-page .campo-contact-hours {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-top: auto;
+    padding: 1.2rem;
+    border-radius: 16px;
+    background: var(--campo-cream-light);
+    color: var(--campo-green);
+}
+
+.public-home-page .campo-contact-hours > i {
+    margin-top: .25rem;
+    font-size: 1.3rem;
+}
+
+.public-home-page .campo-contact-hours h4 {
+    color: var(--campo-green-dark);
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.public-home-page .campo-contact-hours strong {
+    color: var(--campo-green);
+    font-weight: 600;
+}
+
+/* Small visual refinements only; retain all booking states and form layout. */
+.public-site .booking-card,
+.public-site .booking-summary,
+.public-site .availability-card {
+    border-color: var(--campo-line);
+    border-radius: 20px;
+    box-shadow: var(--campo-shadow);
+}
+
+.public-site .booking-card > .card-header,
+.public-site .availability-card > .card-header {
+    border-radius: 20px 20px 0 0;
+}
+
+.public-site .booking-summary > .card-header {
+    background: var(--campo-green);
+    color: #fff;
+}
+
+.public-site .payment-option-card,
+.public-site .availability-slot-btn,
+.public-site .slot-btn {
+    border-radius: 12px;
+}
+
+.public-site .form-control {
+    border-radius: 10px;
+}
+
+.public-site .confirmation-hero,
+.public-site .confirmation-ref {
+    border-radius: 20px;
+}
+
+/* Footer uses the same content and destinations on every customer page. */
+.public-site .campo-footer {
+    padding: 2.5rem 0;
+    border-top: 0;
+    background: var(--campo-green-deep);
+    color: var(--campo-cream);
+}
+
+.public-site .campo-footer .footer-brand {
+    min-width: 0;
+    margin: 0;
+}
+
+.public-site .campo-footer .footer-logo-img {
+    width: 185px;
+    max-width: 100%;
+}
+
+.public-site .campo-footer .footer-links a,
+.public-site .campo-footer .footer-social a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    color: var(--campo-cream);
+}
+
+.public-site .campo-footer .footer-social a {
+    width: 44px;
+    background: rgba(245, 240, 231, .1);
+}
+
+.public-site .campo-footer .footer-links a:hover,
+.public-site .campo-footer .footer-links a:focus,
+.public-site .campo-footer .footer-social a:hover,
+.public-site .campo-footer .footer-social a:focus {
+    color: var(--campo-orange);
+}
+
+@media (max-width: 991.98px) {
+    .public-home-page .campo-sports-section .campo-activities-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .public-site .site-navbar .navbar-brand .campo-logo-img {
+        width: 170px;
+    }
+
+    .public-site .site-navbar .container {
+        gap: .5rem;
+    }
+
+    .public-site .site-navbar .btn-book-turf {
+        padding-right: 1rem;
+        padding-left: 1rem;
+    }
+
+    .public-home-page .campo-contact-item {
+        padding: 1.25rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .public-home-page .campo-sport-card {
+        grid-template-columns: minmax(0, 1fr) 30px;
+        padding: 1rem .75rem;
+    }
+
+    .public-home-page .campo-sport-arrow {
+        width: 30px;
+        height: 30px;
+    }
+
+    .public-home-page .campo-sport-card strong {
+        font-size: 1.15rem;
+    }
+
+    .public-home-page .campo-rate-rule {
+        grid-template-columns: 36px minmax(0, 1fr) 110px;
+        gap: .6rem;
+        padding: .85rem .7rem;
+    }
+
+    .public-home-page .campo-rate-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1.1rem;
+    }
+
+    .public-home-page .campo-rate-rule-main strong {
+        font-size: .85rem;
+    }
+
+    .public-home-page .campo-rate-rule-price {
+        padding-left: .7rem;
+        font-size: 1.4rem;
+    }
+
+    .public-home-page .campo-sports-section .campo-activities-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+    }
+
+    .public-home-page .campo-sport-card:last-child {
+        grid-column: 1 / -1;
+    }
+
+    .public-site .site-navbar {
+        padding: .65rem 0;
+        min-height: 76px;
+    }
+
+    .public-site .site-navbar .container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        min-height: 52px;
+    }
+
+    .public-site .site-navbar .navbar-brand .campo-logo-img {
+        width: 185px;
+        max-height: 54px;
+    }
+
+    .public-site .site-navbar .navbar-toggler {
+        width: 48px;
+        height: 48px;
+        padding: .5rem;
+        border-radius: 50%;
+        border-color: rgba(245, 240, 231, .4);
+    }
+
+    .public-site .site-navbar .navbar-toggler-icon {
+        filter: invert(1);
+    }
+
+    .public-site .site-navbar .navbar-collapse {
+        flex-basis: 100%;
+        margin-top: .65rem;
+        padding: 1rem;
+        border-radius: 18px;
+        border: 1px solid var(--campo-line);
+        background: var(--campo-cream);
+        box-shadow: none;
+    }
+
+    .public-site .site-navbar-nav {
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+    }
+
+    .public-site .site-navbar .navbar-collapse .nav-link {
+        justify-content: flex-start;
+        padding: .7rem 1rem !important;
+        color: var(--campo-green) !important;
+    }
+
+    .public-site .site-navbar .navbar-collapse .nav-link.active,
+    .public-site .site-navbar .navbar-collapse .nav-link:hover,
+    .public-site .site-navbar .navbar-collapse .nav-link:focus {
+        background: #fff;
+    }
+
+    .public-site .site-navbar-mobile-cta {
+        padding-top: .75rem;
+    }
+
+    .public-site .site-navbar-mobile-cta .btn-book-turf {
+        width: 100%;
+    }
+
+    .public-home-page .campo-home-hero {
+        min-height: 480px;
+        padding: 3rem 0 2rem;
+    }
+
+    .public-home-page .campo-contact-icon {
+        flex-basis: 52px;
+        width: 52px;
+        height: 52px;
+        font-size: 1.4rem;
+    }
+
+    .public-site .booking-summary.sticky-top {
+        position: static;
+    }
+
+    .public-site .campo-footer {
+        padding: 2rem 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .public-site .btn,
+    .public-site .gallery-card,
+    .public-site .slot-btn,
+    .public-site .availability-slot-btn {
+        transition: none;
+    }
+}

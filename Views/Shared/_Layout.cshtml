@@ -47,9 +47,12 @@
         }
     </style>
 
+    <!-- Customer presentation only; admin and staff use separate layouts. -->
+    <link rel="stylesheet" href="~/css/public.css" asp-append-version="true" />
+
     @await RenderSectionAsync("Styles", required: false)
 </head>
-<body class="hold-transition layout-top-nav @(isHomePage ? "public-home-page" : "")" data-color-scheme="@theme.Key">
+<body class="hold-transition layout-top-nav public-site @(isHomePage ? "public-home-page" : "")" data-color-scheme="@theme.Key">
     <div class="wrapper">
         @await RenderSectionAsync("AnnouncementBar", required: false)
 
@@ -103,7 +106,7 @@
         <!-- ============ FOOTER ============ -->
         <footer class="main-footer campo-footer text-sm">
             <div class="container d-flex flex-column flex-md-row align-items-center justify-content-between">
-                <a asp-controller="Home" asp-action="Index" class="footer-brand">
+                <a asp-controller="Account" asp-action="Login" class="footer-brand">
                     <img src="/img/branding/campo-logo.png" alt="CAMPO Cebu - Your neighborhood turf." class="campo-logo-img footer-logo-img" />
                 </a>
                 <div class="footer-links my-3 my-md-0">
