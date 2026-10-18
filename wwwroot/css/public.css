@@ -342,7 +342,7 @@
     letter-spacing: .15em;
 }
 
-/* Sports artwork comes from the supplied concept; cards use the existing turf booking route. */
+/* Compact product-style sports artwork; cards use the existing turf booking route. */
 .public-home-page .campo-sports-section .section-header {
     max-width: none;
     margin-right: 0;
@@ -420,17 +420,20 @@
     justify-content: center;
     grid-column: 1 / -1;
     justify-self: center;
-    width: min(124px, 100%);
+    width: min(104px, 100%);
     aspect-ratio: 1;
     margin-bottom: .5rem;
     border-radius: 50%;
-    background: #FFF0DE;
+    background: radial-gradient(circle at 38% 30%, #FFF8EF, #FFF0DE);
 }
 
 .public-home-page .campo-sport-card img {
-    width: 82%;
-    height: auto;
-    max-width: 100px;
+    display: block;
+    width: 84px;
+    height: 84px;
+    max-width: 82%;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 3px rgba(48, 37, 23, .12));
 }
 
 .public-home-page .campo-sport-card strong {

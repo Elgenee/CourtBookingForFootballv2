@@ -18,7 +18,12 @@
 
                             <div class="form-group">
                                 <label asp-for="BookingReferenceNo"></label>
-                                <input asp-for="BookingReferenceNo" class="form-control text-uppercase" placeholder="GFC-YYYYMMDD-XXXXXX" autocomplete="off" />
+                                <input asp-for="BookingReferenceNo" class="form-control text-uppercase" placeholder="GFC-YYYYMMDD-XXXXXX"
+                                       data-booking-reference-mask autocomplete="off" autocapitalize="characters" spellcheck="false"
+                                       maxlength="19" required pattern="[Gg][Ff][Cc]-[0-9]{8}-[A-Za-z0-9]{6}"
+                                       aria-describedby="booking-reference-help"
+                                       title="Enter GFC-, 8 date digits, a hyphen, and the 6-character booking code." />
+                                <small id="booking-reference-help" class="form-text text-muted">Enter the 8-digit date and 6-character code from your booking reference. GFC- and the hyphen are added automatically.</small>
                                 <span asp-validation-for="BookingReferenceNo" class="text-danger small"></span>
                             </div>
 
@@ -41,4 +46,5 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/booking-reference-mask.js" asp-append-version="true"></script>
 }
