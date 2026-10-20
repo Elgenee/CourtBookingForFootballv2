@@ -146,9 +146,30 @@ namespace CourtBookingSystem.Areas.SuperAdmin.ViewModels
         [Display(Name = "Facilities (one per line)")]
         public string FacilitiesList { get; set; } = string.Empty;
 
-        [Display(Name = "Contact Phone")]
+        [Display(Name = "Scheduling Phone")]
         [StringLength(120)]
         public string? ContactPhone { get; set; }
+
+        [Display(Name = "Scheduling Contact Name"), StringLength(100)]
+        public string? SchedulingContactName { get; set; }
+
+        [Display(Name = "Events / Inquiries Phone"), StringLength(120)]
+        public string? EventsPhone { get; set; }
+
+        [Display(Name = "Events / Inquiries Contact Name"), StringLength(100)]
+        public string? EventsContactName { get; set; }
+
+        [Display(Name = "Facebook Page Name"), StringLength(120)]
+        public string? FacebookName { get; set; }
+
+        [Display(Name = "Facebook URL"), Url, StringLength(500)]
+        public string? FacebookUrl { get; set; }
+
+        [Display(Name = "Instagram Handle"), StringLength(120)]
+        public string? InstagramHandle { get; set; }
+
+        [Display(Name = "Instagram URL"), Url, StringLength(500)]
+        public string? InstagramUrl { get; set; }
 
         [Display(Name = "Contact Email")]
         [StringLength(160)]

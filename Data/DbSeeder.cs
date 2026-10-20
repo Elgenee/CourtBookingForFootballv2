@@ -326,6 +326,30 @@ namespace CourtBookingSystem.Data
 
         private static async Task EnsureSqliteCmsSchemaAsync(ApplicationDbContext db)
         {
+            // Frozen upgrade defaults; later CMS edits must not be overwritten.
+            var contactColumnCommands = new[]
+            {
+                "ALTER TABLE AboutContents ADD COLUMN SchedulingContactName TEXT NULL DEFAULT 'Jenny';",
+                "ALTER TABLE AboutContents ADD COLUMN EventsPhone TEXT NULL DEFAULT '0915 619 0673';",
+                "ALTER TABLE AboutContents ADD COLUMN EventsContactName TEXT NULL DEFAULT 'Catrina';",
+                "ALTER TABLE AboutContents ADD COLUMN FacebookName TEXT NULL DEFAULT 'Campo Cebu';",
+                "ALTER TABLE AboutContents ADD COLUMN FacebookUrl TEXT NULL DEFAULT 'https://www.facebook.com/share/1Eo5wmywbV/?mibextid=wwXIfr';",
+                "ALTER TABLE AboutContents ADD COLUMN InstagramHandle TEXT NULL DEFAULT '@campocebu';",
+                "ALTER TABLE AboutContents ADD COLUMN InstagramUrl TEXT NULL DEFAULT 'https://www.instagram.com/campocebu/';"
+            };
+            foreach (var command in contactColumnCommands)
+            {
+                try
+                {
+                    await db.Database.ExecuteSqlRawAsync(command);
+                }
+                catch (SqliteException ex) when (ex.SqliteErrorCode == 1 &&
+                                                 ex.Message.Contains("duplicate column name", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Preserve saved values when this upgrade has already run.
+                }
+            }
+
             try
             {
                 await db.Database.ExecuteSqlRawAsync(
@@ -469,9 +493,16 @@ namespace CourtBookingSystem.Data
                     "Friendly staff",
                     "Online & walk-in booking"
                 }),
-                ContactPhone = "0917 622 0308",
-                ContactEmail = "hello@campoturf.ph",
-                Location = "CAMPO TURF Sanchez Compound Banilad 6000 Cebu (PH)",
+                ContactPhone = CampoContactDetails.SchedulingPhone,
+                SchedulingContactName = CampoContactDetails.SchedulingContactName,
+                EventsPhone = CampoContactDetails.EventsPhone,
+                EventsContactName = CampoContactDetails.EventsContactName,
+                FacebookName = CampoContactDetails.FacebookName,
+                FacebookUrl = CampoContactDetails.FacebookUrl,
+                InstagramHandle = CampoContactDetails.InstagramHandle,
+                InstagramUrl = CampoContactDetails.InstagramUrl,
+                ContactEmail = CampoContactDetails.ContactEmail,
+                Location = CampoContactDetails.Address,
                 OpeningHoursDays = "Mon – Sun",
                 OpeningHoursTimes = "6:00 AM – 4:00 AM (next day)",
                 UpdatedDate = DateTime.UtcNow
@@ -633,11 +664,28 @@ namespace CourtBookingSystem.Data
                         "Friendly staff",
                         "Online & walk-in booking"
                     });
-                    about.ContactPhone = "0917 622 0308";
-                    about.ContactEmail = "hello@campoturf.ph";
-                    about.Location = "CAMPO TURF Sanchez Compound Banilad 6000 Cebu (PH)";
+                    about.ContactPhone = CampoContactDetails.SchedulingPhone;
+                    about.ContactEmail = CampoContactDetails.ContactEmail;
+                    about.Location = CampoContactDetails.Address;
                     about.OpeningHoursDays = string.IsNullOrWhiteSpace(about.OpeningHoursDays) ? "Mon – Sun" : about.OpeningHoursDays;
                     about.OpeningHoursTimes = "6:00 AM – 4:00 AM (next day)";
+                    about.UpdatedDate = now;
+                }
+
+                // Refresh the previous contact defaults on existing installations.
+                if (string.Equals(about.ContactEmail?.Trim(), "hello@campoturf.ph", StringComparison.OrdinalIgnoreCase))
+                {
+                    about.ContactEmail = CampoContactDetails.ContactEmail;
+                    about.UpdatedDate = now;
+                }
+                if (new string((about.ContactPhone ?? "").Where(char.IsDigit).ToArray()) == "09176220308")
+                {
+                    about.ContactPhone = CampoContactDetails.SchedulingPhone;
+                    about.UpdatedDate = now;
+                }
+                if (string.Equals(about.Location?.Trim(), "CAMPO TURF Sanchez Compound Banilad 6000 Cebu (PH)", StringComparison.OrdinalIgnoreCase))
+                {
+                    about.Location = CampoContactDetails.Address;
                     about.UpdatedDate = now;
                 }
             }

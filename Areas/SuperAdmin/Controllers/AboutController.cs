@@ -24,6 +24,13 @@ namespace CourtBookingSystem.Areas.SuperAdmin.Controllers
                 Description = about.Description,
                 FacilitiesList = about.FacilitiesList,
                 ContactPhone = about.ContactPhone,
+                SchedulingContactName = about.SchedulingContactName,
+                EventsPhone = about.EventsPhone,
+                EventsContactName = about.EventsContactName,
+                FacebookName = about.FacebookName,
+                FacebookUrl = about.FacebookUrl,
+                InstagramHandle = about.InstagramHandle,
+                InstagramUrl = about.InstagramUrl,
                 ContactEmail = about.ContactEmail,
                 Location = about.Location,
                 OpeningHoursDays = about.OpeningHoursDays,
@@ -44,6 +51,13 @@ namespace CourtBookingSystem.Areas.SuperAdmin.Controllers
             about.Description = vm.Description.Trim();
             about.FacilitiesList = NormalizeFacilities(vm.FacilitiesList);
             about.ContactPhone = vm.ContactPhone?.Trim();
+            about.SchedulingContactName = vm.SchedulingContactName?.Trim();
+            about.EventsPhone = vm.EventsPhone?.Trim();
+            about.EventsContactName = vm.EventsContactName?.Trim();
+            about.FacebookName = vm.FacebookName?.Trim();
+            about.FacebookUrl = vm.FacebookUrl?.Trim();
+            about.InstagramHandle = vm.InstagramHandle?.Trim();
+            about.InstagramUrl = vm.InstagramUrl?.Trim();
             about.ContactEmail = vm.ContactEmail?.Trim();
             about.Location = vm.Location?.Trim();
             about.OpeningHoursDays = vm.OpeningHoursDays?.Trim();
