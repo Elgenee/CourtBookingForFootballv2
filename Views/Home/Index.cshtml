@@ -7,8 +7,10 @@
     var galleryItems = ViewBag.Gallery as List<CourtBookingSystem.Models.Cms.GalleryImage>
         ?? new List<CourtBookingSystem.Models.Cms.GalleryImage>();
     var contactEmail = about.ContactEmail?.Trim();
-    var contactPhoneLink = "tel:" + new string((about.ContactPhone ?? "")
+    var schedulingPhone = about.ContactPhone;
+    var contactPhoneLink = "tel:" + new string((schedulingPhone ?? "")
         .Where(c => char.IsDigit(c) || c == '+').ToArray());
+    var eventsPhoneLink = "tel:" + new string((about.EventsPhone ?? "").Where(c => char.IsDigit(c) || c == '+').ToArray());
 
     var activeCourts = (Model ?? Enumerable.Empty<CourtBookingSystem.Models.Court>())
         .Where(c => c.IsActive)
@@ -282,7 +284,7 @@
                         <div class="campo-contact-icon" aria-hidden="true"><i class="fas fa-location-dot"></i></div>
                         <div>
                             <h3>Location</h3>
-                            <p class="mb-0"><strong data-testid="about-location">@TurfText(about.Location)</strong></p>
+                            <p class="mb-0"><strong data-testid="about-location">@about.Location</strong></p>
                         </div>
                     </div>
 
@@ -290,17 +292,28 @@
                         <div class="campo-contact-icon" aria-hidden="true"><i class="fas fa-phone"></i></div>
                         <div>
                             <h3>Phone</h3>
-                            <p class="mb-0">
-                                @if (!string.IsNullOrWhiteSpace(about.ContactPhone))
-                                {
-                                    <a href="@contactPhoneLink" data-testid="about-phone">@about.ContactPhone</a>
-                                }
-                                else
-                                {
-                                    <span data-testid="about-phone">Message us on Facebook</span>
-                                }
-                            </p>
-                            <small>Call us for quick questions.</small>
+                            @if (!string.IsNullOrWhiteSpace(schedulingPhone))
+                            {
+                                <p class="mb-0">
+                                    <small>For scheduling:</small>
+                                    <a href="@contactPhoneLink" data-testid="about-phone">@schedulingPhone</a>
+                                    @if (!string.IsNullOrWhiteSpace(about.SchedulingContactName))
+                                    {
+                                        <span>· @about.SchedulingContactName</span>
+                                    }
+                                </p>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(about.EventsPhone))
+                            {
+                                <p class="mb-0 mt-2">
+                                    <small>For events / inquiries:</small>
+                                    <a href="@eventsPhoneLink" data-testid="about-events-phone">@about.EventsPhone</a>
+                                    @if (!string.IsNullOrWhiteSpace(about.EventsContactName))
+                                    {
+                                        <span>· @about.EventsContactName</span>
+                                    }
+                                </p>
+                            }
                         </div>
                     </div>
 
@@ -316,14 +329,31 @@
                         </div>
                     }
 
-                    <div class="campo-contact-item">
-                        <div class="campo-contact-icon" aria-hidden="true"><i class="fab fa-facebook-f"></i></div>
-                        <div>
-                            <h3>Facebook</h3>
-                            <p class="mb-0"><a href="https://www.facebook.com/CampoGFC/" target="_blank" rel="noopener noreferrer">facebook.com/CampoGFC</a></p>
-                            <small>Get the latest updates and promos.</small>
+                    @if (!string.IsNullOrWhiteSpace(about.FacebookUrl) || !string.IsNullOrWhiteSpace(about.InstagramUrl))
+                    {
+                        <div class="campo-contact-item">
+                            <div class="campo-contact-icon" aria-hidden="true"><i class="fas fa-share-nodes"></i></div>
+                            <div>
+                                <h3>Social Media</h3>
+                                <div class="campo-contact-social-links">
+                                    @if (!string.IsNullOrWhiteSpace(about.FacebookUrl))
+                                    {
+                                        <a href="@about.FacebookUrl" target="_blank" rel="noopener noreferrer">
+                                            <i class="fab fa-facebook-f" aria-hidden="true"></i>
+                                            <span>Facebook · @about.FacebookName</span>
+                                        </a>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(about.InstagramUrl))
+                                    {
+                                        <a href="@about.InstagramUrl" target="_blank" rel="noopener noreferrer">
+                                            <i class="fab fa-instagram" aria-hidden="true"></i>
+                                            <span>Instagram · @about.InstagramHandle</span>
+                                        </a>
+                                    }
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    }
                 </div>
             </div>
 
@@ -332,19 +362,23 @@
                     <div>
                         <span class="campo-message-icon" aria-hidden="true"><i class="far fa-comments"></i></span>
                         <h3>Send us a Message</h3>
-                        <p>We'd love to hear from you. Get in touch or drop by.</p>
-                        <p>Choose a contact channel below to reach our team about the turf, group activities, or your visit.</p>
+                        <p class="mb-0">Chat with our team about bookings, events, or your next visit.</p>
                     </div>
                     <div class="campo-contact-actions">
-                        <a class="btn campo-contact-message-btn" href="https://www.facebook.com/CampoGFC/" target="_blank" rel="noopener noreferrer">
-                            <i class="fab fa-facebook-messenger mr-2" aria-hidden="true"></i>Message us on Facebook
-                        </a>
-                      @*   @if (!string.IsNullOrWhiteSpace(contactEmail))
+                        @if (!string.IsNullOrWhiteSpace(about.FacebookUrl))
                         {
-                            <a class="btn btn-outline-primary" href="mailto:@contactEmail">
-                                <i class="far fa-envelope mr-2" aria-hidden="true"></i>Send us an Email
+                            <a class="btn campo-contact-message-btn" href="@about.FacebookUrl" target="_blank" rel="noopener noreferrer">
+                                <i class="fab fa-facebook-messenger" aria-hidden="true"></i>
+                                <span>Message us on Facebook<small>@about.FacebookName</small></span>
                             </a>
-                        } *@
+                        }
+                        @if (!string.IsNullOrWhiteSpace(about.InstagramUrl))
+                        {
+                            <a class="btn campo-contact-instagram-btn" href="@about.InstagramUrl" target="_blank" rel="noopener noreferrer">
+                                <i class="fab fa-instagram" aria-hidden="true"></i>
+                                <span>Message us on Instagram<small>@about.InstagramHandle</small></span>
+                            </a>
+                        }
                     </div>
                     <div class="campo-contact-hours">
                         <i class="far fa-clock" aria-hidden="true"></i>

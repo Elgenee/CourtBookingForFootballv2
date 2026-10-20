@@ -1,0 +1,92 @@
+@inject CourtBookingSystem.Services.SiteContentService SiteContent
+@{
+    var privacyContactEmail = (await SiteContent.GetAboutAsync()).ContactEmail?.Trim();
+}
+
+<h5 class="mb-3">CAMPO CEBU – Booking Terms &amp; Conditions</h5>
+<h6 class="mt-3">FIELD RULES</h6>
+<ul class="pl-3 mb-3">
+    <li class="mb-1">Cleats are OK, but NO metal studs.</li>
+    <li class="mb-1">No tackling or rough play.</li>
+    <li class="mb-1">Keep good sportsmanship. Respect all players and staff.</li>
+    <li class="mb-1">NO PETS inside the premises. A PHP 1,000 fine will be charged to the player or booking holder if caught.</li>
+    <li class="mb-1">Arriving 15 minutes early is recommended.</li>
+    <li class="mb-1">Bookings start and end on time.</li>
+    <li class="mb-1">Show your booking reference at the counter.</li>
+</ul>
+<h6 class="mt-3">Terms &amp; Conditions</h6>
+<p>These Terms &amp; Conditions apply to every booking and every visit to CAMPO CEBU. Please read them before you book. By booking, you agree to them.</p>
+<h6 class="mt-3">1. Booking</h6>
+<p>1.1 All reservations are made only through the CAMPO CEBU website (campocebu.com). We do not accept bookings through other channels.</p>
+<p>1.2 When booking, choose your date, start time and duration, then complete payment online.</p>
+<p>1.3 After a successful booking, you will receive an automatic confirmation email with your booking reference number.</p>
+<p>1.4 Show your booking reference number at the counter when you arrive. We may refuse entry if no valid booking reference can be shown.</p>
+<h6 class="mt-3">2. Arrival and Booking Time</h6>
+<p>2.1 We recommend arriving 15 minutes before your booking starts so you can check in and get ready.</p>
+<p>2.2 Bookings start and end exactly on time. Late arrival does not extend your booking, and your time cannot be moved, rescheduled, refunded or credited because of a late start.</p>
+<p>2.3 No-shows: if no one from your group has arrived 30 minutes into your booking, it is treated as a NO-SHOW. No-shows get no refund and no credit.</p>
+<p>2.4 The number of players allowed is subject to the booked package and to management's discretion.</p>
+<h6 class="mt-3">3. Payment</h6>
+<p>3.1 When you book, pay online through PayMongo either a 50% downpayment or the full amount.</p>
+<p>3.2 If you paid a downpayment, the remaining balance must be paid on site before your booking starts. Accepted payment methods on site: cash, GCash or QR code.</p>
+<p>3.3 Full payment must be confirmed before you enter the play area. We recommend settling the balance early so your playing time is not affected.</p>
+<p>3.4 Your booking is confirmed once your online payment is successful and you receive the confirmation email.</p>
+<h6 class="mt-3">4. Cancellations, Rescheduling and Credit</h6>
+<p>4.1 No cash refunds: there are no cash refunds for cancellations made by the customer. Once paid, we will only give credit, and only as described in clause 4.2. (The only case where we give a refund is a natural disaster or emergency calamity; see clause 5.3.)</p>
+<p>4.2 48 hours or more before your booking time: you may reschedule. The amount you paid (downpayment or full payment) carries over as credit toward your rescheduled booking.</p>
+<p>4.3 Credit is valid for 30 DAYS from the date of the original booking. Unused credit after this period expires and cannot be converted to cash.</p>
+<p>4.4 Less than 48 hours before your booking time: the booking is treated as a cancellation/no-show, and the amount you paid (downpayment or full payment) is forfeited. No refund and no credit are given.</p>
+<p>4.5 No refunds or credit are given for no-shows (see clause 2.3), late arrival, unused time, or weather preferences (see clause 5.1).</p>
+<p>4.6 Bookings are non-transferable through CAMPO CEBU, except by Pasalo (see clause 6). If you can no longer make it within 48 hours of your booking, Pasalo is your option.</p>
+<h6 class="mt-3">5. Weather</h6>
+<p>5.1 Rain while it is still safe to play: play continues. There is no refund or credit if you choose not to play because of the weather.</p>
+<p>5.2 Unsafe conditions: if CAMPO CEBU cancels or stops play because conditions are unsafe (for example: lightning), you will receive credit equal to the full booked hour(s) affected, to use on a future booking. This credit is not a cash refund.</p>
+<p>5.3 Natural disasters and emergency calamities: if a booking cannot go ahead because of a natural disaster or emergency calamity (for example a typhoon, earthquake or a government-declared emergency), you will receive a full refund of the amount paid for the affected booking time.</p>
+<h6 class="mt-3">6. Pasalo (Slot Transfers)</h6>
+<p>6.1 Pasalo (passing your booked slot to another player or group) is allowed privately, at the players' own risk.</p>
+<p>6.2 Any Pasalo arrangement, including payment, is solely between the parties involved. CAMPO CEBU does not mediate, verify or guarantee any Pasalo arrangement and is not responsible for any dispute, non-payment or fraud between the parties.</p>
+<p>6.3 The replacement player or group MUST show the original booking reference number at the counter. All of these Terms &amp; Conditions apply to the replacement player or group.</p>
+<h6 class="mt-3">7. Safety and Assumption of Risk</h6>
+<p>7.1 Sports and physical activities carry inherent risks, including but not limited to slips, falls, collisions, injuries from equipment, and medical emergencies.</p>
+<p>7.2 All players participate entirely at their own risk and are solely responsible for their own physical fitness and health condition to play.</p>
+<p>7.3 CAMPO CEBU, its owners, officers, employees, coaches, staff, affiliates and representatives shall not be liable for any injury, illness, disability, death, accident or loss suffered by any player or guest arising from the use of the facilities or participation in any activity.</p>
+<h6 class="mt-3">8. Minors</h6>
+<p>8.1 Players under 18 years old are recommended to have parental or adult supervision while at CAMPO CEBU.</p>
+<p>8.2 CAMPO CEBU does not collect parental consent and is not liable for minors who choose to play.</p>
+<p>8.3 By accepting these Terms &amp; Conditions, the booking holder confirms that the required parent or guardian consent has been obtained for any minor included in the booking.</p>
+<h6 class="mt-3">9. Personal Belongings</h6>
+<p>9.1 Players and guests are solely responsible for their personal belongings.</p>
+<p>9.2 CAMPO CEBU is not liable for any lost, stolen or damaged items, including but not limited to phones, wallets, cash, jewelry, sports equipment, bags, clothing, vehicles or their contents.</p>
+<p>9.3 Items left behind may be kept in lost and found, but retrieval is not guaranteed.</p>
+<h6 class="mt-3">10. Property Damage</h6>
+<p>10.1 Players are responsible for any damage to the facilities, field or equipment caused by negligence, misuse, intentional acts or violation of the rules.</p>
+<p>10.2 CAMPO CEBU will recover the cost of repair or replacement from the responsible player or booking holder.</p>
+<h6 class="mt-3">11. Emergencies and Force Majeure</h6>
+<p>11.1 CAMPO CEBU may suspend, delay, modify or end operations or any booking because of accidents, injury, medical emergencies, natural disasters, unsafe weather, power interruptions, government restrictions or other force majeure events.</p>
+<p>11.2 In these cases, refunds and credit follow clauses 4 and 5: a full refund for bookings affected by natural disasters and emergency calamities, and credit for bookings cancelled or stopped by CAMPO CEBU because of unsafe weather. Apart from this, CAMPO CEBU is not liable for any direct, indirect, incidental, consequential or special damages.</p>
+<p>11.3 Players authorize CAMPO CEBU staff to contact emergency responders when needed. Any medical costs are the responsibility of the individual concerned.</p>
+<h6 class="mt-3">12. Conduct</h6>
+<p>12.1 All players and guests must show good sportsmanship and respect toward other players, guests and staff.</p>
+<p>12.2 Management may refuse entry, remove any player or group, or cancel a booking without refund for unsafe, disruptive, abusive or unlawful behaviour.</p>
+<p>12.3 Breaking the Field Rules (listed at the top of this page) may result in removal from the premises without refund.</p>
+<p>12.4 Bringing pets into the premises will result in a PHP 1,000 fine charged to the player or booking holder.</p>
+<h6 class="mt-3">13. Data Privacy</h6>
+<p>13.1 CAMPO CEBU respects your privacy and processes personal data in line with the Philippine Data Privacy Act of 2012 (Republic Act No. 10173).</p>
+<p>13.2 What we collect: your name, contact details (such as mobile number and email address), and booking and payment details.</p>
+<p>13.3 Why we collect it: to process and confirm bookings, handle payments, provide customer support, and keep the facility safe.</p>
+<p>13.4 Payments: online payments are processed by PayMongo, our payment provider. CAMPO CEBU does not store your full card details.</p>
+<p>13.5 Sharing: we never sell your personal data. We only share it with service providers who help us run our bookings and payments, or when required by law.</p>
+<p>13.6 Retention: we keep booking records and related personal data for 1 year after your booking, unless the law requires us to keep them longer (for example, for tax and accounting records). After that, the data is securely deleted.</p>
+<p>13.7 Your rights: you may request access to, correction of, or deletion of your personal data, subject to legal requirements.</p>
+@if (!string.IsNullOrWhiteSpace(privacyContactEmail))
+{
+    <p>13.8 Privacy requests and questions: contact us at <a href="mailto:@privacyContactEmail">@privacyContactEmail</a>.</p>
+}
+else
+{
+    <p>13.8 Privacy requests and questions: <a href="/#contact">contact our team</a>.</p>
+}
+<h6 class="mt-3">14. Limitation of Liability</h6>
+<p>14.1 To the fullest extent permitted by Philippine law, CAMPO CEBU shall not be liable for any claim, loss or damage arising from or related to: the use of the facilities; participation in any activity; loss of or damage to personal property; accidents; booking disputes between players (including Pasalo); force majeure events; and technical issues with online reservations.</p>
+<h6 class="mt-3">15. Acceptance of Terms</h6>
+<p>15.1 By completing an online reservation and payment, the customer agrees to be legally bound by these Terms &amp; Conditions, including the no-cash-refund cancellation policy in clause 4, and voluntarily accepts all risks associated with the use of the facilities and participation in any activity.</p>

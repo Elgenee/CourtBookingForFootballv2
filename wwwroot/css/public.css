@@ -765,9 +765,8 @@
 
 .public-home-page .campo-contact-details {
     display: grid;
-    grid-auto-rows: 1fr;
     gap: 1rem;
-    height: 100%;
+    align-content: start;
 }
 
 .public-home-page .campo-contact-item {
@@ -836,11 +835,29 @@
     font-size: .9rem;
 }
 
+.public-home-page .campo-contact-social-links {
+    display: grid;
+    gap: .65rem;
+}
+
+.public-home-page .campo-contact-social-links a {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+}
+
+.public-home-page .campo-contact-social-links i {
+    flex: 0 0 1.25rem;
+    color: var(--campo-green);
+    font-size: 1.25rem;
+    text-align: center;
+}
+
 .public-home-page .campo-contact-panel {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    height: 100%;
+    height: auto;
     padding: clamp(1.5rem, 3vw, 2.5rem);
     border: 1px solid var(--campo-line);
     border-radius: 20px;
@@ -884,11 +901,24 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: .85rem;
     min-height: 56px;
     padding: .85rem 1rem;
     border-radius: 12px;
     font-size: 1.05rem;
     white-space: normal;
+}
+
+.public-home-page .campo-contact-actions .btn > i {
+    flex: 0 0 2rem;
+    font-size: 2rem;
+    line-height: 1;
+    text-align: center;
+}
+
+.public-home-page .campo-contact-actions .btn > span {
+    min-width: 0;
+    overflow-wrap: anywhere;
 }
 
 .public-home-page .campo-contact-message-btn {
@@ -904,11 +934,31 @@
     color: var(--campo-ink);
 }
 
+.public-home-page .campo-contact-instagram-btn {
+    background: var(--campo-green);
+    border-color: var(--campo-green);
+    color: #fff;
+}
+
+.public-home-page .campo-contact-instagram-btn:hover,
+.public-home-page .campo-contact-instagram-btn:focus {
+    background: var(--campo-green-dark);
+    border-color: var(--campo-green-dark);
+    color: #fff;
+}
+
+.public-home-page .campo-contact-actions .btn small {
+    display: block;
+    margin-top: .15rem;
+    font-size: .8rem;
+    font-weight: 400;
+}
+
 .public-home-page .campo-contact-hours {
     display: flex;
     align-items: flex-start;
     gap: 1rem;
-    margin-top: auto;
+    margin-top: 0;
     padding: 1.2rem;
     border-radius: 16px;
     background: var(--campo-cream-light);
@@ -954,6 +1004,19 @@
 .public-site .availability-slot-btn,
 .public-site .slot-btn {
     border-radius: 12px;
+}
+
+/* Keep selection above rate colors and the hover state retained after a tap. */
+.public-site .campo-booking-page .slot-btn.active {
+    border-color: var(--campo-green);
+    background: var(--campo-green);
+    color: #fff;
+    box-shadow: 0 0 0 2px var(--campo-green), 0 12px 24px rgba(32, 75, 49, .18);
+}
+
+.public-site .campo-booking-page .slot-btn.slot-mixed.active .slot-rate-badge {
+    background: #fde8bc;
+    color: #7a4a08;
 }
 
 .public-site .form-control {

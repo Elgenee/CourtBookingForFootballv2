@@ -26,6 +26,27 @@ namespace CourtBookingSystem.Models.Cms
         [StringLength(120)]
         public string? ContactPhone { get; set; }
 
+        [StringLength(100)]
+        public string? SchedulingContactName { get; set; }
+
+        [StringLength(120)]
+        public string? EventsPhone { get; set; }
+
+        [StringLength(100)]
+        public string? EventsContactName { get; set; }
+
+        [StringLength(120)]
+        public string? FacebookName { get; set; }
+
+        [Url, StringLength(500)]
+        public string? FacebookUrl { get; set; }
+
+        [StringLength(120)]
+        public string? InstagramHandle { get; set; }
+
+        [Url, StringLength(500)]
+        public string? InstagramUrl { get; set; }
+
         [StringLength(160)]
         public string? ContactEmail { get; set; }
 

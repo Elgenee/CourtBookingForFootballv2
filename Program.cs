@@ -115,6 +115,8 @@ else
     app.UseHsts();
 }
 
+// Redirect the old hosting domains before HTTPS redirection or static files.
+app.UseMiddleware<CourtBookingSystem.Middleware.LegacyDomainRedirectMiddleware>();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 

@@ -2,6 +2,7 @@
 @inject CourtBookingSystem.Services.SiteContentService SiteContent
 @{
     var ws = await SiteContent.GetSettingsAsync();
+    var contact = await SiteContent.GetAboutAsync();
     var theme = CourtBookingSystem.Models.Cms.LandingColorSchemeCatalog.GetByKey(ws.LandingColorScheme);
     var currentController = (ViewContext.RouteData.Values["controller"] as string) ?? "";
     var currentAction = (ViewContext.RouteData.Values["action"] as string) ?? "";
@@ -114,12 +115,18 @@
                     <a href="/#contact">Contact</a>
                 </div>
                 <div class="footer-social">
-                    <a href="https://www.facebook.com/CampoGFC/" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
-                    <a href="/#contact" aria-label="Instagram">
-                        <i class="fab fa-instagram"></i>
-                    </a>
+                    @if (!string.IsNullOrWhiteSpace(contact.FacebookUrl))
+                    {
+                        <a href="@contact.FacebookUrl" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(contact.InstagramUrl))
+                    {
+                        <a href="@contact.InstagramUrl" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    }
                 </div>
             </div>
         </footer>
