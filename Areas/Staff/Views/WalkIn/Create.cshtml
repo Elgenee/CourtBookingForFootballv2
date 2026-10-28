@@ -8,10 +8,21 @@
     var slotsUrl = Url.Action("GetSlots", "Bookings", new { area = "" });
 }
 
-<form asp-action="Create" method="post" id="walkInForm" novalidate>
-    @Html.AntiForgeryToken()
+@section Styles {
+    <style>
+        #walkInForm .slot-btn.slot-added { background: var(--campo-green); color: #fff; opacity: 1; }
+        #selectedBookings { max-height: 45vh; overflow-y: auto; }
+        @@media (max-width: 991.98px) { #selectedBookings { max-height: none; } }
+    </style>
+}
 
-    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+<form asp-action="Create" method="post" id="walkInForm" data-slots-url="@slotsUrl" novalidate>
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="UseSlotSelection" value="true" />
+    <input type="hidden" asp-for="SubmissionId" />
+    <div id="selectedSlotInputs"></div>
+
+    <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
 
     <div class="row">
         <!-- LEFT: Selection -->
@@ -27,7 +38,7 @@
                             <select asp-for="CourtId" class="form-control" id="CourtId" data-testid="walkin-court-select">
                                 @foreach (var court in Model.Courts)
                                 {
-                                    <option value="@court.Id" data-sport="@court.SportType">
+                                    <option value="@court.Id" data-sport="@court.SportType" data-name="@court.CourtName" data-group="@court.CourtGroupId" data-full="@court.IsFullCourt.ToString().ToLowerInvariant()">
                                         @court.CourtName — @court.SportType
                                     </option>
                                 }
@@ -62,6 +73,10 @@
                         <input type="hidden" asp-for="StartTime" id="StartTime" />
                         <span asp-validation-for="StartTime" class="text-danger small d-block mt-1"></span>
                     </div>
+                    <button type="button" class="btn btn-outline-primary" id="addToBookingBtn" data-testid="walkin-add-btn" disabled>
+                        <i class="fas fa-plus mr-2"></i>Add to Booking
+                    </button>
+                    <div id="selectionMessage" class="small mt-2" role="status" aria-live="polite"></div>
                 </div>
             </div>
 
@@ -124,34 +139,22 @@
             <div class="card booking-summary sticky-top" style="top: 1rem;">
                 <div class="card-header"><i class="fas fa-receipt mr-2"></i>Booking Summary</div>
                 <div class="card-body">
-                    <dl class="summary-list">
-                        <dt>Field</dt>
-                        <dd id="summaryCourt" data-testid="walkin-summary-court">—</dd>
-
-                        <dt>Sport</dt>
-                        <dd id="summarySport" data-testid="walkin-summary-sport">—</dd>
-
-                        <dt>Date</dt>
-                        <dd id="summaryDate" data-testid="walkin-summary-date">—</dd>
-
-                        <dt>Time</dt>
-                        <dd id="summaryTime" data-testid="walkin-summary-time">—</dd>
-
-                        <dt>Duration</dt>
-                        <dd id="summaryDuration" data-testid="walkin-summary-duration">1 hour</dd>
-
-                        <dt>Hourly Rate</dt>
-                        <dd id="summaryRate" data-testid="walkin-summary-rate">—</dd>
-                        <dt>Rate Type</dt>
-                        <dd id="summaryRateType" data-testid="walkin-summary-rate-type">Regular</dd>
-                    </dl>
+                    <h2 class="h6">Selected Bookings</h2>
+                    <div id="selectedBookings" data-testid="walkin-selected-bookings" aria-live="polite"></div>
                     <hr />
+                    <dl class="summary-list">
+                        <dt>Total Bookings</dt>
+                        <dd id="summaryCount" data-testid="walkin-summary-count">0</dd>
+                        <dt>Total Hours</dt>
+                        <dd id="summaryDuration" data-testid="walkin-summary-duration">0 hours</dd>
+                    </dl>
                     <div class="d-flex justify-content-between align-items-center">
-                        <span class="font-weight-bold">Total</span>
-                        <span class="summary-total" id="summaryTotal" data-testid="walkin-summary-total">0.00</span>
+                        <span class="font-weight-bold">Grand Total</span>
+                        <span class="summary-total" id="summaryTotal" data-testid="walkin-summary-total">₱0.00</span>
                     </div>
+                    <small class="text-muted">Availability and pricing are checked again when you submit.</small>
                     <button type="submit" class="btn btn-primary btn-block btn-lg mt-3" id="submitWalkInBtn" data-testid="walkin-submit-btn" disabled>
-                        <i class="fas fa-check mr-2"></i>Create Walk-In Booking
+                        <i class="fas fa-check mr-2"></i>Create Walk-In Bookings
                     </button>
                     <a asp-area="Staff" asp-controller="Dashboard" asp-action="Index" class="btn btn-link btn-block">Cancel</a>
                 </div>
@@ -162,189 +165,23 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script>
-        (function ($) {
-            "use strict";
-
-            const $court = $("#CourtId");
-            const $date = $("#BookingDate");
-            const $duration = $("#DurationHours");
-            const $slots = $("#slotsContainer");
-            const $startTime = $("#StartTime");
-            const $submit = $("#submitWalkInBtn");
-
-            let selectedSlot = null;
-            const periods = [
-                { key: 'morning', label: 'Morning', icon: 'fa-sun' },
-                { key: 'afternoon', label: 'Afternoon', icon: 'fa-cloud-sun' },
-                { key: 'evening', label: 'Evening', icon: 'fa-cloud-moon' },
-                { key: 'late-night', label: 'Late Night', icon: 'fa-moon' }
-            ];
-
-            function periodKey(slot) {
-                const hour = parseInt(slot.startTime.split(':')[0], 10);
-                if (hour >= 6 && hour < 12) return 'morning';
-                if (hour >= 12 && hour < 18) return 'afternoon';
-                if (hour >= 18 && hour < 22) return 'evening';
-                return 'late-night';
-            }
-
-            function dayNote(slot) {
-                const operatingDate = $date.val();
-                const label = value => new Date(value + 'T00:00:00')
-                    .toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-                if (slot.startDate && slot.startDate > operatingDate) return 'Next day · ' + label(slot.startDate);
-                if (slot.endDate && slot.endDate > operatingDate) return 'Ends next day · ' + label(slot.endDate);
-                return '';
-            }
-
-            // Capture preselected time from server-rendered hidden input (model re-display
-            // after validation error). "00:00:00" is the default TimeSpan render — treat as empty.
-            let preselectedStart = ($startTime.val() || "").trim();
-            if (preselectedStart === "00:00:00") preselectedStart = "";
-
-            function formatMoney(n) {
-                return Number(n).toFixed(2);
-            }
-
-            function formatDate(d) {
-                if (!d) return "—";
-                const dt = new Date(d + "T00:00:00");
-                return dt.toLocaleDateString(undefined, { weekday: "short", year: "numeric", month: "short", day: "numeric" });
-            }
-
-            function updateSummary() {
-                const opt = $court.find("option:selected");
-                const hrs = parseInt($duration.val(), 10) || 1;
-                const rate = selectedSlot ? selectedSlot.rate : 0;
-                const total = selectedSlot ? selectedSlot.total : 0;
-                const rateLabel = selectedSlot && selectedSlot.isMixed
-                    ? formatMoney(rate) + " / hour avg"
-                    : formatMoney(rate) + " / hour";
-                const rateType = selectedSlot && selectedSlot.isMixed
-                    ? '<span class="badge badge-warning">Mixed rates</span>'
-                    : (selectedSlot && selectedSlot.isPromo
-                        ? '<span class="badge badge-success">Promo</span>'
-                        : '<span class="badge badge-light border">Regular</span>');
-                $("#summaryCourt").text(opt.text().split(" — ")[0] || "—");
-                $("#summarySport").text(opt.data("sport") || "—");
-                $("#summaryDate").text(formatDate($date.val()));
-                $("#summaryDuration").text(hrs + (hrs === 1 ? " hour" : " hours"));
-                $("#summaryRate").text(rateLabel);
-                $("#summaryRateType").html(rateType);
-                $("#summaryTotal").text(formatMoney(total));
-                $("#summaryTime").text(selectedSlot
-                    ? selectedSlot.label + (selectedSlot.dayNote ? ' · ' + selectedSlot.dayNote : '')
-                    : "—");
-                $submit.prop("disabled", !selectedSlot);
-            }
-
-            function renderSlots(payload) {
-                $slots.empty();
-                if (payload.closed) {
-                    $slots.append('<div class="alert alert-warning mb-0 py-2">We are closed on this day.</div>');
-                    return;
-                }
-                if (!payload.slots || payload.slots.length === 0) {
-                    $slots.append('<div class="text-muted small">No slots in this window.</div>');
-                    return;
-                }
-                periods.forEach(function (period) {
-                    const slots = payload.slots.filter(s => periodKey(s) === period.key);
-                    if (slots.length === 0) return;
-
-                    const $section = $('<section>', {
-                        class: 'availability-period availability-period-' + period.key,
-                        'aria-label': period.label
-                    });
-                    const $heading = $('<div>', { class: 'availability-period-heading' });
-                    $('<h3>', { class: 'availability-period-title' })
-                        .append($('<i>', { class: 'fas ' + period.icon, 'aria-hidden': 'true' }))
-                        .append(document.createTextNode(period.label))
-                        .appendTo($heading);
-                    $('<span>', { class: 'availability-period-count' })
-                        .text(slots.filter(s => s.isAvailable).length + ' available')
-                        .appendTo($heading);
-                    const $grid = $('<div>', { class: 'slot-grid' });
-                    slots.forEach(function (s) {
-                        const rateClass = s.isMixedRate ? " slot-mixed" : (s.isPromoRate ? " slot-promo" : "");
-                        const cls = (s.isAvailable ? "slot-btn" : "slot-btn slot-unavailable") + rateClass;
-                        const note = dayNote(s);
-                        const $b = $('<button>', { type: 'button', class: cls, disabled: !s.isAvailable });
-                        if (s.reason) $b.attr('title', s.reason);
-                        $('<span>', { class: 'slot-time', text: s.label }).appendTo($b);
-                        if (s.isMixedRate || s.isPromoRate) {
-                            $('<span>', { class: 'slot-rate-badge', text: s.isMixedRate ? 'Mixed' : 'Promo' }).appendTo($b);
-                        }
-                        if (note) $('<span>', { class: 'availability-day-note', text: note }).appendTo($b);
-                        $b.data("start", s.startTime);
-                        $b.data("label", s.label);
-                        $b.data("dayNote", note);
-                        $b.data("rate", s.hourlyRate);
-                        $b.data("total", s.totalAmount);
-                        $b.data("promo", s.isPromoRate);
-                        $b.data("mixed", s.isMixedRate);
-                        $grid.append($b);
-                    });
-                    $section.append($heading, $grid).appendTo($slots);
-                });
-            }
-
-            function highlightPreselected() {
-                if (!preselectedStart) return;
-                const $match = $slots.find(".slot-btn:not(.slot-unavailable)").filter(function () {
-                    return String($(this).data("start")) === preselectedStart;
-                }).first();
-                if ($match.length) {
-                    $match.trigger("click");
-                }
-                preselectedStart = null;
-            }
-
-            function loadSlots() {
-                const courtId = $court.val();
-                const date = $date.val();
-                const dur = $duration.val();
-                if (!courtId || !date || !dur) return;
-
-                $slots.html('<div class="text-muted small"><i class="fas fa-spinner fa-spin mr-1"></i>Loading slots…</div>');
-                selectedSlot = null;
-                $startTime.val("");
-                updateSummary();
-
-                $.getJSON('@slotsUrl', { courtId: courtId, date: date, durationHours: dur })
-                    .done(function (payload) {
-                        renderSlots(payload);
-                        highlightPreselected();
-                    })
-                    .fail(function () {
-                        $slots.html('<div class="alert alert-danger mb-0 py-2">Failed to load slots. Please try again.</div>');
-                    });
-            }
-
-            $slots.on("click", ".slot-btn:not(.slot-unavailable)", function () {
-                $slots.find(".slot-btn").removeClass("active");
-                $(this).addClass("active");
-                selectedSlot = {
-                    start: $(this).data("start"),
-                    label: $(this).data("label"),
-                    dayNote: $(this).data("dayNote"),
-                    rate: parseFloat($(this).data("rate")) || 0,
-                    total: parseFloat($(this).data("total")) || 0,
-                    isPromo: $(this).data("promo") === true,
-                    isMixed: $(this).data("mixed") === true
-                };
-                $startTime.val(selectedSlot.start);
-                updateSummary();
-            });
-
-            $court.on("change", loadSlots);
-            $date.on("change", loadSlots);
-            $duration.on("change", loadSlots);
-
-            // Initial render
-            updateSummary();
-            loadSlots();
-        })(jQuery);
-    </script>
+    <script type="application/json" id="walkInSelectionData">@Json.Serialize(Model.Slots.Select(slot => new {
+        courtId = slot.CourtId,
+        operatingDate = slot.BookingDate?.ToString("yyyy-MM-dd"),
+        startTime = slot.StartTime?.ToString(@"hh\:mm\:ss"),
+        durationHours = slot.DurationHours,
+        startDate = slot.StartDateTime?.ToString("yyyy-MM-dd"),
+        endDate = slot.EndDateTime?.ToString("yyyy-MM-dd"),
+        endTime = slot.EndDateTime?.ToString("HH:mm:ss"),
+        label = slot.StartTime.HasValue && slot.EndDateTime.HasValue
+            ? $"{PhilippineTime.FormatTime(slot.StartTime.Value)} – {PhilippineTime.FormatTime(slot.EndDateTime.Value.TimeOfDay)}" : "Invalid time",
+        courtName = slot.CourtName,
+        sport = slot.Sport,
+        groupId = Model.Courts.FirstOrDefault(c => c.Id == slot.CourtId)?.CourtGroupId,
+        isFullCourt = Model.Courts.FirstOrDefault(c => c.Id == slot.CourtId)?.IsFullCourt ?? false,
+        totalAmount = slot.TotalAmount,
+        rateType = slot.RateType,
+        error = slot.Error
+    }))</script>
+    <script src="~/js/staff-walkin.js" asp-append-version="true"></script>
 }

@@ -1,0 +1,52 @@
+@model List<CourtBookingSystem.Models.Booking>
+@using CourtBookingSystem.Models.Enums
+@{
+    ViewData["Title"] = "Walk-In Bookings Created";
+    var hours = (Dictionary<DayOfWeek, BusinessHour>)ViewData["OperatingHours"]!;
+    DateTime Start(Booking booking) => hours.TryGetValue(booking.BookingDate.DayOfWeek, out var day)
+        ? OperatingHoursHelper.ToOperatingDateTime(booking.BookingDate, day, booking.StartTime)
+        : booking.BookingDate.Add(booking.StartTime);
+}
+<div class="card booking-card">
+    <div class="card-header"><i class="fas fa-check-circle mr-2"></i>Walk-In Bookings</div>
+    <div class="card-body">
+        <p>@Model.Count booking(s) for <strong>@Model.First().CustomerName</strong> · Total: <strong>₱@Model.Sum(b => b.TotalAmount).ToString("N2")</strong></p>
+        @if (Model.Any(b => b.Payments.Any(p => p.PaymentMethod == PaymentMethod.GCash && p.PaymentStatus == PaymentStatus.Unpaid)))
+        {
+            <div class="alert alert-info">Open each booking to upload its GCash receipt and continue the existing payment verification process.</div>
+        }
+        <div class="table-responsive">
+            <table class="table">
+                <thead><tr><th>Reference / Field</th><th>Operating date / Time</th><th>Amount</th><th>Status</th><th></th></tr></thead>
+                <tbody>
+                    @foreach (var booking in Model.OrderBy(Start))
+                    {
+                        var start = Start(booking);
+                        var end = start.Add(OperatingHoursHelper.GetDuration(booking.StartTime, booking.EndTime));
+                        <tr>
+                            <td>@booking.BookingReferenceNo<br /><small>@booking.Court?.CourtName</small></td>
+                            <td>
+                                @booking.BookingDate.ToString("MMM d, yyyy")<br />
+                                @PhilippineTime.FormatTime(booking.StartTime) – @PhilippineTime.FormatTime(booking.EndTime)<br />
+                                <small class="text-muted">@OperatingHoursHelper.GetDuration(booking.StartTime, booking.EndTime).TotalHours hour(s)</small>
+                                @if (start.Date > booking.BookingDate.Date)
+                                {
+                                    <br /><small class="text-muted">Next day · @start.ToString("MMM d, yyyy")</small>
+                                }
+                                else if (end.Date > booking.BookingDate.Date)
+                                {
+                                    <br /><small class="text-muted">Ends next day · @end.ToString("MMM d, yyyy")</small>
+                                }
+                            </td>
+                            <td>₱@booking.TotalAmount.ToString("N2")</td>
+                            <td>@booking.BookingStatus<br /><small>@string.Join(", ", booking.Payments.Select(p => $"{p.PaymentMethod}: {p.PaymentStatus}"))</small></td>
+                            <td><a asp-area="Staff" asp-controller="Bookings" asp-action="Details" asp-route-id="@booking.Id" class="btn btn-outline-primary btn-sm">View booking</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <a asp-action="Create" class="btn btn-primary">New walk-in booking</a>
+        <a asp-area="Staff" asp-controller="Bookings" asp-action="Index" class="btn btn-link">All bookings</a>
+    </div>
+</div>

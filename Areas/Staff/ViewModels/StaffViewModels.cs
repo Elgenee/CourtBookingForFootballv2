@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using CourtBookingSystem.Models;
 using CourtBookingSystem.Models.Enums;
 using CourtBookingSystem.Services;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace CourtBookingSystem.Areas.Staff.ViewModels
 {
@@ -17,6 +18,13 @@ namespace CourtBookingSystem.Areas.Staff.ViewModels
 
     public class WalkInFormViewModel
     {
+        // Older single-slot posts remain supported. The new UI explicitly opts in.
+        public bool UseSlotSelection { get; set; }
+        public Guid SubmissionId { get; set; } = Guid.NewGuid();
+
+        [MaxLength(100, ErrorMessage = "Choose at most 100 bookings at a time.")]
+        public List<WalkInSlotViewModel> Slots { get; set; } = new();
+
         [Required, Display(Name = "Field")]
         public int CourtId { get; set; }
 
@@ -45,5 +53,28 @@ namespace CourtBookingSystem.Areas.Staff.ViewModels
         public string? Notes { get; set; }
 
         public List<Court> Courts { get; set; } = new();
+    }
+
+    public class WalkInSlotViewModel
+    {
+        [Range(1, int.MaxValue)]
+        public int CourtId { get; set; }
+
+        [Required, DataType(DataType.Date)]
+        public DateTime? BookingDate { get; set; }
+
+        [Required, DataType(DataType.Time)]
+        public TimeSpan? StartTime { get; set; }
+
+        [Range(1, 8)]
+        public int DurationHours { get; set; } = 1;
+
+        [BindNever] public string CourtName { get; set; } = "";
+        [BindNever] public string Sport { get; set; } = "";
+        [BindNever] public DateTime? StartDateTime { get; set; }
+        [BindNever] public DateTime? EndDateTime { get; set; }
+        [BindNever] public decimal TotalAmount { get; set; }
+        [BindNever] public string RateType { get; set; } = "Regular";
+        [BindNever] public string? Error { get; set; }
     }
 }

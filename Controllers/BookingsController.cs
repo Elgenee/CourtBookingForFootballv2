@@ -94,6 +94,7 @@ namespace CourtBookingSystem.Controllers
         // POST /Bookings/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [TypeFilter(typeof(BookingCreationTransactionFilter))]
         public async Task<IActionResult> Create(BookingFormViewModel vm)
         {
             // Always re-populate court list for re-display.
