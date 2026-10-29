@@ -32,12 +32,11 @@ namespace CourtBookingSystem.Data
             if (db.Database.IsSqlite())
             {
                 await db.Database.EnsureCreatedAsync();
-                // SQLite path uses EnsureCreated (no migrations table), so
-                // re-run the status remap idempotently against any legacy data
-                // left over from the pre-simplification workflow.
-                await RemapLegacyStatusesAsync(db);
+                // SQLite EnsureCreated installations upgrade their schema here.
+                await RemapLegacyStatusesIfNeededAsync(db);
                 await EnsureSqliteCmsSchemaAsync(db);
                 await EnsureSqlitePartialPaymentSchemaAsync(db);
+                await EnsureSqliteCashCollectionSchemaAsync(db);
                 await ApplySqliteOperatingHoursAsync(db);
             }
             else
@@ -77,7 +76,26 @@ namespace CourtBookingSystem.Data
             }
         }
 
-        // Idempotent remap of legacy enum int values into the simplified workflow.
+        private static async Task RemapLegacyStatusesIfNeededAsync(ApplicationDbContext db)
+        {
+            // PaymentPurpose marks databases already using current enum values.
+            // Replaying the old remap would change current reservation,
+            // Completed, and Cancelled statuses on every restart.
+            await db.Database.OpenConnectionAsync();
+            try
+            {
+                using var command = db.Database.GetDbConnection().CreateCommand();
+                command.CommandText = "SELECT COUNT(*) FROM pragma_table_info('Payments') WHERE name = 'PaymentPurpose'";
+                if (Convert.ToInt32(await command.ExecuteScalarAsync()) == 0)
+                    await RemapLegacyStatusesAsync(db);
+            }
+            finally
+            {
+                await db.Database.CloseConnectionAsync();
+            }
+        }
+
+        // Remap legacy enum int values into the simplified workflow once.
         // Used on the SQLite EnsureCreated path (where EF migrations don't run).
         // Matches the logic in 20260602063500_SimplifyBookingPaymentStatuses.cs.
         private static async Task RemapLegacyStatusesAsync(ApplicationDbContext db)
@@ -392,6 +410,24 @@ namespace CourtBookingSystem.Data
             {
                 // Existing SQLite database already has the partial-payment column.
             }
+        }
+
+        private static async Task EnsureSqliteCashCollectionSchemaAsync(ApplicationDbContext db)
+        {
+            try
+            {
+                await db.Database.ExecuteSqlRawAsync("ALTER TABLE Payments ADD COLUMN CollectionSubmissionId TEXT NULL;");
+            }
+            catch (SqliteException ex) when (ex.SqliteErrorCode == 1 &&
+                ex.Message.Contains("duplicate column name", StringComparison.OrdinalIgnoreCase))
+            {
+                // EnsureCreated databases need the same additive upgrade as migrations.
+            }
+            await db.Database.ExecuteSqlRawAsync(@"
+                CREATE UNIQUE INDEX IF NOT EXISTS IX_Payments_CollectionSubmissionId
+                ON Payments (CollectionSubmissionId) WHERE CollectionSubmissionId IS NOT NULL;
+                UPDATE Bookings SET BookingStatus = 3 WHERE BookingStatus = 6
+                    AND EXISTS (SELECT 1 FROM Payments WHERE Payments.BookingId = Bookings.Id AND PaymentStatus = 3);");
         }
 
         private static async Task EnsureBookingPricingSchemaAsync(ApplicationDbContext db)

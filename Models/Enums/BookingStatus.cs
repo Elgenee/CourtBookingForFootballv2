@@ -10,6 +10,6 @@ namespace CourtBookingSystem.Models.Enums
         Confirmed = 3,    // Payment approved — booking confirmed
         Completed = 4,    // Booking schedule finished
         Cancelled = 5,    // Cancelled by customer or Staff/Admin
-        PartiallyPaid = 6  // Reservation payment received — balance remains
+        PartiallyPaid = 6  // Legacy reservation state; new paid reservations stay Confirmed.
     }
 }

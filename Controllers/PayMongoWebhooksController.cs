@@ -92,6 +92,17 @@ namespace CourtBookingSystem.Controllers
                 return Ok();
             }
 
+            // Reload under the same booking lock used by cash collection and
+            // checkout creation, so a webhook cannot race their balance reads.
+            var bookingId = payment.BookingId;
+            var localPaymentId = payment.Id;
+            _db.ChangeTracker.Clear();
+            await using var transaction = await _db.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable, ct);
+            var lockedBooking = await Services.BookingPaymentLock.Query(_db).SingleAsync(b => b.Id == bookingId, ct);
+            await _db.Entry(lockedBooking).Collection(b => b.Payments).LoadAsync(ct);
+            payment = lockedBooking.Payments.Single(p => p.Id == localPaymentId);
+            if (payment.Booking == null) return Ok();
+
             var isPaidEvent = eventType is "payment.paid" or "checkout_session.payment.paid";
             var isFailedEvent = eventType is "payment.failed" or "checkout_session.payment.failed";
             var isExpiredEvent = eventType is "qrph.expired" or "qr.expired";
@@ -137,18 +148,26 @@ namespace CourtBookingSystem.Controllers
                         ? $"Payment for booking {payment.Booking.BookingReferenceNo} arrived after the {expiryMinutes}-minute QR Ph expiry and the booking remains cancelled."
                         : $"Balance payment for booking {payment.Booking.BookingReferenceNo} arrived after the {expiryMinutes}-minute QR Ph expiry and was rejected; the partially paid booking remains active.";
                 }
+                else if (payment.PaymentPurpose == PaymentPurpose.Balance
+                    && payment.Amount > Services.PaymentSummaryHelper.Calculate(payment.Booking).RemainingBalance)
+                {
+                    // An on-time gateway payment can be delivered after local
+                    // expiry and cash settlement. Keep its gateway audit data
+                    // for reconciliation without approving an excess balance.
+                    payment.PaymentStatus = PaymentStatus.Rejected;
+                    payment.CheckoutUrl = null;
+                    notifyTitle = "PayMongo Balance Requires Review";
+                    notifyMessage = $"PayMongo balance payment for {payment.Booking.BookingReferenceNo} exceeds its current outstanding balance. Review the gateway transaction and recorded cash payments.";
+                }
                 else
                 {
                     payment.PaymentStatus = PaymentStatus.Approved;
                     payment.ConfirmedDate = DateTime.UtcNow;
                     var summary = Services.PaymentSummaryHelper.Calculate(payment.Booking);
-                    payment.Booking.BookingStatus = summary.RemainingBalance <= 0m
-                        ? BookingStatus.Confirmed
-                        : payment.PaymentPurpose == PaymentPurpose.Reservation
-                            ? BookingStatus.PartiallyPaid
-                            : payment.Booking.BookingStatus;
+                    if (payment.Booking.BookingStatus != BookingStatus.Completed)
+                        payment.Booking.BookingStatus = BookingStatus.Confirmed;
                     notifyTitle = "PayMongo Payment Received";
-                    notifyMessage = payment.Booking.BookingStatus == BookingStatus.PartiallyPaid
+                    notifyMessage = summary.RemainingBalance > 0m
                         ? $"Booking {payment.Booking.BookingReferenceNo} reservation payment received via PayMongo QR Ph."
                         : $"Booking {payment.Booking.BookingReferenceNo} auto-confirmed via PayMongo QR Ph.";
                 }
@@ -177,6 +196,7 @@ namespace CourtBookingSystem.Controllers
             }
 
             await _db.SaveChangesAsync(ct);
+            await transaction.CommitAsync(ct);
 
             if (notifyTitle != null)
             {

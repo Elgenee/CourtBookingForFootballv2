@@ -19,8 +19,7 @@ namespace CourtBookingSystem.Services
         {
             var payment = booking.Payments?.OrderByDescending(p => p.Id).FirstOrDefault();
             var summary = PaymentSummaryHelper.Calculate(booking);
-            var isReservationOnlyPaid = booking.BookingStatus == BookingStatus.PartiallyPaid
-                && summary.RemainingBalance > 0m;
+            var isReservationOnlyPaid = summary.AmountPaid > 0m && summary.RemainingBalance > 0m;
 
             var doc = Document.Create(c =>
             {
@@ -72,7 +71,7 @@ namespace CourtBookingSystem.Services
                             Row("Date", booking.BookingDate.ToString("dddd, MMMM d, yyyy"));
                             Row("Time", $"{FormatTime(booking.StartTime)} – {FormatTime(booking.EndTime)}");
                             Row("Booking Status", booking.BookingStatus.ToString());
-                            Row("Payment Status", payment?.PaymentStatus.ToString() ?? "—");
+                            Row("Payment Status", summary.StatusLabel);
                             Row("Payment Method", payment?.PaymentMethod.ToString() ?? "—");
                             Row("Amount Paid", summary.AmountPaid.ToString("0.00"));
                             Row("Remaining Balance", summary.RemainingBalance.ToString("0.00"));

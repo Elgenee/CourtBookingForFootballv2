@@ -4,6 +4,7 @@
     string formatTime(TimeSpan t) => PhilippineTime.FormatTime(t);
     var duration = OperatingHoursHelper.GetDuration(Model.StartTime, Model.EndTime);
     var pay = Model.Payments.OrderByDescending(p => p.Id).FirstOrDefault();
+    var canCollectBalance = PaymentSummaryHelper.CanCollectBalance(Model);
     var canApprovePayment = pay != null
         && pay.PaymentMethod != PaymentMethod.PayMongoQrPh
         && pay.PaymentStatus is PaymentStatus.Unpaid or PaymentStatus.Submitted or PaymentStatus.Rejected
@@ -42,8 +43,10 @@
             </div>
         </div>
 
+        <partial name="_BookingPaymentSummary" model="Model" />
+
         <div class="card">
-            <div class="card-header"><h5 class="card-title mb-0"><i class="fas fa-money-check-alt mr-2"></i>Payments (@Model.Payments.Count)</h5></div>
+            <div class="card-header"><h5 class="card-title mb-0"><i class="fas fa-money-check-alt mr-2"></i>Payment Transaction History (@Model.Payments.Count)</h5></div>
             <div class="card-body p-0">
                 @if (!Model.Payments.Any())
                 {
@@ -54,12 +57,13 @@
                     <div class="table-responsive">
                     <table class="table table-sm mb-0" data-testid="admin-detail-payments-table">
                         <thead class="thead-light">
-                            <tr><th>Method</th><th>Amount</th><th>Status</th><th>Proof</th><th>Confirmed</th></tr>
+                            <tr><th>Payment Date</th><th>Method</th><th>Amount</th><th>Status</th><th>Proof</th><th>Recorded By</th><th>Reference Number</th></tr>
                         </thead>
                         <tbody>
-                        @foreach (var p in Model.Payments)
+                        @foreach (var p in Model.Payments.OrderByDescending(p => p.PaidDate).ThenByDescending(p => p.Id))
                         {
                             <tr>
+                                <td><small>@(p.PaidDate.HasValue ? PhilippineTime.FromUtc(p.PaidDate.Value).ToString("MMM d, yyyy h:mm tt") : "—")</small></td>
                                 <td>@p.PaymentMethod</td>
                                 <td>@p.Amount.ToString("0.00")</td>
                                 <td><span class="status-badge payment-@p.PaymentStatus">@p.PaymentStatus</span></td>
@@ -86,8 +90,9 @@
                                     {
                                         <small>@p.ConfirmedByUser.FullName<br /><span class="text-muted">@(p.ConfirmedDate.HasValue ? PhilippineTime.FromUtc(p.ConfirmedDate.Value).ToString("MMM d, h:mm tt") : null)</span></small>
                                     }
-                                    else { <small class="text-muted">-</small> }
+                                    else { <small class="text-muted">@(p.PaymentMethod == PaymentMethod.PayMongoQrPh ? "PayMongo" : "—")</small> }
                                 </td>
+                                <td><small>@(p.GatewayTransactionId ?? p.ReferenceNo ?? p.QrReference ?? "—")</small></td>
                             </tr>
                         }
                         </tbody>
@@ -141,9 +146,16 @@
         <div class="card">
             <div class="card-header"><h5 class="card-title mb-0"><i class="fas fa-cog mr-2"></i>Actions</h5></div>
             <div class="card-body">
-                @if (!canApprovePayment && !canRejectPayment && !canComplete && !canCancel)
+                @if (!canApprovePayment && !canRejectPayment && !canComplete && !canCancel && !canCollectBalance)
                 {
                     <div class="text-muted small">No actions available for this booking in its current state.</div>
+                }
+
+                @if (canCollectBalance)
+                {
+                    <button type="button" class="btn btn-success btn-block mb-2" data-toggle="modal" data-target="#collectBalanceModal" data-testid="collect-balance-btn">
+                        <i class="fas fa-money-bill-wave mr-1"></i>Collect Balance
+                    </button>
                 }
 
                 @if (canApprovePayment)
@@ -199,3 +211,8 @@
 </div>
 
 <partial name="_ProofModal" />
+<partial name="_CollectBalanceModal" model="Model" />
+
+@section Scripts {
+    <script src="~/js/collect-balance.js" asp-append-version="true"></script>
+}

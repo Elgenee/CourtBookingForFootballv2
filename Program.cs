@@ -69,6 +69,7 @@ builder.Services.AddScoped<CourtBookingSystem.Services.BookingAvailabilityServic
 builder.Services.AddScoped<CourtBookingSystem.Services.DailyBookingCalendarService>();
 builder.Services.AddScoped<CourtBookingSystem.Services.CourtGroupAvailabilityService>();
 builder.Services.AddScoped<CourtBookingSystem.Services.BookingPricingService>();
+builder.Services.AddScoped<CashBalanceCollectionService>();
 builder.Services.AddScoped<CourtBookingSystem.Services.SiteContentService>();
 builder.Services.AddScoped<CourtBookingSystem.Services.PayMongoQrPhExpiryService>();
 builder.Services.AddHostedService<CourtBookingSystem.Services.PayMongoQrPhExpiryBackgroundService>();

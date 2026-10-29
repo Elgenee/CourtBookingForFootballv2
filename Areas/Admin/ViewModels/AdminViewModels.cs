@@ -22,6 +22,8 @@ namespace CourtBookingSystem.Areas.Admin.ViewModels
         public int? CourtId { get; set; }
         public SportType? Sport { get; set; }
         public BookingStatus? Status { get; set; }
+        [RegularExpression("^(Unpaid|PartiallyPaid|FullyPaid)$")]
+        public string? PaymentState { get; set; }
         public string? Search { get; set; }     // matches ref/name/email
 
         public List<Court> Courts { get; set; } = new();

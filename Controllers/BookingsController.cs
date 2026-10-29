@@ -297,6 +297,7 @@ namespace CourtBookingSystem.Controllers
         // POST /Bookings/StartBalancePayment
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [TypeFilter(typeof(BookingPaymentTransactionFilter))]
         public async Task<IActionResult> StartBalancePayment(string reference)
         {
             if (string.IsNullOrWhiteSpace(reference)) return NotFound();
@@ -326,13 +327,13 @@ namespace CourtBookingSystem.Controllers
             }
 
             var summary = PaymentSummaryHelper.Calculate(booking);
-            if (summary.RemainingBalance <= 0m || booking.BookingStatus == BookingStatus.Confirmed)
+            if (summary.RemainingBalance <= 0m)
             {
                 TempData["Error"] = "This booking is already fully paid.";
                 return RedirectToAction(nameof(Confirmation), new { reference });
             }
 
-            if (booking.BookingStatus != BookingStatus.PartiallyPaid)
+            if (booking.BookingStatus is not (BookingStatus.PartiallyPaid or BookingStatus.Confirmed) || summary.AmountPaid <= 0m)
             {
                 TempData["Error"] = "The reservation payment must be completed before paying the remaining balance.";
                 return RedirectToAction(nameof(Confirmation), new { reference });
@@ -362,6 +363,7 @@ namespace CourtBookingSystem.Controllers
                     Amount = summary.RemainingBalance,
                     PaymentMethod = PaymentMethod.PayMongoQrPh,
                     PaymentPurpose = PaymentPurpose.Balance,
+                    CheckoutExpiresAtUtc = _qrPhExpiry.CreateExpiryUtc(DateTime.UtcNow),
                     PaymentStatus = PaymentStatus.Unpaid
                 };
                 _db.Payments.Add(payment);
@@ -375,6 +377,7 @@ namespace CourtBookingSystem.Controllers
         // Creates a PayMongo QR Ph Checkout Session for the booking and
         // either redirects to the hosted QR page or shows the embedded view.
         [HttpGet]
+        [TypeFilter(typeof(BookingPaymentTransactionFilter))]
         public async Task<IActionResult> PayMongoStart(
             string reference,
             int? paymentId,
@@ -410,6 +413,12 @@ namespace CourtBookingSystem.Controllers
 
             if (payment.PaymentStatus == PaymentStatus.Approved)
             {
+                return RedirectToAction(nameof(Confirmation), new { reference });
+            }
+
+            if (payment.PaymentPurpose == PaymentPurpose.Balance && payment.PaymentStatus == PaymentStatus.Rejected)
+            {
+                TempData["Error"] = "This balance payment link is closed. Start a new remaining-balance payment from your booking.";
                 return RedirectToAction(nameof(Confirmation), new { reference });
             }
 
@@ -524,7 +533,7 @@ namespace CourtBookingSystem.Controllers
             }
 
             if (payment.PaymentStatus == PaymentStatus.Approved
-                || booking.BookingStatus == BookingStatus.Confirmed
+                || PaymentSummaryHelper.Calculate(booking).RemainingBalance <= 0m
                 || (booking.BookingStatus == BookingStatus.PartiallyPaid && payment.PaymentPurpose != PaymentPurpose.Balance))
             {
                 return RedirectToAction(nameof(Receipt), new { reference });
@@ -625,6 +634,8 @@ namespace CourtBookingSystem.Controllers
                 paymentPurpose = payment?.PaymentPurpose.ToString(),
                 amountPaid = summary.AmountPaid,
                 remainingBalance = summary.RemainingBalance,
+                totalAmount = summary.TotalAmount,
+                balancePaymentStatus = summary.Status,
                 gatewayTransactionId = payment?.GatewayTransactionId,
                 paidDate = payment?.PaidDate is DateTime paidDate
                     ? PhilippineTime.FromUtc(paidDate).ToString("MMM d, yyyy h:mm tt")

@@ -164,7 +164,8 @@
                 const r = await fetch(statusUrl + "?reference=" + encodeURIComponent(ref), { cache: "no-store" });
                 if (r.ok) {
                     const data = await r.json();
-                    if (data.bookingStatus === "Confirmed"
+                    if (data.paymentStatus === "Approved"
+                        || data.balancePaymentStatus === "FullyPaid"
                         || data.bookingStatus === "Cancelled"
                         || data.paymentStatus === "Rejected"
                         || (paymentPurpose === "Reservation" && data.bookingStatus === "PartiallyPaid")) {
@@ -176,8 +177,8 @@
                 try {
                     const r = await fetch(target, { redirect: "follow" });
                     const t = await r.text();
-                    if (t.includes("status-Confirmed")
-                        || t.includes(">Confirmed<")
+                    if (t.includes(">Fully Paid<")
+                        || (paymentPurpose !== "Balance" && t.includes("status-Confirmed"))
                         || t.includes("payment-Rejected")
                         || (paymentPurpose === "Reservation" && (t.includes("status-PartiallyPaid") || t.includes(">PartiallyPaid<")))
                         || t.includes("status-Cancelled")) {

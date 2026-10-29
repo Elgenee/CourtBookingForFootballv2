@@ -77,7 +77,7 @@ namespace CourtBookingSystem.Services
                     && (p.PaymentStatus == PaymentStatus.Unpaid || p.PaymentStatus == PaymentStatus.Submitted)
                     && p.Booking != null
                     && p.Booking.BookingStatus != BookingStatus.Cancelled
-                    && p.Booking.BookingStatus != BookingStatus.Confirmed)
+                    && (p.PaymentPurpose == PaymentPurpose.Balance || p.Booking.BookingStatus != BookingStatus.Confirmed))
                 .ToListAsync(cancellationToken);
 
             foreach (var payment in expiredPayments)
@@ -141,7 +141,7 @@ namespace CourtBookingSystem.Services
             return payment.PaymentMethod == PaymentMethod.PayMongoQrPh
                 && payment.PaymentPurpose == PaymentPurpose.Balance
                 && payment.PaymentStatus is PaymentStatus.Unpaid or PaymentStatus.Submitted
-                && booking.BookingStatus is not BookingStatus.Cancelled and not BookingStatus.Confirmed
+                && booking.BookingStatus != BookingStatus.Cancelled
                 && IsExpired(booking, payment, utcNow);
         }
 

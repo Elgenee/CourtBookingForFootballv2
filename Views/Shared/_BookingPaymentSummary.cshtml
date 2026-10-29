@@ -1,0 +1,25 @@
+@model CourtBookingSystem.Models.Booking
+@{
+    var summary = PaymentSummaryHelper.Calculate(Model);
+}
+<div class="card border-success" data-testid="booking-payment-summary">
+    <div class="card-header bg-success text-white">
+        <h5 class="card-title mb-0"><i class="fas fa-wallet mr-2"></i>Payment Summary</h5>
+    </div>
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-5">Total Amount</dt><dd class="col-sm-7">₱@summary.TotalAmount.ToString("N2")</dd>
+            <dt class="col-sm-5">Paid via PayMongo</dt><dd class="col-sm-7">₱@PaymentSummaryHelper.PaidVia(Model, PaymentMethod.PayMongoQrPh).ToString("N2")</dd>
+            <dt class="col-sm-5">Paid via Cash</dt><dd class="col-sm-7">₱@PaymentSummaryHelper.PaidVia(Model, PaymentMethod.Cash).ToString("N2")</dd>
+            @if (PaymentSummaryHelper.PaidVia(Model, PaymentMethod.GCash) > 0m)
+            {
+                <dt class="col-sm-5">Paid via GCash</dt><dd class="col-sm-7">₱@PaymentSummaryHelper.PaidVia(Model, PaymentMethod.GCash).ToString("N2")</dd>
+            }
+            <dt class="col-sm-5">Total Paid</dt><dd class="col-sm-7 text-success" data-testid="summary-total-paid">₱@summary.AmountPaid.ToString("N2")</dd>
+            <dt class="col-sm-5">Remaining Balance</dt><dd class="col-sm-7 font-weight-bold" data-testid="summary-remaining-balance">₱@summary.RemainingBalance.ToString("N2")</dd>
+            <dt class="col-sm-5">Payment Status</dt>
+            <dd class="col-sm-7"><span class="badge @(summary.Status == "FullyPaid" ? "badge-success" : "badge-warning")" data-testid="summary-payment-status">@summary.StatusLabel</span></dd>
+        </dl>
+        <small class="text-muted">Only approved payments are included in these totals.</small>
+    </div>
+</div>
