@@ -1,0 +1,47 @@
+@model CourtBookingSystem.Models.Booking
+@{
+    var summary = PaymentSummaryHelper.Calculate(Model);
+    var area = ViewContext.RouteData.Values["area"]?.ToString();
+}
+@if (PaymentSummaryHelper.CanCollectBalance(Model))
+{
+    <div class="modal fade" id="collectBalanceModal" tabindex="-1" aria-labelledby="collectBalanceTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="collectBalanceTitle">Collect Remaining Balance</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <form asp-area="@area" asp-controller="Bookings" asp-action="CollectBalance" method="post" id="collectBalanceForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="Id" value="@Model.Id" />
+                    <input type="hidden" name="SubmissionId" value="@Guid.NewGuid()" />
+                    <div class="modal-body">
+                        <dl class="row">
+                            <dt class="col-6">Customer Name</dt><dd class="col-6">@Model.CustomerName</dd>
+                            <dt class="col-6">Booking Reference</dt><dd class="col-6 text-monospace">@Model.BookingReferenceNo</dd>
+                            <dt class="col-6">Total Booking Amount</dt><dd class="col-6">₱@summary.TotalAmount.ToString("N2")</dd>
+                            <dt class="col-6">Previously Paid Amount</dt><dd class="col-6">₱@summary.AmountPaid.ToString("N2")</dd>
+                            <dt class="col-6">Outstanding Balance</dt><dd class="col-6 font-weight-bold">₱@summary.RemainingBalance.ToString("N2")</dd>
+                        </dl>
+                        <div class="form-group">
+                            <label for="collectionAmount">Amount to Collect (PHP)</label>
+                            <input type="number" id="collectionAmount" name="Amount" class="form-control" required min="0.01" step="0.01"
+                                   max="@summary.RemainingBalance.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)"
+                                   value="@summary.RemainingBalance.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)" />
+                            <small class="form-text text-muted">You may collect part of the balance. Confirm only after receiving the cash.</small>
+                        </div>
+                        <div class="form-group mb-0">
+                            <label for="collectionMethod">Payment Method</label>
+                            <select id="collectionMethod" class="form-control" disabled><option>Cash</option></select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success" data-testid="confirm-cash-payment">Confirm Payment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}

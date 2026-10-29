@@ -30,16 +30,25 @@
                 </select>
             </div>
             <div class="form-group col-md-2">
-                <label asp-for="Status" class="small">Status</label>
-                <select asp-for="Status" class="form-control form-control-sm" asp-items="Html.GetEnumSelectList<BookingStatus>()">
-                    <option value="">Any status</option>
+                <label asp-for="Status" class="small">Booking Status</label>
+                <select asp-for="Status" class="form-control form-control-sm" asp-items="Html.GetEnumSelectList<BookingStatus>().Where(s => s.Value != ((int)BookingStatus.PartiallyPaid).ToString())">
+                    <option value="">Any booking status</option>
                 </select>
             </div>
             <div class="form-group col-md-2">
+                <label asp-for="PaymentState" class="small">Payment Status</label>
+                <select asp-for="PaymentState" class="form-control form-control-sm">
+                    <option value="">Any payment status</option>
+                    <option value="Unpaid">Unpaid</option>
+                    <option value="PartiallyPaid">Partially Paid</option>
+                    <option value="FullyPaid">Fully Paid</option>
+                </select>
+            </div>
+            <div class="form-group col-md-8 mb-md-0">
                 <label asp-for="Search" class="small">Search</label>
                 <input asp-for="Search" type="text" class="form-control form-control-sm" placeholder="Ref / name / email" />
             </div>
-            <div class="form-group col-12 text-right mb-0">
+            <div class="form-group col-md-4 align-self-end text-right mb-0">
                 <a asp-action="Index" class="btn btn-link btn-sm">Reset</a>
                 <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-search mr-1"></i>Apply</button>
             </div>
@@ -69,7 +78,9 @@
                             <th>Time</th>
                             <th>Field</th>
                             <th>Customer</th>
-                            <th>Status</th>
+                            <th>Booking Status</th>
+                            <th>Payment Status</th>
+                            <th class="text-right">Balance</th>
                             <th class="text-right">Total</th>
                             <th></th>
                         </tr>
@@ -77,13 +88,16 @@
                     <tbody>
                     @foreach (var b in Model.Results)
                     {
-                        <tr>
+                        var summary = PaymentSummaryHelper.Calculate(b);
+                        <tr data-testid="booking-row-@b.Id">
                             <td class="text-monospace">@b.BookingReferenceNo</td>
                             <td>@b.BookingDate.ToString("MMM d, yyyy")</td>
                             <td>@formatTime(b.StartTime) – @formatTime(b.EndTime)</td>
                             <td>@b.Court?.CourtName<br /><small class="text-muted">@b.Court?.SportType</small></td>
                             <td>@b.CustomerName<br /><small class="text-muted">@b.CustomerEmail</small></td>
                             <td><span class="status-badge status-@b.BookingStatus">@b.BookingStatus</span></td>
+                            <td><span class="badge @(summary.Status == "FullyPaid" ? "badge-success" : "badge-warning")">@summary.StatusLabel</span></td>
+                            <td class="text-right">₱@summary.RemainingBalance.ToString("N2")</td>
                             <td class="text-right">@b.TotalAmount.ToString("0.00")</td>
                             <td><a asp-action="Details" asp-route-id="@b.Id" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></a></td>
                         </tr>

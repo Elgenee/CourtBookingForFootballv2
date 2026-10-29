@@ -698,6 +698,9 @@ namespace CourtBookingSystem.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<Guid?>("CollectionSubmissionId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("ConfirmedByUserId")
                         .HasColumnType("nvarchar(450)");
 
@@ -722,6 +725,7 @@ namespace CourtBookingSystem.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("PaymentStatus")
+                        .IsConcurrencyToken()
                         .HasColumnType("int");
 
                     b.Property<string>("ProofImagePath")
@@ -742,6 +746,10 @@ namespace CourtBookingSystem.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BookingId");
+
+                    b.HasIndex("CollectionSubmissionId")
+                        .IsUnique()
+                        .HasFilter("[CollectionSubmissionId] IS NOT NULL");
 
                     b.HasIndex("ConfirmedByUserId");
 

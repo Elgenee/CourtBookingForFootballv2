@@ -133,7 +133,7 @@
                     const response = await fetch(statusUrl + "?reference=" + encodeURIComponent(ref), { cache: "no-store" });
                     if (response.ok) {
                         const data = await response.json();
-                        if (data.paymentStatus === "Approved" || data.bookingStatus === "Confirmed" || (!isBalancePayment && data.bookingStatus === "PartiallyPaid")) {
+                        if (data.paymentStatus === "Approved" || data.balancePaymentStatus === "FullyPaid" || (!isBalancePayment && data.bookingStatus === "PartiallyPaid")) {
                             window.location.href = receiptUrl;
                             return;
                         }

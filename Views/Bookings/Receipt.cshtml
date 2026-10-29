@@ -6,7 +6,7 @@
     var ws = await SiteContent.GetSettingsAsync();
     var payment = Model.Payments?.OrderByDescending(p => p.Id).FirstOrDefault();
     var summary = CourtBookingSystem.Services.PaymentSummaryHelper.Calculate(Model);
-    var isReservationOnlyPaid = Model.BookingStatus == BookingStatus.PartiallyPaid && summary.RemainingBalance > 0m;
+    var isReservationOnlyPaid = summary.AmountPaid > 0m && summary.RemainingBalance > 0m;
     string formatTime(TimeSpan t) => PhilippineTime.FormatTime(t);
     string TurfText(string? text)
     {
@@ -99,7 +99,7 @@
                     <span class="value">
                         @if (payment != null)
                         {
-                            <span class="receipt-badge @payBadge(payment.PaymentStatus)" data-testid="receipt-payment-status">@payment.PaymentStatus</span>
+                            <span class="receipt-badge @payBadge(payment.PaymentStatus)" data-testid="receipt-payment-status">@summary.StatusLabel</span>
                         }
                         else
                         {

@@ -24,6 +24,7 @@ namespace CourtBookingSystem.Models
 
         [Required]
         [Display(Name = "Payment Status")]
+        [ConcurrencyCheck]
         public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Unpaid;
 
         [Required]
@@ -50,6 +51,9 @@ namespace CourtBookingSystem.Models
 
         [Display(Name = "Confirmed Date")]
         public DateTime? ConfirmedDate { get; set; }
+
+        // One key per cash collection form. Retries must never create another payment.
+        public Guid? CollectionSubmissionId { get; set; }
 
         // ---------- Payment-gateway fields (used by PayMongo QR Ph) ----------
         // Provider tag, e.g. "PayMongo". Null for manual payments (Cash / GCash).

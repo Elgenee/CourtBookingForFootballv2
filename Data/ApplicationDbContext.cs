@@ -60,6 +60,11 @@ namespace CourtBookingSystem.Data
 
             // Payment -> ConfirmedByUser (optional)
             builder.Entity<Payment>()
+                .HasIndex(p => p.CollectionSubmissionId)
+                .IsUnique()
+                .HasFilter("[CollectionSubmissionId] IS NOT NULL");
+
+            builder.Entity<Payment>()
                 .HasOne(p => p.ConfirmedByUser)
                 .WithMany()
                 .HasForeignKey(p => p.ConfirmedByUserId)

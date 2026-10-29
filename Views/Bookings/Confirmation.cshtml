@@ -5,7 +5,7 @@
     var payment = Model.Payments.OrderByDescending(p => p.Id).FirstOrDefault();
     var summary = CourtBookingSystem.Services.PaymentSummaryHelper.Calculate(Model);
     var isPayMongo = payment?.PaymentMethod == PaymentMethod.PayMongoQrPh;
-    var isReservationOnlyPaid = Model.BookingStatus == BookingStatus.PartiallyPaid && summary.RemainingBalance > 0m;
+    var isReservationOnlyPaid = summary.AmountPaid > 0m && summary.RemainingBalance > 0m;
     var qrExpiryMinutes = (int)CourtBookingSystem.Services.PayMongoQrPhExpiryService.CheckoutLifetime.TotalMinutes;
     string formatTime(TimeSpan t) => PhilippineTime.FormatTime(t);
     string bookingBadge(BookingStatus s) => $"status-badge status-{s}";
@@ -131,9 +131,9 @@
                                 <dt class="col-sm-4">Payment Method</dt>
                                 <dd class="col-sm-8">@payment.PaymentMethod</dd>
 
-                                <dt class="col-sm-4">Payment Status</dt>
+                                <dt class="col-sm-4">Latest Transaction Status</dt>
                                 <dd class="col-sm-8">
-                                    <span id="payment-status" class="@paymentBadge(payment.PaymentStatus)" data-testid="confirmation-payment-status">@payment.PaymentStatus</span>
+                                    <span class="@paymentBadge(payment.PaymentStatus)">@payment.PaymentStatus</span>
                                 </dd>
 
                                 @if (!string.IsNullOrWhiteSpace(payment.GatewayTransactionId))
@@ -148,6 +148,9 @@
                                     <dd class="col-sm-8">@PhilippineTime.FromUtc(payment.PaidDate.Value).ToString("MMM d, yyyy h:mm tt")</dd>
                                 }
                             }
+
+                            <dt class="col-sm-4">Payment Status</dt>
+                            <dd class="col-sm-8"><span id="payment-status" class="badge @(summary.Status == "FullyPaid" ? "badge-success" : "badge-warning")" data-testid="confirmation-payment-status">@summary.StatusLabel</span></dd>
 
                             <dt class="col-sm-4">Total Amount</dt>
                             <dd class="col-sm-8"><strong class="confirmation-amount">@summary.TotalAmount.ToString("0.00") PHP</strong></dd>
@@ -206,7 +209,7 @@
                                 <ol class="mb-0 pl-3">
                                     <li>Arrive at the venue at least <strong>15 minutes before your slot</strong>.</li>
                                     <li>Show your booking reference <code>@Model.BookingReferenceNo</code> at the front desk.</li>
-                                    <li>Pay <strong>@Model.TotalAmount.ToString("0.00") PHP</strong> in cash to confirm your booking.</li>
+                                    <li>Remaining balance: <strong>@summary.RemainingBalance.ToString("0.00") PHP</strong>. Payment status: <strong>@summary.StatusLabel</strong>.</li>
                                     <li>Our staff will check you in and assign your turf field.</li>
                                 </ol>
                             }
@@ -216,7 +219,7 @@
                                 {
                                     <div class="alert alert-success mb-0">
                                         <i class="fas fa-check-circle mr-1"></i>
-                                        @if (Model.BookingStatus == BookingStatus.PartiallyPaid)
+                                        @if (isReservationOnlyPaid)
                                         {
                                             <span>Reservation payment received via PayMongo QR Ph. Remaining balance: <strong>@summary.RemainingBalance.ToString("0.00") PHP</strong>.</span>
                                         }
@@ -336,7 +339,7 @@
                     }
                 }
 
-                @if (Model.BookingStatus == BookingStatus.PartiallyPaid && summary.RemainingBalance > 0m)
+                @if (isReservationOnlyPaid && Model.BookingStatus is BookingStatus.PartiallyPaid or BookingStatus.Confirmed)
                 {
                     <div class="card booking-card mt-3 border-success">
                         <div class="card-header">
@@ -347,6 +350,7 @@
                                 Amount paid: <strong>@summary.AmountPaid.ToString("0.00") PHP</strong><br />
                                 Remaining balance: <strong class="text-danger">@summary.RemainingBalance.ToString("0.00") PHP</strong>
                             </p>
+                            <p class="small text-muted">You can also settle the remaining balance in cash with our staff at the venue.</p>
                             <form asp-action="StartBalancePayment" method="post">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="reference" value="@Model.BookingReferenceNo" />
@@ -398,6 +402,7 @@
                 const ref = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.BookingReferenceNo));
                 const currentBookingStatus = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.BookingStatus.ToString()));
                 const currentPaymentStatus = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(payment?.PaymentStatus.ToString()));
+                const currentAmountPaid = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(summary.AmountPaid));
                 const statusUrl = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Url.Action("ConfirmationStatus", "Bookings")));
 
                 async function pollStatus() {
@@ -405,7 +410,7 @@
                         const response = await fetch(statusUrl + "?reference=" + encodeURIComponent(ref), { cache: "no-store" });
                         if (response.ok) {
                             const data = await response.json();
-                            if (data.bookingStatus !== currentBookingStatus || data.paymentStatus !== currentPaymentStatus) {
+                            if (data.bookingStatus !== currentBookingStatus || data.paymentStatus !== currentPaymentStatus || data.amountPaid !== currentAmountPaid) {
                                 window.location.reload();
                                 return;
                             }

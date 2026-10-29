@@ -47,6 +47,11 @@ namespace CourtBookingSystem.Areas.Staff.Controllers
             }
 
             var user = await _userManager.GetUserAsync(User);
+            if (payment.PaymentStatus == PaymentStatus.Approved)
+            {
+                TempData["Error"] = "This payment has already been approved.";
+                return RedirectToAction(nameof(Index));
+            }
             payment.PaymentStatus = PaymentStatus.Approved;
             payment.PaidDate ??= DateTime.UtcNow;
             payment.ConfirmedByUserId = user?.Id;
@@ -74,6 +79,11 @@ namespace CourtBookingSystem.Areas.Staff.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            if (payment.PaymentStatus is PaymentStatus.Approved or PaymentStatus.Rejected)
+            {
+                TempData["Error"] = "A recorded payment cannot be rejected through payment proof review.";
+                return RedirectToAction(nameof(Index));
+            }
             var user = await _userManager.GetUserAsync(User);
             payment.PaymentStatus = PaymentStatus.Rejected;
             payment.ConfirmedByUserId = user?.Id;

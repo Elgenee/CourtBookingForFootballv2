@@ -180,6 +180,69 @@ Booking Confirmed                       Notification        re-upload)
 
 **PaymentStatus values (simplified):** `Unpaid → Submitted → Approved` (happy path) or `→ Rejected` (customer re-uploads, booking returns to `Pending`).
 
+### Reservation payments and cash balance collection
+
+For PayMongo reservations, only a signature-verified successful webhook approves
+the reservation transaction. Both full payments and paid reservations set the
+booking to `Confirmed`. Payment summary state is calculated independently:
+`Unpaid` (no approved payments), `PartiallyPaid` (positive approved payments with
+a balance), or `FullyPaid` (no balance). Totals use decimal amounts from approved
+`Payment` rows; pending and rejected gateway transactions are excluded.
+
+Admin and Staff can open the existing booking details page and choose **Collect
+Balance**. The modal shows the customer, reference, total, approved amount paid,
+and outstanding balance. It prefills the remainder and accepts smaller cash
+amounts. Each confirmation creates a new approved `Cash`/`Balance` payment with
+its paid/confirmed UTC dates, `ConfirmedByUserId`, and a `CASH-...` reference.
+The original PayMongo payment is preserved. The booking stays `Confirmed` while
+partially paid; collecting after auto-completion preserves `Completed`.
+Cancelled bookings and reservations without approved payments cannot use this
+action. Customer confirmation, lookup results, and receipts show the aggregate
+payment status and updated balances without exposing collection controls.
+
+Admin and Staff booking lists have separate **Booking Status** and **Payment
+Status** filters. Choose `Confirmed` plus `Partially Paid` to find active
+reservations with an outstanding balance. The list shows the aggregate payment
+status and balance using the same approved-only totals as booking details.
+Payment filtering runs before the 200-result cap. Older `Status=6` or
+`Status=PartiallyPaid` list links are interpreted as a partially paid payment
+filter. Collecting the full remainder moves a booking from the partially paid
+payment results to the fully paid results while its booking status stays confirmed.
+
+Collection endpoints require an active Admin/Staff user and antiforgery token.
+The server validates positive amounts, two decimal places, and the current
+balance. A serializable database transaction coordinates cash collection,
+checkout creation, and webhooks; SQL Server also locks the booking row before
+reading payments. `PaymentStatus` is an optimistic concurrency token so stale
+expiry/proof-review requests cannot overwrite a concurrently verified payment.
+A unique nullable `CollectionSubmissionId` prevents repeated form submissions,
+including simultaneous retries. Reusing a key with a different amount fails.
+
+An unverified online payment blocks cash collection until confirmation or the
+existing checkout expiry workflow closes it. Balance expiry preserves confirmed
+bookings. A delayed gateway balance payment that would exceed the current balance
+retains its gateway audit data as rejected and creates a staff review notification.
+
+Migration `20261029060347_AddCashBalanceCollection` adds only the nullable key
+and unique filtered index, and normalizes legacy `PartiallyPaid` bookings with
+approved payments to `Confirmed`. No bookings or payments are deleted. SQL Server
+applies migrations through the existing startup seeder. Existing SQLite
+`EnsureCreated` installations receive the equivalent idempotent additive upgrade;
+databases with `PaymentPurpose` skip the old status-number remap on restart.
+
+Run the integration suite against disposable SQLite or LocalDB databases:
+
+```powershell
+dotnet run --project Tests/BalanceCollectionChecks/BalanceCollectionChecks.csproj -c BalanceChecks
+dotnet run --project Tests/BalanceCollectionChecks/BalanceCollectionChecks.csproj -c BalanceChecks -- --sqlserver
+```
+
+The suite covers signed/unverified webhooks, full and partial payments, cash
+settlement, server validation, authorization, antiforgery, duplicate/concurrent
+requests, commit rollback, customer views/receipts, online balance checkout and
+expiry, legacy bookings, and the additive EF migration. Gateway session creation
+uses a local test double; these checks do not call PayMongo or charge customers.
+
 ---
 
 ## H. Notification Workflow

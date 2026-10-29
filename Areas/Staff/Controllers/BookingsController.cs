@@ -37,6 +37,14 @@ namespace CourtBookingSystem.Areas.Staff.Controllers
         // see consistent data; only the actions available to Staff differ.
         public async Task<IActionResult> Index(BookingFilterViewModel filter)
         {
+            // Interpret old PartiallyPaid booking-status links as payment filters.
+            if (filter.Status == BookingStatus.PartiallyPaid)
+            {
+                filter.Status = null;
+                filter.PaymentState ??= "PartiallyPaid";
+                ModelState.Remove(nameof(filter.Status));
+                ModelState.Remove(nameof(filter.PaymentState));
+            }
             filter.Courts = await _db.Courts.OrderBy(c => c.CourtName).ToListAsync();
 
             var q = _db.Bookings.Include(b => b.Court).Include(b => b.Payments).AsQueryable();
@@ -60,10 +68,7 @@ namespace CourtBookingSystem.Areas.Staff.Controllers
             }
 
             // Materialize before sorting by TimeSpan (same approach used by Admin).
-            var raw = await q
-                .OrderByDescending(b => b.BookingDate)
-                .Take(200)
-                .ToListAsync();
+            var raw = await BookingListQuery.LoadAsync(q, filter.PaymentState);
             filter.Results = raw
                 .OrderByDescending(b => b.BookingDate)
                 .ThenBy(b => b.StartTime)
@@ -111,6 +116,22 @@ namespace CourtBookingSystem.Areas.Staff.Controllers
                 .FirstOrDefaultAsync(b => b.Id == id);
             if (booking == null) return NotFound();
             return View(booking);
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> CollectBalance(CourtBookingSystem.ViewModels.CollectBalanceViewModel vm,
+            [FromServices] CashBalanceCollectionService collection, CancellationToken ct)
+        {
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Enter a valid positive cash amount and reload the booking if the payment form is invalid.";
+                return RedirectToAction(nameof(Details), new { id = vm.Id });
+            }
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null || !user.IsActive) return Forbid();
+            var result = await collection.CollectAsync(vm.Id, vm.Amount, vm.SubmissionId, user.Id, ct);
+            TempData[result.Success ? "Success" : "Error"] = result.Message;
+            return RedirectToAction(nameof(Details), new { id = vm.Id });
         }
 
         // /Staff/Bookings/Today
