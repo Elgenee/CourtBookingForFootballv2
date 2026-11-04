@@ -16,13 +16,17 @@ namespace CourtBookingSystem.Services
         private readonly ApplicationDbContext _db;
         private readonly CourtGroupAvailabilityService _groups;
         private readonly BookingPricingService _pricing;
+        private readonly TimeProvider _timeProvider;
 
-        public BookingAvailabilityService(ApplicationDbContext db, CourtGroupAvailabilityService groups, BookingPricingService pricing)
+        public BookingAvailabilityService(ApplicationDbContext db, CourtGroupAvailabilityService groups, BookingPricingService pricing, TimeProvider? timeProvider = null)
         {
             _db = db;
             _groups = groups;
             _pricing = pricing;
+            _timeProvider = timeProvider ?? TimeProvider.System;
         }
+
+        public DateTime CurrentPhilippineTime => PhilippineTime.FromUtc(_timeProvider.GetUtcNow().UtcDateTime);
 
         public record TimeSlot(DateTime StartDateTime, DateTime EndDateTime, bool IsAvailable, string? Reason)
         {
@@ -44,7 +48,7 @@ namespace CourtBookingSystem.Services
             DateTime EndDateTime);
 
         // For one specific court — used by Bookings/Create slot grid.
-        public async Task<List<TimeSlot>> GenerateSlotsForCourtAsync(int courtId, DateTime date, int durationHours)
+        public async Task<List<TimeSlot>> GenerateSlotsForCourtAsync(int courtId, DateTime date, int durationHours, bool customerBooking = false)
         {
             var slots = new List<TimeSlot>();
             var bh = await _db.BusinessHours.FirstOrDefaultAsync(b => b.DayOfWeek == date.DayOfWeek);
@@ -54,7 +58,7 @@ namespace CourtBookingSystem.Services
             var blocked = await SameDayBlockedAsync(courtId, date);
             var groupConflicts = await _groups.GetGroupConflictsAsync(courtId, date);
 
-            var now = PhilippineTime.Now;
+            var now = CurrentPhilippineTime;
             var duration = TimeSpan.FromHours(durationHours);
             var operatingRange = OperatingHoursHelper.GetOperatingRange(date, bh);
 
@@ -71,6 +75,7 @@ namespace CourtBookingSystem.Services
                     : clashBooking ? "Booked"
                     : clashBlocked ? "Blocked"
                     : groupClash != null ? groupClash.Reason
+                    : customerBooking && !CustomerBookingRules.CanBook(slotStart, now) ? CustomerBookingRules.AdvanceBookingReason
                     : null;
 
                 slots.Add(new TimeSlot(slotStart, slotEnd, reason == null, reason));
@@ -96,7 +101,7 @@ namespace CourtBookingSystem.Services
             if (courts.Count == 0) return results;
 
             // Materialize same-operating-day data once per field (still cross-provider safe).
-            var now = PhilippineTime.Now;
+            var now = CurrentPhilippineTime;
             var duration = TimeSpan.FromHours(durationHours);
             var operatingRange = OperatingHoursHelper.GetOperatingRange(date, bh);
 
@@ -113,7 +118,7 @@ namespace CourtBookingSystem.Services
                     bool clashBooking = existing.Any(b => OperatingHoursHelper.Overlaps(b.StartDateTime, b.EndDateTime, slotStart, slotEnd));
                     bool clashBlocked = blocked.Any(s => OperatingHoursHelper.Overlaps(s.StartDateTime, s.EndDateTime, slotStart, slotEnd));
                     bool clashGroup = CourtGroupAvailabilityService.FindOverlap(groupConflicts, slotStart, slotEnd) != null;
-                    if (isPast || clashBooking || clashBlocked || clashGroup) continue;
+                    if (isPast || clashBooking || clashBlocked || clashGroup || !CustomerBookingRules.CanBook(slotStart, now)) continue;
 
                     var price = _pricing.Quote(court, date, slotStart.TimeOfDay, durationHours);
                     results.Add(new AvailableSlotRow(

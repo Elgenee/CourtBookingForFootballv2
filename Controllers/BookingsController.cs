@@ -124,7 +124,7 @@ namespace CourtBookingSystem.Controllers
                 return View(vm);
             }
 
-            var now = PhilippineTime.Now;
+            var now = _availability.CurrentPhilippineTime;
 
             var startTime = vm.StartTime;
 
@@ -241,6 +241,13 @@ namespace CourtBookingSystem.Controllers
                 PaymentPurpose = paymentPurpose,
                 PaymentStatus = PaymentStatus.Unpaid
             };
+
+            // Recheck at submission, after the availability reads and before any writes.
+            if (!CustomerBookingRules.CanBook(slotStartDateTime, _availability.CurrentPhilippineTime))
+            {
+                ModelState.AddModelError(nameof(vm.StartTime), CustomerBookingRules.AdvanceBookingMessage);
+                return View(vm);
+            }
 
             _db.Bookings.Add(booking);
             _db.Payments.Add(payment);
@@ -787,11 +794,10 @@ namespace CourtBookingSystem.Controllers
 
         // GET /Bookings/GetSlots?courtId=1&date=2026-02-01&durationHours=1
         // AJAX endpoint returning available time slots.
-        // Single source of truth: delegates slot generation to
-        // BookingAvailabilityService so Customer Booking, Staff Walk-In Booking
-        // and any other consumer all see the same availability.
+        // Staff walk-ins explicitly request their existing rules; only staff/admin
+        // may use that mode. Customer POST validation always applies independently.
         [HttpGet]
-        public async Task<IActionResult> GetSlots(int courtId, DateTime date, int durationHours = 1)
+        public async Task<IActionResult> GetSlots(int courtId, DateTime date, int durationHours = 1, bool staffBooking = false)
         {
             if (durationHours < 1 || durationHours > 8)
             {
@@ -807,7 +813,8 @@ namespace CourtBookingSystem.Controllers
             var court = await _db.Courts.AsNoTracking().FirstOrDefaultAsync(c => c.Id == courtId);
             if (court == null) return NotFound();
 
-            var rawSlots = await _availability.GenerateSlotsForCourtAsync(courtId, date, durationHours);
+            var customerBooking = !staffBooking || !(User.IsInRole("Staff") || User.IsInRole("Admin"));
+            var rawSlots = await _availability.GenerateSlotsForCourtAsync(courtId, date, durationHours, customerBooking);
             var slots = rawSlots.Select(s =>
             {
                 var price = _pricing.Quote(court, date, s.Start, durationHours);
@@ -820,6 +827,8 @@ namespace CourtBookingSystem.Controllers
                     Label = $"{FormatTime(s.Start)} – {FormatTime(s.End)}",
                     IsAvailable = s.IsAvailable,
                     Reason = s.Reason,
+                    AdvanceBookingDeadlineUtc = customerBooking && CustomerBookingRules.GetAdvanceBookingDeadline(s.StartDateTime) is DateTime deadline
+                        ? PhilippineTime.ToUtc(deadline) : null,
                     HourlyRate = price.HourlyRate,
                     TotalAmount = price.TotalAmount,
                     IsPromoRate = price.IsPromoApplied,
@@ -827,7 +836,7 @@ namespace CourtBookingSystem.Controllers
                 };
             }).ToList();
 
-            return Json(new { closed = false, slots });
+            return Json(new { closed = false, slots, serverNowUtc = PhilippineTime.ToUtc(_availability.CurrentPhilippineTime) });
         }
 
         // ------------------ helpers ------------------
