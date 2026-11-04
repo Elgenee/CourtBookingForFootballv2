@@ -70,6 +70,7 @@ namespace CourtBookingSystem.ViewModels
         public string Label { get; set; } = string.Empty;      // "8:00 AM – 9:00 AM" — display
         public bool IsAvailable { get; set; }
         public string? Reason { get; set; }                    // "Booked", "Blocked", "Past"
+        public DateTime? AdvanceBookingDeadlineUtc { get; set; }
         public decimal HourlyRate { get; set; }
         public decimal TotalAmount { get; set; }
         public bool IsPromoRate { get; set; }

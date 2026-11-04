@@ -5,7 +5,7 @@
     var minDate = PhilippineTime.Today.AddDays(-1).ToString("yyyy-MM-dd");
     var maxDate = PhilippineTime.Today.AddYears(5).ToString("yyyy-MM-dd");
     // Same slots endpoint used by Customer Booking — single source of truth.
-    var slotsUrl = Url.Action("GetSlots", "Bookings", new { area = "" });
+    var slotsUrl = Url.Action("GetSlots", "Bookings", new { area = "", staffBooking = true });
 }
 
 @section Styles {

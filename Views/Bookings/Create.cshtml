@@ -82,6 +82,7 @@
                                 </div>
                                 <input type="hidden" asp-for="StartTime" id="StartTime" />
                                 <span asp-validation-for="StartTime" class="text-danger small d-block mt-1"></span>
+                                <span id="lateNightError" class="text-danger small d-block mt-1" role="alert"></span>
                             </div>
                         </div>
                     </div>
@@ -285,6 +286,11 @@
             const $acceptedTerms = $("#AcceptedTerms");
             const payMongoValue = "@((int)PaymentMethod.PayMongoQrPh)";
             const reservationFeePercent = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(reservationFeePercent));
+            const advanceBookingReason = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(CustomerBookingRules.AdvanceBookingReason));
+            const advanceBookingMessage = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(CustomerBookingRules.AdvanceBookingMessage));
+            const $lateNightError = $("#lateNightError");
+            let serverNow = 0;
+            let receivedAt = 0;
 
             let selectedSlot = null;
             const periods = [
@@ -394,6 +400,9 @@
                         const $b = $('<button>', { type: 'button', class: cls, disabled: !s.isAvailable });
                         if (s.reason) $b.attr('title', s.reason);
                         $('<span>', { class: 'slot-time', text: s.label }).appendTo($b);
+                        if (s.reason === advanceBookingReason) {
+                            $('<span>', { class: 'availability-day-note', text: advanceBookingReason }).appendTo($b);
+                        }
                         if (s.isMixedRate || s.isPromoRate) {
                             $('<span>', { class: 'slot-rate-badge', text: s.isMixedRate ? 'Mixed' : 'Promo' }).appendTo($b);
                         }
@@ -405,10 +414,35 @@
                         $b.data("total", s.totalAmount);
                         $b.data("promo", s.isPromoRate);
                         $b.data("mixed", s.isMixedRate);
+                        $b.data("deadline", s.advanceBookingDeadlineUtc ? Date.parse(s.advanceBookingDeadlineUtc) : null);
                         $grid.append($b);
                     });
                     $section.append($heading, $grid).appendTo($slots);
                 });
+            }
+
+            function expireLateNightSlots() {
+                const now = serverNow + (performance.now() - receivedAt);
+                let selectionExpired = false;
+                $slots.find(".slot-btn:not(.slot-unavailable)").each(function () {
+                    const $button = $(this);
+                    const deadline = $button.data("deadline");
+                    if (deadline == null || now <= deadline) return;
+                    if ($button.hasClass("active")) selectionExpired = true;
+                    $button.addClass("slot-unavailable").removeClass("active")
+                        .prop("disabled", true).attr("title", advanceBookingReason);
+                    $('<span>', { class: 'availability-day-note', text: advanceBookingReason }).appendTo($button);
+                });
+                $slots.find(".availability-period").each(function () {
+                    $(this).find(".availability-period-count").text($(this).find(".slot-btn:not(.slot-unavailable)").length + ' available');
+                });
+                if (selectionExpired) {
+                    selectedSlot = null;
+                    $startTime.val("");
+                    $lateNightError.text(advanceBookingMessage);
+                    updateSummary();
+                }
+                return selectionExpired;
             }
 
             function highlightPreselected() {
@@ -432,11 +466,15 @@
                 $slots.html('<div class="text-muted small"><i class="fas fa-spinner fa-spin mr-1"></i>Loading slots…</div>');
                 selectedSlot = null;
                 $startTime.val("");
+                $lateNightError.empty();
                 updateSummary();
 
                 $.getJSON('@Url.Action("GetSlots", "Bookings")', { courtId: courtId, date: date, durationHours: dur })
                     .done(function (payload) {
+                        serverNow = Date.parse(payload.serverNowUtc);
+                        receivedAt = performance.now();
                         renderSlots(payload);
+                        expireLateNightSlots();
                         highlightPreselected();
                     })
                     .fail(function () {
@@ -445,6 +483,12 @@
             }
 
             $slots.on("click", ".slot-btn:not(.slot-unavailable)", function () {
+                expireLateNightSlots();
+                if ($(this).prop("disabled")) {
+                    $lateNightError.text(advanceBookingMessage);
+                    return;
+                }
+                $lateNightError.empty();
                 $slots.find(".slot-btn").removeClass("active");
                 $(this).addClass("active");
                 selectedSlot = {
@@ -459,6 +503,11 @@
                 $startTime.val(selectedSlot.start);
                 updateSummary();
             });
+
+            $("#bookingForm").on("submit", function (event) {
+                if (expireLateNightSlots() || !selectedSlot) event.preventDefault();
+            });
+            window.setInterval(expireLateNightSlots, 1000);
 
             $court.on("change", loadSlots);
             $date.on("change", loadSlots);
