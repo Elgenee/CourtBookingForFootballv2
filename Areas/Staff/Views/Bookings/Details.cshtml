@@ -41,7 +41,32 @@
                     <dt class="col-sm-4">Time</dt><dd class="col-sm-8">@formatTime(Model.StartTime) – @formatTime(Model.EndTime)</dd>
                     <dt class="col-sm-4">Duration</dt><dd class="col-sm-8">@(duration.TotalHours.ToString("0.#")) hour(s)</dd>
                     <dt class="col-sm-4">Customer</dt><dd class="col-sm-8">@Model.CustomerName<br /><small class="text-muted">@Model.CustomerEmail &middot; @Model.CustomerMobile</small></dd>
-                    @if (!string.IsNullOrWhiteSpace(Model.Notes)) {<dt class="col-sm-4">Notes</dt><dd class="col-sm-8">@Model.Notes</dd>}
+                    @if (Model.IsWalkIn)
+                    {
+                        <dt class="col-sm-4">Notes</dt>
+                        <dd class="col-sm-8">
+                            <div id="bookingNotesDisplay" style="white-space: pre-wrap; overflow-wrap: anywhere;">@(string.IsNullOrWhiteSpace(Model.Notes) ? "No notes." : Model.Notes)</div>
+                            <button type="button" id="editBookingNotes" class="btn btn-sm btn-outline-primary mt-2" aria-controls="bookingNotesForm" aria-expanded="false">
+                                <i class="fas fa-edit mr-1"></i>Edit Notes
+                            </button>
+                            <form asp-action="UpdateNotes" method="post" id="bookingNotesForm" class="mt-2" hidden>
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="Id" value="@Model.Id" />
+                                <label for="bookingNotesInput" class="sr-only">Booking notes</label>
+                                <textarea id="bookingNotesInput" name="Notes" class="form-control" rows="3" maxlength="5000" readonly aria-describedby="bookingNotesLimit">@Model.Notes</textarea>
+                                <small id="bookingNotesLimit" class="form-text text-muted">Maximum 5,000 characters.</small>
+                                <div class="mt-2">
+                                    <button type="submit" class="btn btn-sm btn-primary">Save</button>
+                                    <button type="button" id="cancelBookingNotes" class="btn btn-sm btn-secondary ml-1">Cancel</button>
+                                </div>
+                            </form>
+                            <div id="bookingNotesMessage" class="alert mt-2 mb-0" role="status" aria-live="polite" hidden></div>
+                        </dd>
+                    }
+                    else if (!string.IsNullOrWhiteSpace(Model.Notes))
+                    {
+                        <dt class="col-sm-4">Notes</dt><dd class="col-sm-8">@Model.Notes</dd>
+                    }
                     <dt class="col-sm-4">Total</dt><dd class="col-sm-8"><strong class="text-primary" data-testid="staff-detail-total">@Model.TotalAmount.ToString("0.00")</strong></dd>
                     <dt class="col-sm-4">Created</dt><dd class="col-sm-8">@PhilippineTime.FromUtc(Model.CreatedDate).ToString("MMM d, yyyy h:mm tt")</dd>
                 </dl>
@@ -223,4 +248,8 @@
 
 @section Scripts {
     <script src="~/js/collect-balance.js" asp-append-version="true"></script>
+    @if (Model.IsWalkIn)
+    {
+        <script src="~/js/staff-booking-notes.js" asp-append-version="true"></script>
+    }
 }

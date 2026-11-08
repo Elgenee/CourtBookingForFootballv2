@@ -44,6 +44,7 @@ builder.Services.AddScoped<CourtGroupAvailabilityService>();
 builder.Services.AddScoped<BookingPricingService>();
 builder.Services.AddScoped<PayMongoQrPhExpiryService>();
 builder.Services.AddScoped<SiteContentService>();
+builder.Services.AddScoped<CashBalanceCollectionService>();
 builder.Services.Configure<FootballPaymentOptions>(_ => { });
 builder.Services.Configure<PayMongoOptions>(_ => { });
 builder.Services.AddHttpClient<IPayMongoClient, PayMongoClient>();
@@ -51,8 +52,9 @@ await using var app = builder.Build();
 app.UseRouting();
 app.Use(async (context, next) =>
 {
-    context.User = new ClaimsPrincipal(new ClaimsIdentity(new[] {
-        new Claim(ClaimTypes.NameIdentifier, "test-staff"), new Claim(ClaimTypes.Name, "Test Staff"), new Claim(ClaimTypes.Role, "Staff")
+    var role = context.Request.Headers["X-Test-Role"].FirstOrDefault() ?? "Staff";
+    context.User = role == "Anonymous" ? new ClaimsPrincipal(new ClaimsIdentity()) : new ClaimsPrincipal(new ClaimsIdentity(new[] {
+        new Claim(ClaimTypes.NameIdentifier, "test-staff"), new Claim(ClaimTypes.Name, "Test Staff"), new Claim(ClaimTypes.Role, role)
     }, IdentityConstants.ApplicationScheme));
     await next();
 });
@@ -242,6 +244,7 @@ try
     Check(customerRace.Count(r => r.StatusCode == HttpStatusCode.Redirect) == 1 && await Count() == beforeRace + 3,
         "Concurrent customer/split and staff/full-field submissions cannot double-book");
     foreach (var response in customerRace) response.Dispose();
+    await BookingNotesChecks.RunAsync(app, client, Check);
     Console.WriteLine($"All {checks} integration checks passed ({(useSqlServer ? "SQL Server" : "SQLite")}).");
 }
 finally

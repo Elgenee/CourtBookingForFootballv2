@@ -1,4 +1,5 @@
 using CourtBookingSystem.Areas.Admin.ViewModels;
+using CourtBookingSystem.Areas.Staff.ViewModels;
 using CourtBookingSystem.Data;
 using CourtBookingSystem.Models;
 using CourtBookingSystem.Models.Enums;
@@ -116,6 +117,26 @@ namespace CourtBookingSystem.Areas.Staff.Controllers
                 .FirstOrDefaultAsync(b => b.Id == id);
             if (booking == null) return NotFound();
             return View(booking);
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateNotes(UpdateBookingNotesViewModel vm, CancellationToken ct)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null || !user.IsActive) return Forbid();
+
+            if (!ModelState.IsValid)
+                return BadRequest(new { message = "Enter a valid booking ID and notes of 5,000 characters or fewer." });
+
+            var booking = await _db.Bookings.FirstOrDefaultAsync(b => b.Id == vm.Id, ct);
+            if (booking == null) return NotFound();
+            if (!booking.IsWalkIn) return Forbid();
+
+            // Notes can change in any booking state. Leave all workflow and payment fields alone.
+            booking.Notes = string.IsNullOrWhiteSpace(vm.Notes) ? null : vm.Notes.Trim();
+            await _db.SaveChangesAsync(ct);
+
+            return Json(new { notes = booking.Notes, message = "Booking notes updated successfully." });
         }
 
         [HttpPost, ValidateAntiForgeryToken]
