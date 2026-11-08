@@ -386,14 +386,14 @@ try
         (PaymentSummaryHelper.Calculate(racedBooking).RemainingBalance == 0m || !racedBooking.Payments.Any(p => p.PaymentMethod == PaymentMethod.Cash)),
         "Concurrent cash collection and online checkout creation cannot both claim the same balance");
 
-    // Apply just the new migration to an existing schema, preserving records.
+    // Apply the cash collection migration to an existing schema, preserving records.
     await WithDb(async db =>
     {
         var legacyId = await Seed(paymentStatus: PaymentStatus.Approved, bookingStatus: BookingStatus.PartiallyPaid);
         var migrationIds = db.Database.GetMigrations().ToArray();
         if (sqlServer) await db.Database.ExecuteSqlRawAsync("CREATE TABLE [__EFMigrationsHistory] ([MigrationId] nvarchar(150) NOT NULL PRIMARY KEY, [ProductVersion] nvarchar(32) NOT NULL);");
         else await db.Database.ExecuteSqlRawAsync("CREATE TABLE __EFMigrationsHistory (MigrationId TEXT NOT NULL PRIMARY KEY, ProductVersion TEXT NOT NULL);");
-        foreach (var migration in migrationIds[..^1])
+        foreach (var migration in migrationIds.Where(id => id != "20261029060347_AddCashBalanceCollection"))
             await db.Database.ExecuteSqlInterpolatedAsync($"INSERT INTO __EFMigrationsHistory (MigrationId, ProductVersion) VALUES ({migration}, {"8.0.0"});");
         await db.Database.ExecuteSqlRawAsync("DROP INDEX IX_Payments_CollectionSubmissionId ON Payments;".Replace(" ON Payments", sqlServer ? " ON Payments" : ""));
         await db.Database.ExecuteSqlRawAsync("ALTER TABLE Payments DROP COLUMN CollectionSubmissionId;");

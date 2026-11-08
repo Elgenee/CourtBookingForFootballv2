@@ -93,6 +93,7 @@ namespace CourtBookingSystem.Areas.Staff.Controllers
                 var booking = new Booking
                 {
                     BookingReferenceNo = reference,
+                    IsWalkIn = true,
                     UserId = null,
                     CustomerName = vm.CustomerName.Trim(),
                     CustomerEmail = string.IsNullOrWhiteSpace(vm.CustomerEmail)

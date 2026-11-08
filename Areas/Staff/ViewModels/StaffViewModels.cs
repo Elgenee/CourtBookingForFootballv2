@@ -16,6 +16,15 @@ namespace CourtBookingSystem.Areas.Staff.ViewModels
         public List<Booking> UpcomingToday { get; set; } = new();
     }
 
+    public class UpdateBookingNotesViewModel
+    {
+        [Range(1, int.MaxValue)]
+        public int Id { get; set; }
+
+        [StringLength(5000, ErrorMessage = "Notes must be 5,000 characters or fewer.")]
+        public string? Notes { get; set; }
+    }
+
     public class WalkInFormViewModel
     {
         // Older single-slot posts remain supported. The new UI explicitly opts in.

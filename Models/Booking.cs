@@ -64,7 +64,10 @@ namespace CourtBookingSystem.Models
         [Display(Name = "Booking Status")]
         public BookingStatus BookingStatus { get; set; } = BookingStatus.Pending;
 
-        [StringLength(500)]
+        // Set by the counter booking flow, independently of editable notes.
+        public bool IsWalkIn { get; set; }
+
+        [StringLength(5000)]
         public string? Notes { get; set; }
 
         [Display(Name = "Created Date")]

@@ -37,6 +37,7 @@ namespace CourtBookingSystem.Data
                 await EnsureSqliteCmsSchemaAsync(db);
                 await EnsureSqlitePartialPaymentSchemaAsync(db);
                 await EnsureSqliteCashCollectionSchemaAsync(db);
+                await EnsureSqliteWalkInSchemaAsync(db);
                 await ApplySqliteOperatingHoursAsync(db);
             }
             else
@@ -428,6 +429,27 @@ namespace CourtBookingSystem.Data
                 ON Payments (CollectionSubmissionId) WHERE CollectionSubmissionId IS NOT NULL;
                 UPDATE Bookings SET BookingStatus = 3 WHERE BookingStatus = 6
                     AND EXISTS (SELECT 1 FROM Payments WHERE Payments.BookingId = Bookings.Id AND PaymentStatus = 3);");
+        }
+
+        private static async Task EnsureSqliteWalkInSchemaAsync(ApplicationDbContext db)
+        {
+            await db.Database.OpenConnectionAsync();
+            try
+            {
+                using var command = db.Database.GetDbConnection().CreateCommand();
+                command.CommandText = "SELECT COUNT(*) FROM pragma_table_info('Bookings') WHERE name = 'IsWalkIn'";
+                if (Convert.ToInt32(await command.ExecuteScalarAsync()) != 0) return;
+
+                // Keep the column and its one-time legacy backfill atomic.
+                await using var transaction = await db.Database.BeginTransactionAsync();
+                await db.Database.ExecuteSqlRawAsync("ALTER TABLE Bookings ADD COLUMN IsWalkIn INTEGER NOT NULL DEFAULT 0;");
+                await db.Database.ExecuteSqlRawAsync(Migrations.AddBookingIsWalkIn.BackfillSql);
+                await transaction.CommitAsync();
+            }
+            finally
+            {
+                await db.Database.CloseConnectionAsync();
+            }
         }
 
         private static async Task EnsureBookingPricingSchemaAsync(ApplicationDbContext db)
